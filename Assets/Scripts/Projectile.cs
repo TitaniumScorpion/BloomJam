@@ -39,9 +39,13 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // TODO: Check if the 'other' collider is an enemy and apply damage
+        // Check if the object we hit has the StandardSwarmer script
+        if (other.TryGetComponent(out StandardSwarmer enemy))
+        {
+            enemy.TakeDamage(damage);
+        }
         
-        // Deactivate the projectile upon hitting anything
+        // Deactivate the projectile upon hitting anything (enemy, wall, floor, etc.)
         gameObject.SetActive(false);
     }
 }
