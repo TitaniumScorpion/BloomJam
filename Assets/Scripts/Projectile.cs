@@ -10,24 +10,38 @@ public class Projectile : MonoBehaviour
 
     private Rigidbody rb;
 
-    private void Start()
+    private void Awake()
     {
+        // Awake is called once when the object is first instantiated by the ObjectPooler
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false; // Energy projectiles fly straight
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // Prevents fast bullets from passing through walls
-        
-        // Instantly apply velocity so it flies forward
+    }
+
+    private void OnEnable()
+    {
+        // OnEnable is called every time the ObjectPooler activates this bullet
         rb.linearVelocity = transform.forward * speed;
 
-        // Destroy after a set time to prevent cluttering the scene
-        Destroy(gameObject, lifetime);
+        // Deactivate after a set time instead of destroying
+        Invoke(nameof(Deactivate), lifetime);
+    }
+
+    private void OnDisable()
+    {
+        CancelInvoke(); // Clean up the invoke if the bullet hits something early
+    }
+
+    private void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         // TODO: Check if the 'other' collider is an enemy and apply damage
         
-        // Destroy the projectile upon hitting anything
-        Destroy(gameObject);
+        // Deactivate the projectile upon hitting anything
+        gameObject.SetActive(false);
     }
 }

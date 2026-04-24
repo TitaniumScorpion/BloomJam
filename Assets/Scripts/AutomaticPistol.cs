@@ -8,8 +8,16 @@ public class AutomaticPistol : MonoBehaviour
     private float fireTimer;
 
     [Header("References")]
-    public GameObject projectilePrefab;
+    public string projectilePoolTag = "PlayerProjectile";
     public Transform firePoint;
+    public Camera playerCamera;
+
+    private void Start()
+    {
+        // Automatically grab the main camera if one isn't assigned in the inspector
+        if (playerCamera == null)
+            playerCamera = Camera.main;
+    }
 
     private void Update()
     {
@@ -31,8 +39,23 @@ public class AutomaticPistol : MonoBehaviour
     {
         fireTimer = fireRate;
 
-        // Spawn the projectile at the firePoint's position and rotation
-        if (projectilePrefab != null && firePoint != null)
-            Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        if (firePoint != null && playerCamera != null)
+        {
+            // Raycast from the center of the screen to find exactly what the player is aiming at
+            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            Vector3 targetPoint;
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+                targetPoint = hit.point; // We hit something, aim at the hit point
+            else
+                targetPoint = ray.GetPoint(100f); // We didn't hit anything, aim at a point far away
+
+            // Calculate the rotation needed to look from the gun's barrel to the target point
+            Vector3 direction = targetPoint - firePoint.position;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            // Grab a projectile from the Object Pool with the corrected rotation
+            ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
+        }
     }
 }
