@@ -25,6 +25,9 @@ public class ImpactBombWeapon : MonoBehaviour
 
     private void Update()
     {
+        // Don't process input or cooldowns if the game is paused
+        if (Time.timeScale == 0f) return;
+
         if (cooldownTimer > 0f)
         {
             cooldownTimer -= Time.deltaTime;

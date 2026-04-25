@@ -21,6 +21,9 @@ public class AutomaticPistol : MonoBehaviour
 
     private void Update()
     {
+        // Don't process input or cooldowns if the game is paused (e.g., during the countdown)
+        if (Time.timeScale == 0f) return;
+
         // Manage the cooldown timer
         if (fireTimer > 0f)
             fireTimer -= Time.deltaTime;

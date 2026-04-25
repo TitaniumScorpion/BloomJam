@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // Completely freeze the player's inputs and camera movement during the countdown
+        if (Time.timeScale == 0f) return;
+
         // Ground check using a simple Raycast downward
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
