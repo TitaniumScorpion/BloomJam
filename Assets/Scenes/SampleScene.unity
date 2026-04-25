@@ -834,6 +834,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bayraktar
       objectReference: {fileID: 0}
+    - target: {fileID: 1831856011781448324, guid: fc3be5e240170ab47ac883b30f49d70d, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8016875552495342577, guid: fc3be5e240170ab47ac883b30f49d70d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.64799
