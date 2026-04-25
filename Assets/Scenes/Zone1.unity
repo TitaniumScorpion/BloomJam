@@ -950,6 +950,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
       propertyPath: m_LocalPosition.x
       value: -48.32895
       objectReference: {fileID: 0}
@@ -1206,7 +1218,7 @@ MonoBehaviour:
   spawnInterval: 3
   enemiesPerWave: 5
   advancedEnemyPoolTag: AdvancedEnemy
-  advancedEnemySpawnChance: 0.2
+  advancedSpawnInterval: 20
   zone3SpawnInterval: 1.5
   zone3EnemiesPerWave: 8
   spawnPoints: []
