@@ -45,6 +45,20 @@ public class StandardSwarmer : MonoBehaviour
         currentHealth = maxHealth;
         currentSpeed = minMoveSpeed; // Start at minimum speed when spawned
         baseRotation = transform.rotation; // Reset base tracking rotation
+        
+        QuotaManager.OnZoneCleared += Despawn;
+        QuotaManager.OnGameCompleted += Despawn;
+    }
+
+    private void OnDisable()
+    {
+        QuotaManager.OnZoneCleared -= Despawn;
+        QuotaManager.OnGameCompleted -= Despawn;
+    }
+
+    private void Despawn()
+    {
+        gameObject.SetActive(false); // Return to pool without triggering death events
     }
 
     private void FixedUpdate()

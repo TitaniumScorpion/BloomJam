@@ -35,6 +35,20 @@ public class AdvancedEnemy : MonoBehaviour
         fireTimer = fireInterval;
         spawnTimer = spawnInterval * 0.5f;
         initialRotation = transform.rotation;
+        
+        QuotaManager.OnZoneCleared += Despawn;
+        QuotaManager.OnGameCompleted += Despawn;
+    }
+
+    private void OnDisable()
+    {
+        QuotaManager.OnZoneCleared -= Despawn;
+        QuotaManager.OnGameCompleted -= Despawn;
+    }
+
+    private void Despawn()
+    {
+        gameObject.SetActive(false); // Return to pool without triggering death events
     }
 
     private void Update()
