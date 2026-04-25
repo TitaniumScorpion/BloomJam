@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(Rigidbody))]
 public class StandardSwarmer : MonoBehaviour
@@ -10,6 +11,9 @@ public class StandardSwarmer : MonoBehaviour
 
     private Transform playerTransform;
     private Rigidbody rb;
+
+    // Event broadcasted whenever any standard swarmer dies
+    public static event Action OnEnemyDied;
 
     private void Awake()
     {
@@ -57,6 +61,7 @@ public class StandardSwarmer : MonoBehaviour
     private void Die()
     {
         // TODO: Play death sound, spawn ink/neon particles, and broadcast an event for the Quota Manager
+        OnEnemyDied?.Invoke();
 
         // Deactivate the game object to return it to the Object Pool
         gameObject.SetActive(false);
