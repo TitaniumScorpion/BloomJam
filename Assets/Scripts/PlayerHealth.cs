@@ -33,6 +33,14 @@ public class PlayerHealth : MonoBehaviour
     {
         Debug.Log("Player died! Game Over.");
         OnPlayerDied?.Invoke();
+        
+        // Detach the camera so it stays active and we don't get a "No cameras rendering" error
+        Camera playerCam = GetComponentInChildren<Camera>();
+        if (playerCam != null)
+        {
+            playerCam.transform.SetParent(null);
+        }
+
         gameObject.SetActive(false); // Disables the player entirely
     }
 }
