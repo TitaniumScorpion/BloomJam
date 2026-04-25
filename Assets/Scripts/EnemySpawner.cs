@@ -5,8 +5,12 @@ public class EnemySpawner : MonoBehaviour
 {
     [Header("Spawner Settings")]
     public string swarmerPoolTag = "StandardSwarmer";
-    public float spawnInterval = 3f; // How often a new wave spawns
-    public int enemiesPerWave = 5;   // How many enemies spawn at once
+    public float spawnInterval = 6f; // Increased time to decrease spawn rate
+    public int enemiesPerWave = 7;   // Increased to spawn 7 enemies at once
+
+    [Header("Telegraph Settings")]
+    public string telegraphPoolTag = "SpawnTelegraph";
+    public float telegraphDuration = 3f; // Time the warning effect stays before enemies appear
 
     [Header("Advanced Escalation Settings")]
     public string advancedEnemyPoolTag = "AdvancedEnemy";
@@ -99,9 +103,20 @@ public class EnemySpawner : MonoBehaviour
         // Pick ONE spawn location for the entire swarm
         Vector3 waveBasePosition = GetSpawnPosition();
 
-        // TODO: According to GDD, play a brief visual/spatial audio cue here at 'waveBasePosition'
-        // Example: ObjectPooler.Instance.SpawnFromPool("SpawnTelegraph", waveBasePosition, Quaternion.identity);
-        // yield return new WaitForSeconds(0.5f); // Wait for telegraph to finish
+        // Spawn the telegraph particle/object
+        GameObject telegraph = ObjectPooler.Instance.SpawnFromPool(telegraphPoolTag, waveBasePosition, Quaternion.identity);
+
+        // Wait for the telegraph duration before actually spawning the enemies
+        yield return new WaitForSeconds(telegraphDuration);
+
+        // Deactivate the telegraph object (returning it to the pool)
+        if (telegraph != null)
+        {
+            telegraph.SetActive(false);
+        }
+
+        // If the zone was cleared while we were waiting, abort the spawn
+        if (!isSpawningActive) yield break;
 
         for (int i = 0; i < enemiesPerWave; i++)
         {
