@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyProjectile : MonoBehaviour
 {
+    public int damage = 1;
     public float lifetime = 5f;
     private Rigidbody rb;
 
@@ -31,10 +32,9 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.TryGetComponent(out PlayerHealth playerHealth))
         {
-            // TODO: Hook this up to a PlayerHealth script later
-            Debug.Log("Player was hit by enemy artillery!");
+            playerHealth.TakeDamage(damage);
         }
         gameObject.SetActive(false);
     }

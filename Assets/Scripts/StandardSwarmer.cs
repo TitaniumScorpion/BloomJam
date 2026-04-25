@@ -8,6 +8,7 @@ public class StandardSwarmer : MonoBehaviour
     public int maxHealth = 1;
     private int currentHealth;
     public float moveSpeed = 8f; // Should be slightly slower than the player's base speed
+    public int collisionDamage = 1;
 
     private Transform playerTransform;
     private Rigidbody rb;
@@ -46,6 +47,14 @@ public class StandardSwarmer : MonoBehaviour
         // Rotate to look at the player, but lock the Y-axis so they don't tilt up/down
         Vector3 lookTarget = new Vector3(playerTransform.position.x, transform.position.y, playerTransform.position.z);
         transform.LookAt(lookTarget);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && collision.gameObject.TryGetComponent(out PlayerHealth playerHealth))
+        {
+            playerHealth.TakeDamage(collisionDamage);
+        }
     }
 
     public void TakeDamage(int damage)
