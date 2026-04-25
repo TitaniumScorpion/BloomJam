@@ -61,9 +61,15 @@ public class StandardSwarmer : MonoBehaviour
     private void Die()
     {
         // TODO: Play death sound, spawn ink/neon particles, and broadcast an event for the Quota Manager
-        OnEnemyDied?.Invoke();
+        ReportDeath();
 
         // Deactivate the game object to return it to the Object Pool
         gameObject.SetActive(false);
+    }
+
+    // Helper method so other enemies (like the AdvancedEnemy) can count towards the zone quotas
+    public static void ReportDeath()
+    {
+        OnEnemyDied?.Invoke();
     }
 }

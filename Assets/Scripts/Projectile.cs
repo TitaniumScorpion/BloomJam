@@ -44,6 +44,11 @@ public class Projectile : MonoBehaviour
         {
             enemy.TakeDamage(damage);
         }
+        // Check if we hit an Elite boss's weak point
+        else if (other.TryGetComponent(out EnemyWeakPoint weakPoint))
+        {
+            weakPoint.TakeDamage(damage);
+        }
         
         // Deactivate the projectile upon hitting anything (enemy, wall, floor, etc.)
         gameObject.SetActive(false);
