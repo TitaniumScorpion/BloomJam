@@ -131,9 +131,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24733a6f80b065241b8bcc1f13faafd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImpactBomb
-  throwForce: 12
-  upwardForce: 4
+  throwForce: 13
+  upwardForce: 6
   detonationTime: 1.5
-  explosionRadius: 6
+  explosionRadius: 8
   explosionDamage: 10
-  playerBlastForce: 35
+  playerBlastForce: 60
