@@ -31,11 +31,18 @@ public class ObjectPooler : MonoBehaviour
 
         foreach (Pool pool in pools)
         {
+            if (pool.prefab == null)
+            {
+                Debug.LogError($"The prefab for pool '{pool.tag}' is missing! Please assign it in the ObjectPooler Inspector.");
+                continue; // Skip this broken pool so it doesn't crash the whole script
+            }
+
             Queue<GameObject> objectPool = new Queue<GameObject>();
 
             for (int i = 0; i < pool.size; i++)
             {
-                GameObject obj = Instantiate(pool.prefab);
+                // Parent the pooled objects to the ObjectPooler to keep the Hierarchy clean
+                GameObject obj = Instantiate(pool.prefab, transform);
                 obj.SetActive(false);
                 objectPool.Enqueue(obj);
             }
