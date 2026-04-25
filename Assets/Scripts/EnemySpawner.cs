@@ -8,12 +8,32 @@ public class EnemySpawner : MonoBehaviour
     public float spawnInterval = 3f; // How often a new wave spawns
     public int enemiesPerWave = 5;   // How many enemies spawn at once
 
+    [Header("Advanced Escalation Settings")]
+    public string advancedEnemyPoolTag = "AdvancedEnemy";
+    [Range(0f, 1f)] public float advancedEnemySpawnChance = 0.2f; // 20% chance to spawn an advanced enemy
+    
+    [Tooltip("How fast waves spawn in Zone 3 (Index 2)")]
+    public float zone3SpawnInterval = 1.5f;
+    [Tooltip("How many enemies spawn per wave in Zone 3")]
+    public int zone3EnemiesPerWave = 8;
+
     [Header("Spawn Locations")]
     [Tooltip("If empty, enemies will spawn in a random radius around this object.")]
     public Transform[] spawnPoints;
     public float spawnRadius = 20f;
 
     private float spawnTimer;
+    private bool canSpawnAdvanced = false;
+
+    private void OnEnable()
+    {
+        QuotaManager.OnZoneAdvanced += HandleZoneAdvanced;
+    }
+
+    private void OnDisable()
+    {
+        QuotaManager.OnZoneAdvanced -= HandleZoneAdvanced;
+    }
 
     private void Start()
     {
@@ -32,6 +52,20 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    private void HandleZoneAdvanced(int zoneIndex)
+    {
+        if (zoneIndex == 1) // Advanced to Zone 2
+        {
+            canSpawnAdvanced = true;
+        }
+        else if (zoneIndex == 2) // Advanced to Zone 3
+        {
+            canSpawnAdvanced = true;
+            spawnInterval = zone3SpawnInterval;
+            enemiesPerWave = zone3EnemiesPerWave;
+        }
+    }
+
     private IEnumerator SpawnWaveRoutine()
     {
         for (int i = 0; i < enemiesPerWave; i++)
@@ -42,7 +76,14 @@ public class EnemySpawner : MonoBehaviour
             // Example: ObjectPooler.Instance.SpawnFromPool("SpawnTelegraph", spawnPos, Quaternion.identity);
             // yield return new WaitForSeconds(0.5f); // Wait for telegraph to finish
 
-            ObjectPooler.Instance.SpawnFromPool(swarmerPoolTag, spawnPos, Quaternion.identity);
+            string tagToSpawn = swarmerPoolTag;
+            // If we are allowed to spawn advanced enemies, roll a random chance
+            if (canSpawnAdvanced && Random.value <= advancedEnemySpawnChance)
+            {
+                tagToSpawn = advancedEnemyPoolTag;
+            }
+
+            ObjectPooler.Instance.SpawnFromPool(tagToSpawn, spawnPos, Quaternion.identity);
             
             // Small delay between individual spawns so they don't perfectly overlap
             yield return new WaitForSeconds(0.1f);
