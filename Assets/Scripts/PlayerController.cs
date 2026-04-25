@@ -44,6 +44,9 @@ public class PlayerController : MonoBehaviour
     public float fovChangeSpeed = 10f;
     public float bobSpeed = 14f;
     public float bobAmount = 0.05f;
+    public float tiltAngle = 3f;
+    public float tiltSpeed = 6f;
+    private float zRotation = 0f;
     private float defaultCameraY;
     private float timer = 0;
 
@@ -159,7 +162,11 @@ public class PlayerController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Prevent looking past straight up or down
 
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        // Calculate target Z rotation (camera tilt) based on horizontal movement
+        float targetZ = -horizontalInput * tiltAngle;
+        zRotation = Mathf.Lerp(zRotation, targetZ, Time.deltaTime * tiltSpeed);
+
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, zRotation);
         transform.rotation *= Quaternion.Euler(0f, mouseX, 0f);
     }
 
