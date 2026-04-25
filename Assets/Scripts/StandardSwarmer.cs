@@ -7,10 +7,10 @@ public class StandardSwarmer : MonoBehaviour
     [Header("Stats")]
     public int maxHealth = 1;
     private int currentHealth;
-    public float moveSpeed = 8f; // Should be slightly slower than the player's base speed
+    public float moveSpeed = 22f; // Increased to be much faster than the player so they can overshoot
     public float minMoveSpeed = 2f; // Slower speed used when turning or dodged
-    public float acceleration = 4f; // How quickly they reach max speed (creates the glide)
-    public float rotationSpeed = 5f; // Smooth turning
+    public float acceleration = 14f; // High acceleration to simulate being "thrown"
+    public float rotationSpeed = 6f; // Smooth turning when slow
     public float tiltAmount = 30f; // Degrees to bank/roll when turning
     [Header("Wobble Settings")]
     public float pitchWobbleSpeed = 8f; // How fast they bob up and down
@@ -62,8 +62,8 @@ public class StandardSwarmer : MonoBehaviour
         // 1. Calculate Alignment (1 = perfectly facing player, <= 0 = facing away)
         float alignment = Vector3.Dot(baseForward, direction);
         
-        // 2. Modulate speed: Accelerate when swooping, brake hard if they miss/overshoot
-        if (alignment > 0.5f)
+        // 2. Modulate speed: Accelerate when closely aligned, brake hard if they miss/overshoot
+        if (alignment > 0.6f)
         {
             // Swooping / Thrown at the player
             currentSpeed += acceleration * Time.fixedDeltaTime;
@@ -75,9 +75,9 @@ public class StandardSwarmer : MonoBehaviour
         }
         currentSpeed = Mathf.Clamp(currentSpeed, minMoveSpeed, moveSpeed);
 
-        // 3. Calculate dynamic rotation: Nimble when slow, but stiff like a thrown spear when moving fast
+        // 3. Calculate dynamic rotation: Nimble when slow, but completely stiff when moving fast
         float speedPercent = (currentSpeed - minMoveSpeed) / (moveSpeed - minMoveSpeed);
-        float currentRotationSpeed = Mathf.Lerp(rotationSpeed, 0.5f, speedPercent); // 0.5f makes them unable to turn well at max speed
+        float currentRotationSpeed = Mathf.Lerp(rotationSpeed, 0.1f, speedPercent); // 0.1f forces them to fully commit to the trajectory
 
         // 4. Smoothly update the stiff base tracking rotation
         Quaternion targetLook = Quaternion.LookRotation(direction);
