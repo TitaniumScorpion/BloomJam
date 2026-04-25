@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8016875552495342577}
-  - component: {fileID: 1370572406027144449}
   - component: {fileID: 1831856011781448324}
   - component: {fileID: 8384388139181036632}
+  - component: {fileID: 6986421432055780164}
   m_Layer: 0
   m_Name: Bayraktar
   m_TagString: Untagged
@@ -35,27 +35,6 @@ Transform:
   - {fileID: 1396210740128104978}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &1370572406027144449
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1586300689540924413}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.55243134
-  m_Center: {x: 0, y: 0, z: -0.0008893013}
 --- !u!54 &1831856011781448324
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -104,6 +83,30 @@ MonoBehaviour:
   pitchWobbleSpeed: 8
   pitchWobbleAmount: 15
   collisionDamage: 1
+  hoverHeight: 1.5
+--- !u!136 &6986421432055780164
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586300689540924413}
+  m_Material: {fileID: 13400000, guid: 5ebcbe80360aee147ace35b9159a54cf, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1.7305971
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.36529857, z: 0}
 --- !u!1001 &1507280049950598649
 PrefabInstance:
   m_ObjectHideFlags: 0

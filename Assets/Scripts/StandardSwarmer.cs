@@ -16,6 +16,9 @@ public class StandardSwarmer : MonoBehaviour
     public float pitchWobbleSpeed = 8f; // How fast they bob up and down
     public float pitchWobbleAmount = 15f; // Degrees they tilt up and down
     public int collisionDamage = 1;
+    
+    [Header("Ground Avoidance")]
+    public float hoverHeight = 1.5f; // How high they try to stay above the floor
 
     private Transform playerTransform;
     private Rigidbody rb;
@@ -106,8 +109,21 @@ public class StandardSwarmer : MonoBehaviour
         Quaternion smoothedFinalRotation = Quaternion.Slerp(transform.rotation, baseRotation * tiltRotation, Time.fixedDeltaTime * 12f);
         rb.MoveRotation(smoothedFinalRotation);
         
-        // 7. Move using the wobbly forward vector to create a true wavy, dipping flight path!
+        // 7. Calculate target velocity based on the wavy flight path
         Vector3 targetVelocity = (smoothedFinalRotation * Vector3.forward) * currentSpeed;
+
+        // 8. Ground Avoidance: Shoot a quick raycast down to prevent them from scraping the floor
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, hoverHeight * 1.5f))
+        {
+            // If we hit static environment (no rigidbody) that is too close, push the velocity upward
+            if (hit.rigidbody == null && hit.distance < hoverHeight)
+            {
+                float upwardPush = (hoverHeight - hit.distance) * 5f;
+                targetVelocity.y += upwardPush;
+            }
+        }
+        
+        // 9. Apply velocity smoothly
         rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 10f);
     }
 
