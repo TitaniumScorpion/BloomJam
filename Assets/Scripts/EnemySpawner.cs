@@ -100,6 +100,7 @@ public class EnemySpawner : MonoBehaviour
 
         // Fallback: Random point in a flat circle around the spawner (Zone 1 style)
         Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
-        return transform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+        float randomHeight = Random.Range(2f, 6f); // Give them a randomized floating spawn height
+        return transform.position + new Vector3(randomCircle.x, randomHeight, randomCircle.y);
     }
 }

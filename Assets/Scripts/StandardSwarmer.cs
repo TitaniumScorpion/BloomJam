@@ -8,10 +8,19 @@ public class StandardSwarmer : MonoBehaviour
     public int maxHealth = 1;
     private int currentHealth;
     public float moveSpeed = 8f; // Should be slightly slower than the player's base speed
+    public float minMoveSpeed = 2f; // Slower speed used when turning or dodged
+    public float acceleration = 4f; // How quickly they reach max speed (creates the glide)
+    public float rotationSpeed = 5f; // Smooth turning
+    public float tiltAmount = 30f; // Degrees to bank/roll when turning
+    [Header("Wobble Settings")]
+    public float pitchWobbleSpeed = 8f; // How fast they bob up and down
+    public float pitchWobbleAmount = 15f; // Degrees they tilt up and down
     public int collisionDamage = 1;
 
     private Transform playerTransform;
     private Rigidbody rb;
+    private float currentSpeed;
+    private Quaternion baseRotation;
 
     // Event broadcasted whenever any standard swarmer dies
     public static event Action OnEnemyDied;
@@ -26,27 +35,66 @@ public class StandardSwarmer : MonoBehaviour
         {
             playerTransform = player.transform;
         }
+        
+        rb.useGravity = false; // Disable gravity so they float/glide in the air
     }
 
     private void OnEnable()
     {
         // Because we are Object Pooling, we must reset the health every time it spawns
         currentHealth = maxHealth;
+        currentSpeed = minMoveSpeed; // Start at minimum speed when spawned
+        baseRotation = transform.rotation; // Reset base tracking rotation
     }
 
     private void FixedUpdate()
     {
         if (playerTransform == null) return;
 
-        // Calculate the direction directly towards the player
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
+        // Aim for the center of the player's body rather than their feet
+        Vector3 targetPosition = playerTransform.position + Vector3.up * 1.5f;
+        Vector3 direction = (targetPosition - transform.position).normalized;
         
-        // Move towards the player using physics
-        rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
+        // Use baseRotation for forward/right vectors so the cosmetic wobble doesn't break alignment logic
+        Vector3 baseForward = baseRotation * Vector3.forward;
+        Vector3 baseRight = baseRotation * Vector3.right;
+        
+        // 1. Calculate Alignment (1 = perfectly facing player, <= 0 = facing away)
+        float alignment = Vector3.Dot(baseForward, direction);
+        
+        // 2. Modulate speed: Accelerate when swooping, brake hard if they miss/overshoot
+        if (alignment > 0.5f)
+        {
+            // Swooping / Thrown at the player
+            currentSpeed += acceleration * Time.fixedDeltaTime;
+        }
+        else
+        {
+            // Missed the player or turning around - hit the brakes to reset the charge
+            currentSpeed -= (acceleration * 3f) * Time.fixedDeltaTime; 
+        }
+        currentSpeed = Mathf.Clamp(currentSpeed, minMoveSpeed, moveSpeed);
 
-        // Rotate to look at the player, but lock the Y-axis so they don't tilt up/down
-        Vector3 lookTarget = new Vector3(playerTransform.position.x, transform.position.y, playerTransform.position.z);
-        transform.LookAt(lookTarget);
+        // 3. Calculate dynamic rotation: Nimble when slow, but stiff like a thrown spear when moving fast
+        float speedPercent = (currentSpeed - minMoveSpeed) / (moveSpeed - minMoveSpeed);
+        float currentRotationSpeed = Mathf.Lerp(rotationSpeed, 0.5f, speedPercent); // 0.5f makes them unable to turn well at max speed
+
+        // 4. Smoothly update the stiff base tracking rotation
+        Quaternion targetLook = Quaternion.LookRotation(direction);
+        baseRotation = Quaternion.Slerp(baseRotation, targetLook, Time.fixedDeltaTime * currentRotationSpeed);
+
+        // 5. Calculate visual tilt (banking) and pitch wobble
+        float turnAmount = Vector3.Dot(baseRight, direction);
+        float wobble = Mathf.Sin(Time.time * pitchWobbleSpeed) * pitchWobbleAmount;
+        Quaternion tiltRotation = Quaternion.Euler(wobble, 0f, -turnAmount * tiltAmount);
+        
+        // 6. Combine and smooth the final rotation so the wobble feels organic
+        Quaternion smoothedFinalRotation = Quaternion.Slerp(transform.rotation, baseRotation * tiltRotation, Time.fixedDeltaTime * 12f);
+        rb.MoveRotation(smoothedFinalRotation);
+        
+        // 7. Move using the wobbly forward vector to create a true wavy, dipping flight path!
+        Vector3 targetVelocity = (smoothedFinalRotation * Vector3.forward) * currentSpeed;
+        rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 10f);
     }
 
     private void OnCollisionEnter(Collision collision)
