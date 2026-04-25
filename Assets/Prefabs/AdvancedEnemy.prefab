@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 8180711362800916927}
   - component: {fileID: 2506607275216803685}
   m_Layer: 0
-  m_Name: Offender
+  m_Name: AdvancedEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

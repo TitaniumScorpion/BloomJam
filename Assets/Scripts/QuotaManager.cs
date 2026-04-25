@@ -7,12 +7,17 @@ public class QuotaManager : MonoBehaviour
     [Tooltip("Cumulative kills required to complete each zone. E.g., Zone 1 ends at 50, Zone 2 at 150, Zone 3 at 300.")]
     public int[] zoneKillQuotas = { 50, 150, 300 };
     
-    private int currentKills = 0;
-    private int currentZoneIndex = 0;
+    // Made static so progression persists across scene loads
+    public static int currentKills = 0;
+    public static int currentZoneIndex = 0;
+
+    [Header("Level Transition")]
+    [Tooltip("The elevator object that appears when the zone is cleared.")]
+    public GameObject levelElevator;
 
     // Events to broadcast progression state to the UI, Spawner, or Game Manager
     public static event Action<int, int> OnKillCountUpdated; // Sends (currentKills, targetQuota)
-    public static event Action<int> OnZoneAdvanced;          // Sends (newZoneIndex)
+    public static event Action OnZoneCleared;                // Broadcasted when a zone is finished to stop spawners
     public static event Action OnGameCompleted;              // Broadcasted when all 3 zones are beaten
 
     private void OnEnable()
@@ -32,6 +37,16 @@ public class QuotaManager : MonoBehaviour
         // Initialize the UI with starting values
         if (zoneKillQuotas.Length > 0)
             OnKillCountUpdated?.Invoke(currentKills, zoneKillQuotas[currentZoneIndex]);
+            
+        if (levelElevator != null)
+            levelElevator.SetActive(false); // Hide elevator at the start
+    }
+
+    // Call this from your Game Over or Main Menu script when starting a fresh run!
+    public static void ResetProgression()
+    {
+        currentKills = 0;
+        currentZoneIndex = 0;
     }
 
     private void HandleEnemyDied()
@@ -67,9 +82,11 @@ public class QuotaManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Advanced to Zone {currentZoneIndex + 1}!");
-            OnZoneAdvanced?.Invoke(currentZoneIndex);
-            // TODO: Trigger Elite Boss spawn or environmental changes for the next zone
+            Debug.Log($"Zone Cleared! Head to the elevator to advance to Zone {currentZoneIndex + 1}!");
+            OnZoneCleared?.Invoke(); // Tell spawners to stop
+            
+            if (levelElevator != null)
+                levelElevator.SetActive(true); // Reveal the elevator
         }
     }
 }

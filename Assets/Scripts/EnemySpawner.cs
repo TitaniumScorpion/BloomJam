@@ -24,25 +24,31 @@ public class EnemySpawner : MonoBehaviour
 
     private float spawnTimer;
     private bool canSpawnAdvanced = false;
+    private bool isSpawningActive = true;
 
     private void OnEnable()
     {
-        QuotaManager.OnZoneAdvanced += HandleZoneAdvanced;
+        QuotaManager.OnZoneCleared += StopSpawning;
     }
 
     private void OnDisable()
     {
-        QuotaManager.OnZoneAdvanced -= HandleZoneAdvanced;
+        QuotaManager.OnZoneCleared -= StopSpawning;
     }
 
     private void Start()
     {
         // Start the timer
         spawnTimer = spawnInterval;
+        
+        // Setup spawner based on the persistent current zone index
+        ApplyZoneSettings(QuotaManager.currentZoneIndex);
     }
 
     private void Update()
     {
+        if (!isSpawningActive) return;
+
         spawnTimer -= Time.deltaTime;
 
         if (spawnTimer <= 0f)
@@ -52,18 +58,23 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private void HandleZoneAdvanced(int zoneIndex)
+    private void ApplyZoneSettings(int zoneIndex)
     {
         if (zoneIndex == 1) // Advanced to Zone 2
         {
             canSpawnAdvanced = true;
         }
-        else if (zoneIndex == 2) // Advanced to Zone 3
+        else if (zoneIndex >= 2) // Advanced to Zone 3
         {
             canSpawnAdvanced = true;
             spawnInterval = zone3SpawnInterval;
             enemiesPerWave = zone3EnemiesPerWave;
         }
+    }
+
+    private void StopSpawning()
+    {
+        isSpawningActive = false;
     }
 
     private IEnumerator SpawnWaveRoutine()
