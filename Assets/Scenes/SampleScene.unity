@@ -1177,7 +1177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2506607275216803685, guid: 16c78f5f01fe19e4fa134c9e378581bc, type: 3}
       propertyPath: projectileForwardForce
-      value: 22
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 2506607275216803685, guid: 16c78f5f01fe19e4fa134c9e378581bc, type: 3}
       propertyPath: projectileScaleMultiplier
