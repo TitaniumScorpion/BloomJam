@@ -112,14 +112,26 @@ public class StandardSwarmer : MonoBehaviour
         // 7. Calculate target velocity based on the wavy flight path
         Vector3 targetVelocity = (smoothedFinalRotation * Vector3.forward) * currentSpeed;
 
-        // 8. Ground Avoidance: Shoot a quick raycast down to prevent them from scraping the floor
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, hoverHeight * 1.5f))
+        // 8. Ground Avoidance: Shoot a thick spherecast down to prevent them from scraping the floor
+        // A SphereCast acts like a cylinder, detecting the ground even if the edges of the model dip
+        if (Physics.SphereCast(transform.position, 0.5f, Vector3.down, out RaycastHit hit, hoverHeight * 1.5f))
         {
-            // If we hit static environment (no rigidbody) that is too close, push the velocity upward
+            // If we hit static environment (no rigidbody) that is too close
             if (hit.rigidbody == null && hit.distance < hoverHeight)
             {
-                float upwardPush = (hoverHeight - hit.distance) * 5f;
+                // 1. Completely erase any downward intent so they don't fight the push
+                targetVelocity.y = Mathf.Max(targetVelocity.y, 0f);
+                
+                // 2. Push them up with a much stronger force
+                float upwardPush = (hoverHeight - hit.distance) * 20f;
                 targetVelocity.y += upwardPush;
+
+                // 3. Instantly stop current downward momentum so they don't plunge 
+                // into the ground while waiting for the smooth Lerp to catch up
+                if (rb.linearVelocity.y < 0f)
+                {
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                }
             }
         }
         
