@@ -180,7 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa90e9e8e65eee45a3013e1d3abb12e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdvancedEnemy
-  maxHealth: 20
+  maxHealth: 40
   targetZone: {fileID: 0}
   enemyProjectileTag: EnemyProjectile
   firePoint: {fileID: 0}

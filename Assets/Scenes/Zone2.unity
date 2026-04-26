@@ -23705,7 +23705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
-  targetQuota: 5
+  targetQuota: 70
   isFinalZone: 0
   levelElevator: {fileID: 2074548938}
 --- !u!4 &1495397910
@@ -32371,7 +32371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Elevator
   ascensionTime: 6.5
   targetHeight: 20
-  nextSceneName: Zone2
+  nextSceneName: Zone3
 --- !u!4 &2074548942
 Transform:
   m_ObjectHideFlags: 0
