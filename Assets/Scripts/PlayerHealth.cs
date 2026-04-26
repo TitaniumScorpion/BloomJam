@@ -7,6 +7,10 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Set to 1 for true fragility, or higher if you want the player to survive a few hits.")]
     public int maxHealth = 1;
     private int currentHealth;
+    
+    [Header("Environment Hazards")]
+    [Tooltip("If the player falls below this Y position, they die instantly.")]
+    public float killHeight = -15f; 
 
     // Event broadcasted when the player dies
     public static event Action OnPlayerDied;
@@ -14,6 +18,15 @@ public class PlayerHealth : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
+    }
+
+    private void Update()
+    {
+        // Instantly kill the player if they fall off the arena
+        if (transform.position.y < killHeight && currentHealth > 0)
+        {
+            Die();
+        }
     }
 
     public void TakeDamage(int damage)
