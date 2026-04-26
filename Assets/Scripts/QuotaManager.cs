@@ -85,7 +85,6 @@ public class QuotaManager : MonoBehaviour
                 AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.levelCompleteSound, Vector3.zero, AudioManager.Instance.levelCompleteVolume, 1f, 0, 0f);
             }
             OnGameCompleted?.Invoke();
-            // TODO: Hook into FSM/GameManager to show Victory Screen and log clear time
         }
         else
         {

@@ -1412,7 +1412,7 @@ MonoBehaviour:
   gameOverVolume: 1
   playerWalkVolume: 0.368
   levelCompleteVolume: 1
-  playerDashVolume: 0.686
+  playerDashVolume: 0.801
   poolSize: 150
 --- !u!4 &1852399623
 Transform:

@@ -175,6 +175,7 @@ public class GameManager : MonoBehaviour
     private void ShowDeathScreen()
     {
         isTimerRunning = false;
+        Time.timeScale = 0f; // Freeze the game action
         
         if (inGameUI != null) inGameUI.SetActive(false);
         if (deathScreen != null) deathScreen.SetActive(true);
@@ -194,6 +195,7 @@ public class GameManager : MonoBehaviour
     private void ShowVictoryScreen()
     {
         isTimerRunning = false;
+        Time.timeScale = 0f; // Freeze the game action
         
         if (inGameUI != null) inGameUI.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(true);
