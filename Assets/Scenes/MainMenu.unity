@@ -1400,7 +1400,18 @@ MonoBehaviour:
   gameOverSound: {fileID: 8300000, guid: 9f406b239ddd77b40833b839bce64394, type: 3}
   playerWalkSound: {fileID: 8300000, guid: efde1435b78fdc049a11cc26d73fd237, type: 3}
   levelCompleteSound: {fileID: 8300000, guid: 1a51a438068e6a34380bb892f8deb7e0, type: 3}
-  poolSize: 30
+  pistolShootVolume: 0.078
+  bombExplosionVolume: 3
+  enemySpawnTelegraphVolume: 1
+  eliteShootVolume: 1
+  backgroundVolume: 0.361
+  enemyMoveVolume: 0.943
+  eliteMoveVolume: 0.632
+  hitVolume: 2.32
+  gameOverVolume: 1
+  playerWalkVolume: 0.368
+  levelCompleteVolume: 1
+  poolSize: 150
 --- !u!4 &1852399623
 Transform:
   m_ObjectHideFlags: 0
