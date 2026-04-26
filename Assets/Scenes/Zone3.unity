@@ -6382,7 +6382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   swarmerPoolTag: StandardSwarmer
-  spawnInterval: 6.5
+  spawnInterval: 8
   enemiesPerWave: 8
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3

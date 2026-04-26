@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3f290e419ff6174ba8854a0ffe49691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StandardSwarmer
-  maxHealth: 3
+  maxHealth: 2
   moveSpeed: 17.5
   minMoveSpeed: 4.5
   acceleration: 7
