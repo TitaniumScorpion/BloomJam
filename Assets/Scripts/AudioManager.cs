@@ -28,7 +28,7 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float eliteShootVolume = 1f;
     [Range(0f, 1f)] public float backgroundVolume = 0.5f;
     [Range(0f, 1f)] public float enemyMoveVolume = 0.7f;
-    [Range(0f, 1f)] public float eliteMoveVolume = 0.7f;
+    [Range(0f, 1f)] public float eliteMoveVolume = 1f;
     [Range(0f, 3f)] public float hitVolume = 0.9f;
     [Range(0f, 1f)] public float gameOverVolume = 1f;
     [Range(0f, 1f)] public float playerWalkVolume = 0.3f;
@@ -83,8 +83,8 @@ public class AudioManager : MonoBehaviour
             source.playOnAwake = false;
             source.spatialBlend = 1f; // 1 = Fully 3D sound
             source.rolloffMode = AudioRolloffMode.Logarithmic;
-            source.minDistance = 3f;
-            source.maxDistance = 50f;
+            source.minDistance = 10f; // Increased for better audibility
+            source.maxDistance = 150f; // Greatly increased arena hearing range
             
             obj.SetActive(false);
             audioPool.Enqueue(source);
@@ -110,8 +110,8 @@ public class AudioManager : MonoBehaviour
             source.playOnAwake = false;
             source.spatialBlend = 1f;
             source.rolloffMode = AudioRolloffMode.Logarithmic;
-            source.minDistance = 3f;
-            source.maxDistance = 50f;
+            source.minDistance = 10f;
+            source.maxDistance = 150f;
             poolSize++;
         }
 

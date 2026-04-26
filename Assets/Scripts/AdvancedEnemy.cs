@@ -40,8 +40,8 @@ public class AdvancedEnemy : MonoBehaviour
         // Set up dedicated AudioSource for movement sounds to prevent ghost sounds when they die
         moveAudioSource = gameObject.AddComponent<AudioSource>();
         moveAudioSource.spatialBlend = 1f;
-        moveAudioSource.minDistance = 3f;
-        moveAudioSource.maxDistance = 50f;
+        moveAudioSource.minDistance = 15f; // Stays at 100% volume for a much larger radius
+        moveAudioSource.maxDistance = 150f; // Can be heard clearly across the entire arena
         moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         moveAudioSource.playOnAwake = false;
 
