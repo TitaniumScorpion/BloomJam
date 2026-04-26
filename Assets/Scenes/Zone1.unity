@@ -28955,7 +28955,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   swarmerPoolTag: StandardSwarmer
-  spawnInterval: 5
+  spawnInterval: 4
   enemiesPerWave: 7
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3
@@ -28964,7 +28964,8 @@ MonoBehaviour:
   zone3SpawnInterval: 1.5
   zone3EnemiesPerWave: 8
   spawnPoints: []
-  spawnRadius: 20
+  advancedSpawnPoints: []
+  spawnRadius: 25
 --- !u!4 &1908027264
 Transform:
   m_ObjectHideFlags: 0

@@ -23,6 +23,12 @@ public class AdvancedEnemy : MonoBehaviour
     public Transform minionSpawnPoint;
     public float spawnInterval = 4f;
 
+    [Header("Rise Sequence Settings")]
+    public float riseDuration = 4f;
+    public float riseSpeed = 5f;
+    private bool isRising;
+    private float riseTimer;
+
     private float fireTimer;
     private float spawnTimer;
     private Quaternion initialRotation;
@@ -38,15 +44,29 @@ public class AdvancedEnemy : MonoBehaviour
         moveAudioSource.maxDistance = 50f;
         moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         moveAudioSource.playOnAwake = false;
+
+        // Automatically find the Target Zone in the scene since Prefabs can't hold scene references
+        if (targetZone == null)
+        {
+            GameObject zoneObj = GameObject.Find("TargetZone");
+            if (zoneObj != null)
+            {
+                targetZone = zoneObj.GetComponent<BoxCollider>();
+            }
+            else
+            {
+                Debug.LogWarning("Could not find a GameObject named 'TargetZone' in the scene! Advanced Enemy artillery will fail.", this);
+            }
+        }
     }
 
     private void OnEnable()
     {
         currentHealth = maxHealth;
         
-        // Stagger the initial timers so it doesn't shoot and spawn on the exact same frame it appears
-        fireTimer = fireInterval;
-        spawnTimer = spawnInterval * 0.5f;
+        // Enter the rising state as soon as it spawns
+        isRising = true;
+        riseTimer = riseDuration;
         initialRotation = transform.rotation;
         moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f);
         
@@ -70,6 +90,37 @@ public class AdvancedEnemy : MonoBehaviour
     {
         HandleRotation();
 
+        // Handle Movement/Presence Sound
+        moveSoundTimer -= Time.deltaTime;
+        if (moveSoundTimer <= 0f)
+        {
+            if (AudioManager.Instance != null && AudioManager.Instance.eliteMoveSound != null)
+            {
+                moveAudioSource.clip = AudioManager.Instance.eliteMoveSound;
+                moveAudioSource.volume = AudioManager.Instance.eliteMoveVolume;
+                moveAudioSource.pitch = UnityEngine.Random.Range(0.8f, 1.1f);
+                moveAudioSource.Play();
+            }
+            moveSoundTimer = UnityEngine.Random.Range(1.5f, 3f);
+        }
+
+        if (isRising)
+        {
+            // Space.World ensures it goes straight up regardless of its sweeping rotation
+            transform.Translate(Vector3.up * riseSpeed * Time.deltaTime, Space.World);
+            riseTimer -= Time.deltaTime;
+            
+            if (riseTimer <= 0f)
+            {
+                isRising = false;
+                // Start the attack timers exactly when the rising sequence finishes
+                fireTimer = fireInterval;
+                spawnTimer = spawnInterval * 0.5f;
+            }
+            
+            return; // Skip shooting and spawning while rising
+        }
+
         // Handle Artillery Firing
         fireTimer -= Time.deltaTime;
         if (fireTimer <= 0f)
@@ -84,20 +135,6 @@ public class AdvancedEnemy : MonoBehaviour
         {
             SpawnSwarmer();
             spawnTimer = spawnInterval;
-        }
-        
-        // Handle Movement/Presence Sound
-        moveSoundTimer -= Time.deltaTime;
-        if (moveSoundTimer <= 0f)
-        {
-            if (AudioManager.Instance != null && AudioManager.Instance.eliteMoveSound != null)
-            {
-                moveAudioSource.clip = AudioManager.Instance.eliteMoveSound;
-                moveAudioSource.volume = AudioManager.Instance.eliteMoveVolume;
-                moveAudioSource.pitch = UnityEngine.Random.Range(0.8f, 1.1f);
-                moveAudioSource.Play();
-            }
-            moveSoundTimer = UnityEngine.Random.Range(1.5f, 3f);
         }
     }
 
@@ -122,7 +159,8 @@ public class AdvancedEnemy : MonoBehaviour
 
         if (AudioManager.Instance != null && AudioManager.Instance.eliteShootSound != null)
         {
-            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.eliteShootSound, firePos, AudioManager.Instance.eliteShootVolume, Random.Range(0.8f, 1.1f));
+            // spatialBlend: 0.3f makes it 70% 2D (always audible globally) and 30% 3D (slight panning so you know which direction it fired from)
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.eliteShootSound, firePos, AudioManager.Instance.eliteShootVolume, Random.Range(0.8f, 1.1f), 64, 0.3f);
         }
 
         // Fire multiple projectiles at once

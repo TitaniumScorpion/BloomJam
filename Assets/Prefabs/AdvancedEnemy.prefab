@@ -262,12 +262,14 @@ MonoBehaviour:
   targetZone: {fileID: 0}
   enemyProjectileTag: EnemyProjectile
   firePoint: {fileID: 0}
-  fireInterval: 3
+  fireInterval: 4
   projectilesPerShot: 2
-  projectileSpawnSpread: 1.5
-  projectileForwardForce: 15
-  projectileUpwardArc: 8
+  projectileSpawnSpread: 2.5
+  projectileForwardForce: 18
+  projectileUpwardArc: 10
   projectileScaleMultiplier: 2
   swarmerTag: StandardSwarmer
   minionSpawnPoint: {fileID: 0}
   spawnInterval: 4
+  riseDuration: 4
+  riseSpeed: 5

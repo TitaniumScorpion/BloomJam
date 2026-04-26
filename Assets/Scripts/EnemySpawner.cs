@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -26,6 +27,8 @@ public class EnemySpawner : MonoBehaviour
     [Header("Spawn Locations")]
     [Tooltip("If empty, enemies will spawn in a random radius around this object.")]
     public Transform[] spawnPoints;
+    [Tooltip("Specific spawn points strictly for Advanced Enemies (e.g. outside the arena).")]
+    public Transform[] advancedSpawnPoints;
     public float spawnRadius = 20f;
 
     private float spawnTimer;
@@ -138,9 +141,63 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnAdvancedEnemy()
     {
-        // Grab a spawn position and spawn the elite independently of the swarms
-        Vector3 spawnPos = GetSpawnPosition();
-        ObjectPooler.Instance.SpawnFromPool(advancedEnemyPoolTag, spawnPos, Quaternion.identity);
+        // Spawn the elite independently around the edge of the arena
+        Vector3 spawnPos = GetAdvancedSpawnPosition();
+        
+        // Make the boss face the center of the arena
+        Vector3 directionToCenter = transform.position - spawnPos;
+        directionToCenter.y = 0; // Keep the rotation perfectly level
+        Quaternion spawnRot = directionToCenter != Vector3.zero ? Quaternion.LookRotation(directionToCenter) : Quaternion.identity;
+        
+        ObjectPooler.Instance.SpawnFromPool(advancedEnemyPoolTag, spawnPos, spawnRot);
+    }
+
+    private Vector3 GetAdvancedSpawnPosition()
+    {
+        // If you assigned specific spawn points for the boss in the inspector, pick one!
+        if (advancedSpawnPoints != null && advancedSpawnPoints.Length > 0)
+        {
+            List<Transform> availablePoints = new List<Transform>();
+            AdvancedEnemy[] activeElites = FindObjectsOfType<AdvancedEnemy>(); // Only finds currently active/spawned bosses
+
+            foreach (Transform point in advancedSpawnPoints)
+            {
+                bool isOccupied = false;
+                foreach (AdvancedEnemy elite in activeElites)
+                {
+                    // Calculate horizontal distance only, ignoring the fact that they start deep underground
+                    Vector2 pointPos2D = new Vector2(point.position.x, point.position.z);
+                    Vector2 elitePos2D = new Vector2(elite.transform.position.x, elite.transform.position.z);
+                    
+                    if (Vector2.Distance(pointPos2D, elitePos2D) < 10f) // 10 units safe zone radius
+                    {
+                        isOccupied = true;
+                        break;
+                    }
+                }
+
+                if (!isOccupied) availablePoints.Add(point);
+            }
+
+            // Pick from the safe available points, or fallback to ANY point if the arena is entirely full
+            Transform selectedPoint = availablePoints.Count > 0 
+                ? availablePoints[Random.Range(0, availablePoints.Count)] 
+                : advancedSpawnPoints[Random.Range(0, advancedSpawnPoints.Length)];
+            
+            // Start deep below the chosen point
+            return new Vector3(selectedPoint.position.x, selectedPoint.position.y - 15f, selectedPoint.position.z);
+        }
+
+        // Pick a random direction from the center
+        Vector2 randomDir = Random.insideUnitCircle;
+        if (randomDir == Vector2.zero) randomDir = Vector2.right; // Safety check
+        
+        // Push the spawn point strictly to the outer perimeter (spawnRadius + extra padding)
+        Vector2 edgePoint = randomDir.normalized * (spawnRadius + 8f); 
+        
+        // Start deep below the arena floor
+        float startHeight = -15f; 
+        return transform.position + new Vector3(edgePoint.x, startHeight, edgePoint.y);
     }
 
     private Vector3 GetSpawnPosition()

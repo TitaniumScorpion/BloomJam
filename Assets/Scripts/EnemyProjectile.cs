@@ -32,10 +32,21 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // 1. If it hits the player, deal damage and explode
         if (other.CompareTag("Player") && other.TryGetComponent(out PlayerHealth playerHealth))
         {
             playerHealth.TakeDamage(damage);
+            gameObject.SetActive(false);
+            return;
         }
+        
+        // 2. Ignore collisions with the boss itself, standard swarmers, and abstract trigger zones
+        if (other.isTrigger || other.GetComponentInParent<AdvancedEnemy>() != null || other.GetComponent<StandardSwarmer>() != null)
+        {
+            return;
+        }
+        
+        // 3. If it hits anything else (the floor, walls), deactivate it
         gameObject.SetActive(false);
     }
 }
