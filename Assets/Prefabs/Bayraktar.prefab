@@ -75,19 +75,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StandardSwarmer
   maxHealth: 3
-  moveSpeed: 16
-  minMoveSpeed: 4
-  acceleration: 6
-  rotationSpeed: 2
+  moveSpeed: 17.5
+  minMoveSpeed: 4.5
+  acceleration: 7
+  rotationSpeed: 4
   tiltAmount: 30
   pitchWobbleSpeed: 8
   pitchWobbleAmount: 15
   collisionDamage: 1
   hoverHeight: 1.5
-  meshRenderers:
-  - {fileID: 7818159775392218222}
-  flashColor: {r: 1825.2128, g: 1146.7305, b: 0, a: 1}
-  flashDuration: 0.05
+  enemyRenderer: {fileID: 7818159775392218222}
+  flashMaterial: {fileID: 2100000, guid: 001da46b96c6a9a4288358ec418ba1d8, type: 2}
+  flashDuration: 0.1
 --- !u!136 &6986421432055780164
 CapsuleCollider:
   m_ObjectHideFlags: 0

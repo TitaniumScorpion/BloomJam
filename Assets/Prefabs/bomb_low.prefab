@@ -131,10 +131,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24733a6f80b065241b8bcc1f13faafd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImpactBomb
-  throwForce: 12.5
+  throwForce: 12.8
   upwardForce: 6
   detonationTime: 0.8
   explosionPoolTag: BombExplosion
-  explosionRadius: 8
+  explosionRadius: 5
   explosionDamage: 10
-  playerBlastForce: 60
+  playerBlastForce: 65

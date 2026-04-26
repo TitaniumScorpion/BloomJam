@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using System;
 
@@ -19,6 +20,13 @@ public class StandardSwarmer : MonoBehaviour
     
     [Header("Ground Avoidance")]
     public float hoverHeight = 1.5f; // How high they try to stay above the floor
+
+    [Header("Hit Flash Settings")]
+    public Renderer enemyRenderer;
+    public Material flashMaterial;
+    public float flashDuration = 0.1f;
+    private Material originalMaterial;
+    private Coroutine flashCoroutine;
 
     private Transform playerTransform;
     private Rigidbody rb;
@@ -50,6 +58,11 @@ public class StandardSwarmer : MonoBehaviour
         moveAudioSource.maxDistance = 50f;
         moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         moveAudioSource.playOnAwake = false;
+
+        if (enemyRenderer != null)
+        {
+            originalMaterial = enemyRenderer.sharedMaterial;
+        }
     }
 
     private void OnEnable()
@@ -59,6 +72,11 @@ public class StandardSwarmer : MonoBehaviour
         currentSpeed = minMoveSpeed; // Start at minimum speed when spawned
         baseRotation = transform.rotation; // Reset base tracking rotation
         moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f); // Stagger timers so they don't all play at once
+        
+        if (enemyRenderer != null && originalMaterial != null)
+        {
+            enemyRenderer.sharedMaterial = originalMaterial; // Reset material in case it was pooled while flashing
+        }
         
         QuotaManager.OnZoneCleared += Despawn;
         QuotaManager.OnGameCompleted += Despawn;
@@ -181,6 +199,23 @@ public class StandardSwarmer : MonoBehaviour
         {
             Die();
         }
+        else
+        {
+            // Only flash if the enemy survives the hit
+            if (enemyRenderer != null && flashMaterial != null && gameObject.activeInHierarchy)
+            {
+                if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+                flashCoroutine = StartCoroutine(FlashRoutine());
+            }
+        }
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        enemyRenderer.sharedMaterial = flashMaterial;
+        yield return new WaitForSeconds(flashDuration);
+        if (enemyRenderer != null && originalMaterial != null)
+            enemyRenderer.sharedMaterial = originalMaterial;
     }
 
     private void Die()
