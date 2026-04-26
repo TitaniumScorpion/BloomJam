@@ -145,6 +145,11 @@ public class GameManager : MonoBehaviour
         if (inGameUI != null) inGameUI.SetActive(false);
         if (deathScreen != null) deathScreen.SetActive(true);
         
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.gameOverSound, Camera.main != null ? Camera.main.transform.position : Vector3.zero, AudioManager.Instance.gameOverVolume, 1f);
+        }
+
         if (deathTimeText != null) deathTimeText.text = $"TIME ALIVE: {FormatTime(currentRunTime)}";
         
         // Unlock the cursor so the player can click the Restart button

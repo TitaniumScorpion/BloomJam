@@ -49,6 +49,10 @@ public class PlayerController : MonoBehaviour
     private float zRotation = 0f;
     private float defaultCameraY;
     private float timer = 0;
+    
+    [Header("Audio")]
+    public float stepInterval = 0.35f;
+    private float stepTimer = 0f;
 
     private void Start()
     {
@@ -92,6 +96,24 @@ public class PlayerController : MonoBehaviour
         // Manage the dash cooldown timer
         if (dashCooldownTimer > 0)
             dashCooldownTimer -= Time.deltaTime;
+            
+        // Handle Walking Footsteps
+        if (grounded && !isDashing && (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f))
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
+            {
+                if (AudioManager.Instance != null && AudioManager.Instance.playerWalkSound != null)
+                {
+                    AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.playerWalkSound, transform.position, AudioManager.Instance.playerWalkVolume, UnityEngine.Random.Range(0.9f, 1.1f));
+                }
+                stepTimer = stepInterval;
+            }
+        }
+        else
+        {
+            stepTimer = 0f; // Reset so the first step plays immediately upon moving
+        }
     }
 
     private void FixedUpdate()

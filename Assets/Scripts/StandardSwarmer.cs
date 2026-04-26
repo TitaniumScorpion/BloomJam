@@ -24,6 +24,8 @@ public class StandardSwarmer : MonoBehaviour
     private Rigidbody rb;
     private float currentSpeed;
     private Quaternion baseRotation;
+    private float moveSoundTimer;
+    private AudioSource moveAudioSource;
 
     // Event broadcasted whenever any standard swarmer dies
     public static event Action OnEnemyDied;
@@ -40,6 +42,14 @@ public class StandardSwarmer : MonoBehaviour
         }
         
         rb.useGravity = false; // Disable gravity so they float/glide in the air
+
+        // Set up dedicated AudioSource for movement sounds to prevent ghost sounds when they die
+        moveAudioSource = gameObject.AddComponent<AudioSource>();
+        moveAudioSource.spatialBlend = 1f;
+        moveAudioSource.minDistance = 3f;
+        moveAudioSource.maxDistance = 50f;
+        moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        moveAudioSource.playOnAwake = false;
     }
 
     private void OnEnable()
@@ -48,6 +58,7 @@ public class StandardSwarmer : MonoBehaviour
         currentHealth = maxHealth;
         currentSpeed = minMoveSpeed; // Start at minimum speed when spawned
         baseRotation = transform.rotation; // Reset base tracking rotation
+        moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f); // Stagger timers so they don't all play at once
         
         QuotaManager.OnZoneCleared += Despawn;
         QuotaManager.OnGameCompleted += Despawn;
@@ -57,6 +68,7 @@ public class StandardSwarmer : MonoBehaviour
     {
         QuotaManager.OnZoneCleared -= Despawn;
         QuotaManager.OnGameCompleted -= Despawn;
+        if (moveAudioSource != null) moveAudioSource.Stop(); // Stop sound immediately on death/despawn
     }
 
     private void Despawn()
@@ -137,6 +149,20 @@ public class StandardSwarmer : MonoBehaviour
         
         // 9. Apply velocity smoothly
         rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 10f);
+
+        // 10. Play movement sound periodically
+        moveSoundTimer -= Time.fixedDeltaTime;
+        if (moveSoundTimer <= 0f)
+        {
+            if (AudioManager.Instance != null && AudioManager.Instance.enemyMoveSound != null)
+            {
+                moveAudioSource.clip = AudioManager.Instance.enemyMoveSound;
+                moveAudioSource.volume = AudioManager.Instance.enemyMoveVolume;
+                moveAudioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
+                moveAudioSource.Play();
+            }
+            moveSoundTimer = UnityEngine.Random.Range(1f, 2.5f); // Wait 1 to 2.5 seconds before playing again
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

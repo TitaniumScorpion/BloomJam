@@ -42,6 +42,11 @@ public class ImpactBomb : MonoBehaviour
 
     private void Detonate()
     {
+        if (AudioManager.Instance != null && AudioManager.Instance.bombExplosionSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.bombExplosionSound, transform.position, AudioManager.Instance.bombExplosionVolume, Random.Range(0.8f, 1.2f));
+        }
+
         // Create a sphere to detect everything caught in the blast
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
 

@@ -106,6 +106,11 @@ public class EnemySpawner : MonoBehaviour
         // Spawn the telegraph particle/object
         GameObject telegraph = ObjectPooler.Instance.SpawnFromPool(telegraphPoolTag, waveBasePosition, Quaternion.identity);
 
+        if (AudioManager.Instance != null && AudioManager.Instance.enemySpawnTelegraphSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.enemySpawnTelegraphSound, waveBasePosition, AudioManager.Instance.enemySpawnTelegraphVolume, 1f);
+        }
+
         // Wait for the telegraph duration before actually spawning the enemies
         yield return new WaitForSeconds(telegraphDuration);
 

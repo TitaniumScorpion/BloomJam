@@ -1360,6 +1360,62 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &1852399621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1852399623}
+  - component: {fileID: 1852399622}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1852399622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852399621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84a4bb451e66cea4187f0141d327c2f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  pistolShootSound: {fileID: 8300000, guid: e7677a76d5d04b54a8ee39bb49112cad, type: 3}
+  bombExplosionSound: {fileID: 8300000, guid: 6226c3c8dc27dd643a091f18102b6b18, type: 3}
+  enemySpawnTelegraphSound: {fileID: 0}
+  eliteShootSound: {fileID: 8300000, guid: 515f7062d96882e42b9b737e91b4de12, type: 3}
+  backgroundSound: {fileID: 8300000, guid: be4f3c88b1bf78147a9c58aec2d31881, type: 3}
+  enemyMoveSound: {fileID: 8300000, guid: b11ce721c85128d4cbb582504a13a897, type: 3}
+  eliteMoveSound: {fileID: 8300000, guid: 9de7751ff1b9b3748808717f6dcc2cde, type: 3}
+  hitSound: {fileID: 8300000, guid: 3e112e280ad46d14692bbdcd0c1ac890, type: 3}
+  gameOverSound: {fileID: 8300000, guid: 9f406b239ddd77b40833b839bce64394, type: 3}
+  playerWalkSound: {fileID: 8300000, guid: efde1435b78fdc049a11cc26d73fd237, type: 3}
+  levelCompleteSound: {fileID: 8300000, guid: 1a51a438068e6a34380bb892f8deb7e0, type: 3}
+  poolSize: 30
+--- !u!4 &1852399623
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852399621}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -49.65467, y: -0, z: -22.60869}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1369,3 +1425,4 @@ SceneRoots:
   - {fileID: 572988317}
   - {fileID: 8951905}
   - {fileID: 1283173723}
+  - {fileID: 1852399623}

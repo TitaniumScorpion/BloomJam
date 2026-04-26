@@ -42,6 +42,13 @@ public class AutomaticPistol : MonoBehaviour
     {
         fireTimer = fireRate;
 
+        if (AudioManager.Instance != null && AudioManager.Instance.pistolShootSound != null)
+        {
+            float randomPitch = Random.Range(0.9f, 1.1f); // Add slight pitch variation for machine gun effect
+            // Give player shooting a high priority (64) so it doesn't get culled by the audio engine
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.pistolShootSound, firePoint != null ? firePoint.position : transform.position, AudioManager.Instance.pistolShootVolume, randomPitch, 64);
+        }
+
         if (firePoint != null && playerCamera != null)
         {
             // Raycast from the center of the screen to find exactly what the player is aiming at

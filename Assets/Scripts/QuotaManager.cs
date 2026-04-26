@@ -77,12 +77,22 @@ public class QuotaManager : MonoBehaviour
         if (currentZoneIndex >= zoneKillQuotas.Length)
         {
             Debug.Log("All zones cleared! Game Completed!");
+            if (AudioManager.Instance != null && AudioManager.Instance.levelCompleteSound != null)
+            {
+                // Play as a global 2D sound (spatialBlend = 0f) with highest priority (0)
+                AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.levelCompleteSound, Vector3.zero, AudioManager.Instance.levelCompleteVolume, 1f, 0, 0f);
+            }
             OnGameCompleted?.Invoke();
             // TODO: Hook into FSM/GameManager to show Victory Screen and log clear time
         }
         else
         {
             Debug.Log($"Zone Cleared! Head to the elevator to advance to Zone {currentZoneIndex + 1}!");
+            if (AudioManager.Instance != null && AudioManager.Instance.levelCompleteSound != null)
+            {
+                // Play as a global 2D sound (spatialBlend = 0f) with highest priority (0)
+                AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.levelCompleteSound, Vector3.zero, AudioManager.Instance.levelCompleteVolume, 1f, 0, 0f);
+            }
             OnZoneCleared?.Invoke(); // Tell spawners to stop
             
             if (levelElevator != null)

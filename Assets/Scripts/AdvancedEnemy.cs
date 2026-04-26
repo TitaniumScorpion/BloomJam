@@ -26,6 +26,19 @@ public class AdvancedEnemy : MonoBehaviour
     private float fireTimer;
     private float spawnTimer;
     private Quaternion initialRotation;
+    private float moveSoundTimer;
+    private AudioSource moveAudioSource;
+
+    private void Awake()
+    {
+        // Set up dedicated AudioSource for movement sounds to prevent ghost sounds when they die
+        moveAudioSource = gameObject.AddComponent<AudioSource>();
+        moveAudioSource.spatialBlend = 1f;
+        moveAudioSource.minDistance = 3f;
+        moveAudioSource.maxDistance = 50f;
+        moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        moveAudioSource.playOnAwake = false;
+    }
 
     private void OnEnable()
     {
@@ -35,6 +48,7 @@ public class AdvancedEnemy : MonoBehaviour
         fireTimer = fireInterval;
         spawnTimer = spawnInterval * 0.5f;
         initialRotation = transform.rotation;
+        moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f);
         
         QuotaManager.OnZoneCleared += Despawn;
         QuotaManager.OnGameCompleted += Despawn;
@@ -44,6 +58,7 @@ public class AdvancedEnemy : MonoBehaviour
     {
         QuotaManager.OnZoneCleared -= Despawn;
         QuotaManager.OnGameCompleted -= Despawn;
+        if (moveAudioSource != null) moveAudioSource.Stop(); // Stop sound immediately on death/despawn
     }
 
     private void Despawn()
@@ -70,6 +85,20 @@ public class AdvancedEnemy : MonoBehaviour
             SpawnSwarmer();
             spawnTimer = spawnInterval;
         }
+        
+        // Handle Movement/Presence Sound
+        moveSoundTimer -= Time.deltaTime;
+        if (moveSoundTimer <= 0f)
+        {
+            if (AudioManager.Instance != null && AudioManager.Instance.eliteMoveSound != null)
+            {
+                moveAudioSource.clip = AudioManager.Instance.eliteMoveSound;
+                moveAudioSource.volume = AudioManager.Instance.eliteMoveVolume;
+                moveAudioSource.pitch = UnityEngine.Random.Range(0.8f, 1.1f);
+                moveAudioSource.Play();
+            }
+            moveSoundTimer = UnityEngine.Random.Range(1.5f, 3f);
+        }
     }
 
     private void HandleRotation()
@@ -90,6 +119,11 @@ public class AdvancedEnemy : MonoBehaviour
         Vector3 firePos = firePoint != null ? firePoint.position : transform.position + Vector3.up * 2f;
         
         Bounds zoneBounds = targetZone.bounds;
+
+        if (AudioManager.Instance != null && AudioManager.Instance.eliteShootSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.eliteShootSound, firePos, AudioManager.Instance.eliteShootVolume, Random.Range(0.8f, 1.1f));
+        }
 
         // Fire multiple projectiles at once
         for (int i = 0; i < projectilesPerShot; i++)

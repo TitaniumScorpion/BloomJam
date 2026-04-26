@@ -39,15 +39,25 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        bool hitEnemy = false;
+
         // Check if the object we hit has the StandardSwarmer script
         if (other.TryGetComponent(out StandardSwarmer enemy))
         {
             enemy.TakeDamage(damage);
+            hitEnemy = true;
         }
         // Check if we hit an Elite boss's weak point
         else if (other.TryGetComponent(out EnemyWeakPoint weakPoint))
         {
             weakPoint.TakeDamage(damage);
+            hitEnemy = true;
+        }
+        
+        if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
+        {
+            // Give hit sounds a high priority (80) so they don't get lost in the mix
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.hitSound, transform.position, AudioManager.Instance.hitVolume, Random.Range(0.9f, 1.1f), 80);
         }
         
         // Deactivate the projectile upon hitting anything (enemy, wall, floor, etc.)
