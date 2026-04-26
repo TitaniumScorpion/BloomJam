@@ -133,7 +133,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ImpactBomb
   throwForce: 12.5
   upwardForce: 6
-  detonationTime: 1.5
+  detonationTime: 0.8
   explosionPoolTag: BombExplosion
   explosionRadius: 8
   explosionDamage: 10
