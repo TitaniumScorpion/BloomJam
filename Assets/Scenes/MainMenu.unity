@@ -443,7 +443,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -80}
+  m_AnchoredPosition: {x: 0, y: 29}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &499509267
@@ -808,7 +808,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -160}
+  m_AnchoredPosition: {x: 0, y: -101}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1075055000
@@ -939,8 +939,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 30, y: 86}
-  m_SizeDelta: {x: 398.3372, y: 99.3662}
+  m_AnchoredPosition: {x: 37, y: 159}
+  m_SizeDelta: {x: 398.3372, y: 99.36621}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1213434811
 MonoBehaviour:
@@ -1400,6 +1400,7 @@ MonoBehaviour:
   gameOverSound: {fileID: 8300000, guid: 9f406b239ddd77b40833b839bce64394, type: 3}
   playerWalkSound: {fileID: 8300000, guid: efde1435b78fdc049a11cc26d73fd237, type: 3}
   levelCompleteSound: {fileID: 8300000, guid: 1a51a438068e6a34380bb892f8deb7e0, type: 3}
+  playerDashSound: {fileID: 8300000, guid: 9dd93974e70e37341aacd3f970ca1f3d, type: 3}
   pistolShootVolume: 0.078
   bombExplosionVolume: 3
   enemySpawnTelegraphVolume: 1
@@ -1411,6 +1412,7 @@ MonoBehaviour:
   gameOverVolume: 1
   playerWalkVolume: 0.368
   levelCompleteVolume: 1
+  playerDashVolume: 0.686
   poolSize: 150
 --- !u!4 &1852399623
 Transform:

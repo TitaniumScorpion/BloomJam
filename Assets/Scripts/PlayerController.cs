@@ -19,8 +19,10 @@ public class PlayerController : MonoBehaviour
     public float dashForce = 35f;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.5f;
+    public float dashPreDelay = 0.05f; // Small delay to let the sound and FOV warp start before moving
     private bool isDashing;
     private float dashCooldownTimer;
+    private Vector3 currentDashDirection;
 
     [Header("Ground Check")]
     public float playerHeight = 2f;
@@ -235,15 +237,32 @@ public class PlayerController : MonoBehaviour
     {
         isDashing = true;
         dashCooldownTimer = dashCooldown;
+        
+        if (AudioManager.Instance != null && AudioManager.Instance.playerDashSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.playerDashSound, transform.position, AudioManager.Instance.playerDashVolume, UnityEngine.Random.Range(0.9f, 1.1f));
+        }
 
         // Determine which direction we are pressing keys. If standing still, default to forward dash.
-        Vector3 dashDirection = (transform.forward * verticalInput + transform.right * horizontalInput).normalized;
-        if (dashDirection == Vector3.zero)
-            dashDirection = transform.forward;
+        currentDashDirection = (transform.forward * verticalInput + transform.right * horizontalInput).normalized;
+        if (currentDashDirection == Vector3.zero)
+            currentDashDirection = transform.forward;
 
+        // Temporarily freeze movement to create a "hang time" wind-up effect for the sound
+        rb.linearVelocity = Vector3.zero;
+
+        // Wait a tiny fraction of a second before applying the physical force
+        if (dashPreDelay > 0f)
+            Invoke(nameof(ApplyDashForce), dashPreDelay);
+        else
+            ApplyDashForce();
+    }
+
+    private void ApplyDashForce()
+    {
         // Temporarily reset velocity so the dash applies purely and consistently
         rb.linearVelocity = new Vector3(0f, 0f, 0f);
-        rb.AddForce(dashDirection * dashForce, ForceMode.Impulse);
+        rb.AddForce(currentDashDirection * dashForce, ForceMode.Impulse);
 
         // Stop the dash after 'dashDuration' seconds
         Invoke(nameof(EndDash), dashDuration);

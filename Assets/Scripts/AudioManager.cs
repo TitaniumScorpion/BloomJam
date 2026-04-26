@@ -20,6 +20,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip gameOverSound;
     public AudioClip playerWalkSound;
     public AudioClip levelCompleteSound;
+    public AudioClip playerDashSound;
 
     [Header("Volumes")]
     [Range(0f, 1f)] public float pistolShootVolume = 0.15f;
@@ -33,6 +34,7 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float gameOverVolume = 1f;
     [Range(0f, 1f)] public float playerWalkVolume = 0.3f;
     [Range(0f, 1f)] public float levelCompleteVolume = 1f;
+    [Range(0f, 1f)] public float playerDashVolume = 0.6f;
 
     [Header("Pool Settings")]
     public int poolSize = 150; // Massively increased to prevent pool exhaustion during heavy swarms
