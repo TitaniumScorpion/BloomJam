@@ -9,6 +9,7 @@ public class AutomaticPistol : MonoBehaviour
 
     [Header("References")]
     public string projectilePoolTag = "PlayerProjectile";
+    public string muzzleFlashPoolTag = "MuzzleFlash";
     public Transform firePoint;
     public Camera playerCamera;
 
@@ -51,6 +52,10 @@ public class AutomaticPistol : MonoBehaviour
 
         if (firePoint != null && playerCamera != null)
         {
+            // Spawn the muzzle flash and instantly parent it to the firePoint so it moves with the gun
+            GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
+            if (flash != null) flash.transform.SetParent(firePoint);
+
             // Raycast from the center of the screen to find exactly what the player is aiming at
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Vector3 targetPoint;

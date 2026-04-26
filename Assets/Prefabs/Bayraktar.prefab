@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3f290e419ff6174ba8854a0ffe49691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StandardSwarmer
-  maxHealth: 1
+  maxHealth: 3
   moveSpeed: 16
   minMoveSpeed: 4
   acceleration: 6
@@ -84,6 +84,10 @@ MonoBehaviour:
   pitchWobbleAmount: 15
   collisionDamage: 1
   hoverHeight: 1.5
+  meshRenderers:
+  - {fileID: 7818159775392218222}
+  flashColor: {r: 1825.2128, g: 1146.7305, b: 0, a: 1}
+  flashDuration: 0.05
 --- !u!136 &6986421432055780164
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -179,5 +183,10 @@ PrefabInstance:
 --- !u!4 &1396210740128104978 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
+  m_PrefabInstance: {fileID: 1507280049950598649}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7818159775392218222 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -534448565413045865, guid: 7ac9f49d8f240b34e973244348416d42, type: 3}
   m_PrefabInstance: {fileID: 1507280049950598649}
   m_PrefabAsset: {fileID: 0}

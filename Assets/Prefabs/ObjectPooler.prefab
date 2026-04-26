@@ -66,3 +66,6 @@ MonoBehaviour:
   - tag: SpawnTelegraph
     prefab: {fileID: 7146469005827679670, guid: 544ca9439d2085b4d90b1d627888d4b7, type: 3}
     size: 5
+  - tag: MuzzleFlash
+    prefab: {fileID: 100000, guid: 8eaaa4f553116f44b8459bc24201c514, type: 3}
+    size: 100
