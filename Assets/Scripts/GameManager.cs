@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            // Instantly disable the duplicate to prevent its EventSystem child from running OnEnable
+            gameObject.SetActive(false); 
             Destroy(gameObject); // If we reload Zone 1, destroy the duplicate
         }
     }
@@ -64,7 +66,7 @@ public class GameManager : MonoBehaviour
         if (victoryScreen != null) victoryScreen.SetActive(false);
         
         // If the scene loaded before OnEnable could catch it (often happens on the very first play), manually start transition
-        if (transitionCoroutine == null)
+        if (transitionCoroutine == null && SceneManager.GetActiveScene().buildIndex != 0)
         {
             transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
         }
@@ -84,6 +86,16 @@ public class GameManager : MonoBehaviour
         // Hide the end screens just in case
         if (deathScreen != null) deathScreen.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(false);
+
+        // Do not trigger zone transition or lock cursor if returning to the Main Menu
+        if (scene.buildIndex == 0)
+        {
+            if (inGameUI != null) inGameUI.SetActive(false);
+            if (zoneTransitionScreen != null) zoneTransitionScreen.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return;
+        }
 
         // Stop any existing transition and start a fresh one for the newly loaded zone
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
@@ -180,7 +192,7 @@ public class GameManager : MonoBehaviour
         QuotaManager.ResetProgression(); 
         
         // Loading the scene will automatically trigger OnSceneLoaded, starting the transition and UI resets!
-        SceneManager.LoadScene(0); 
+        SceneManager.LoadScene(1); 
     }
 
     public void QuitGame()

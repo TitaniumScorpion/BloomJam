@@ -3,6 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+    private void Start()
+    {
+        // Ensure cursor is visible and unlocked on the Main Menu
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
+        // Ensure time scale is normal when entering the menu
+        Time.timeScale = 1f;
+    }
+
     public void PlayGame()
     {
         // Ensure progression stats are fully reset before starting
