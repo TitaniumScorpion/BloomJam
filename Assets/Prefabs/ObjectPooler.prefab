@@ -69,3 +69,6 @@ MonoBehaviour:
   - tag: MuzzleFlash
     prefab: {fileID: 100000, guid: 8eaaa4f553116f44b8459bc24201c514, type: 3}
     size: 100
+  - tag: BombExplosion
+    prefab: {fileID: 100006, guid: 4575df893a6e3f64a8283dee38413a34, type: 3}
+    size: 6

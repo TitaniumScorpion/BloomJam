@@ -9,6 +9,7 @@ public class ImpactBomb : MonoBehaviour
     public float detonationTime = 2f;
     
     [Header("Explosion Settings")]
+    public string explosionPoolTag = "BombExplosion";
     public float explosionRadius = 6f;
     public int explosionDamage = 10;
     public float playerBlastForce = 35f;
@@ -46,6 +47,9 @@ public class ImpactBomb : MonoBehaviour
         {
             AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.bombExplosionSound, transform.position, AudioManager.Instance.bombExplosionVolume, Random.Range(0.8f, 1.2f));
         }
+        
+        // Spawn the visual explosion particle effect
+        ObjectPooler.Instance.SpawnFromPool(explosionPoolTag, transform.position, Quaternion.identity);
 
         // Create a sphere to detect everything caught in the blast
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
