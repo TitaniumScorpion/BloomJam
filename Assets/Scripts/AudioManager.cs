@@ -21,20 +21,22 @@ public class AudioManager : MonoBehaviour
     public AudioClip playerWalkSound;
     public AudioClip levelCompleteSound;
     public AudioClip playerDashSound;
+    public AudioClip elevatorAscendSound;
 
     [Header("Volumes")]
-    [Range(0f, 1f)] public float pistolShootVolume = 0.15f;
-    [Range(0f, 3f)] public float bombExplosionVolume = 1f;
-    [Range(0f, 1f)] public float enemySpawnTelegraphVolume = 1f;
-    [Range(0f, 1f)] public float eliteShootVolume = 1f;
-    [Range(0f, 1f)] public float backgroundVolume = 0.5f;
-    [Range(0f, 1f)] public float enemyMoveVolume = 0.7f;
-    [Range(0f, 1f)] public float eliteMoveVolume = 1f;
-    [Range(0f, 3f)] public float hitVolume = 0.9f;
-    [Range(0f, 1f)] public float gameOverVolume = 1f;
-    [Range(0f, 1f)] public float playerWalkVolume = 0.3f;
-    [Range(0f, 1f)] public float levelCompleteVolume = 1f;
-    [Range(0f, 1f)] public float playerDashVolume = 0.6f;
+    [Range(0f, 5f)] public float pistolShootVolume = 0.15f;
+    [Range(0f, 5f)] public float bombExplosionVolume = 1f;
+    [Range(0f, 5f)] public float enemySpawnTelegraphVolume = 1f;
+    [Range(0f, 5f)] public float eliteShootVolume = 1f;
+    [Range(0f, 5f)] public float backgroundVolume = 0.5f;
+    [Range(0f, 5f)] public float enemyMoveVolume = 0.7f;
+    [Range(0f, 5f)] public float eliteMoveVolume = 1f;
+    [Range(0f, 5f)] public float hitVolume = 0.9f;
+    [Range(0f, 5f)] public float gameOverVolume = 1f;
+    [Range(0f, 5f)] public float playerWalkVolume = 0.3f;
+    [Range(0f, 5f)] public float levelCompleteVolume = 1f;
+    [Range(0f, 5f)] public float playerDashVolume = 0.6f;
+    [Range(0f, 5f)] public float elevatorAscendVolume = 0.8f;
 
     [Header("Pool Settings")]
     public int poolSize = 150; // Massively increased to prevent pool exhaustion during heavy swarms

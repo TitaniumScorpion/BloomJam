@@ -1401,18 +1401,20 @@ MonoBehaviour:
   playerWalkSound: {fileID: 8300000, guid: efde1435b78fdc049a11cc26d73fd237, type: 3}
   levelCompleteSound: {fileID: 8300000, guid: 1a51a438068e6a34380bb892f8deb7e0, type: 3}
   playerDashSound: {fileID: 8300000, guid: 9dd93974e70e37341aacd3f970ca1f3d, type: 3}
-  pistolShootVolume: 0.078
-  bombExplosionVolume: 3
-  enemySpawnTelegraphVolume: 1
+  elevatorAscendSound: {fileID: 8300000, guid: 22b7fb832b0d64e4d9a8d7b8c1a516d6, type: 3}
+  pistolShootVolume: 0.25
+  bombExplosionVolume: 4.34
+  enemySpawnTelegraphVolume: 3.29
   eliteShootVolume: 1
-  backgroundVolume: 0.361
-  enemyMoveVolume: 0.943
+  backgroundVolume: 0.409
+  enemyMoveVolume: 0.97
   eliteMoveVolume: 1
   hitVolume: 2.32
-  gameOverVolume: 1
+  gameOverVolume: 1.44
   playerWalkVolume: 0.368
-  levelCompleteVolume: 1
+  levelCompleteVolume: 1.6
   playerDashVolume: 0.801
+  elevatorAscendVolume: 0.828
   poolSize: 150
 --- !u!4 &1852399623
 Transform:

@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class Elevator : MonoBehaviour
 {
     [Header("Elevator Settings")]
-    public float liftSpeed = 5f;
+    public float ascensionTime = 6.5f; // Time in seconds to reach the target height
     public float targetHeight = 20f;
     
     [Tooltip("Leave empty to just load the next scene sequentially in the Build Settings")]
@@ -13,6 +13,15 @@ public class Elevator : MonoBehaviour
     private bool isPlayerOnBoard = false;
     private bool isLifting = false;
     private Transform playerTransform;
+    private AudioSource liftAudioSource;
+    private float currentLiftSpeed;
+
+    private void Awake()
+    {
+        liftAudioSource = gameObject.AddComponent<AudioSource>();
+        liftAudioSource.spatialBlend = 1f; // Make it a 3D sound attached to the elevator
+        liftAudioSource.playOnAwake = false;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -22,6 +31,17 @@ public class Elevator : MonoBehaviour
             isPlayerOnBoard = true;
             isLifting = true;
             playerTransform = other.transform;
+            
+            // Calculate exactly how fast it needs to move to arrive in the set time
+            float distanceToTravel = targetHeight - transform.position.y;
+            currentLiftSpeed = distanceToTravel / ascensionTime;
+            
+            if (AudioManager.Instance != null && AudioManager.Instance.elevatorAscendSound != null)
+            {
+                liftAudioSource.clip = AudioManager.Instance.elevatorAscendSound;
+                liftAudioSource.volume = AudioManager.Instance.elevatorAscendVolume;
+                liftAudioSource.Play();
+            }
             
             // Parent the player to the elevator so they move up together perfectly
             // (Ensure your elevator GameObject has a scale of 1,1,1 to avoid player scaling issues)
@@ -38,6 +58,7 @@ public class Elevator : MonoBehaviour
             isLifting = false;
             playerTransform.SetParent(null);
             playerTransform = null;
+            liftAudioSource.Stop(); // Stop the sound if the player bails out early
         }
     }
 
@@ -46,7 +67,7 @@ public class Elevator : MonoBehaviour
         if (isLifting && isPlayerOnBoard)
         {
             // Move the elevator upwards
-            transform.Translate(Vector3.up * liftSpeed * Time.deltaTime);
+            transform.Translate(Vector3.up * currentLiftSpeed * Time.deltaTime);
 
             // Check if we reached the top
             if (transform.position.y >= targetHeight)
