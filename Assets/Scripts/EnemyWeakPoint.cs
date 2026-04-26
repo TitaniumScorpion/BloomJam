@@ -10,5 +10,7 @@ public class EnemyWeakPoint : MonoBehaviour
         // Pass the damage up to the main boss script
         if (parentEnemy != null)
             parentEnemy.TakeDamage(damage);
+        else
+            Debug.LogWarning("EnemyWeakPoint was hit, but 'Parent Enemy' is not assigned in the Inspector!", this);
     }
 }

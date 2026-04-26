@@ -26,12 +26,12 @@ public class AdvancedEnemy : MonoBehaviour
     [Header("Rise Sequence Settings")]
     public float riseDuration = 4f;
     public float riseSpeed = 5f;
+    public float rotationSpeed = 90f; // How fast the boss spins in degrees per second
     private bool isRising;
     private float riseTimer;
 
     private float fireTimer;
     private float spawnTimer;
-    private Quaternion initialRotation;
     private float moveSoundTimer;
     private AudioSource moveAudioSource;
 
@@ -67,7 +67,6 @@ public class AdvancedEnemy : MonoBehaviour
         // Enter the rising state as soon as it spawns
         isRising = true;
         riseTimer = riseDuration;
-        initialRotation = transform.rotation;
         moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f);
         
         QuotaManager.OnZoneCleared += Despawn;
@@ -140,9 +139,8 @@ public class AdvancedEnemy : MonoBehaviour
 
     private void HandleRotation()
     {
-        // A simple back-and-forth sweep animation using a sine wave
-        float sweepAngle = Mathf.Sin(Time.time * 0.3f) * 45f; // Sweeps 45 degrees to each side
-        transform.rotation = initialRotation * Quaternion.Euler(0, sweepAngle, 0);
+        // Constantly rotate the boss around its Y axis
+        transform.Rotate(0f, rotationSpeed * Time.deltaTime, 0f, Space.World);
     }
 
     private void ShootArtillery()

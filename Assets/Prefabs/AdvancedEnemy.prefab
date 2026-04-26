@@ -66,7 +66,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 544034a54c7d55c42866377ff693f707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWeakPoint
-  parentEnemy: {fileID: 0}
+  parentEnemy: {fileID: 7129088868745042600}
 --- !u!1 &3582281129573907521
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 544034a54c7d55c42866377ff693f707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWeakPoint
-  parentEnemy: {fileID: 0}
+  parentEnemy: {fileID: 7129088868745042600}
 --- !u!1 &4596157807924574304
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,6 +143,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4178646186638397590}
+  - component: {fileID: 7129088868745042600}
   m_Layer: 0
   m_Name: AdvancedEnemy
   m_TagString: Untagged
@@ -166,6 +167,34 @@ Transform:
   - {fileID: 1316019237327616942}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7129088868745042600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4596157807924574304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa90e9e8e65eee45a3013e1d3abb12e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AdvancedEnemy
+  maxHealth: 20
+  targetZone: {fileID: 0}
+  enemyProjectileTag: EnemyProjectile
+  firePoint: {fileID: 0}
+  fireInterval: 4
+  projectilesPerShot: 2
+  projectileSpawnSpread: 2.5
+  projectileForwardForce: 19
+  projectileUpwardArc: 10
+  projectileScaleMultiplier: 3
+  swarmerTag: StandardSwarmer
+  minionSpawnPoint: {fileID: 0}
+  spawnInterval: 4
+  riseDuration: 4
+  riseSpeed: 5
+  rotationSpeed: 60
 --- !u!1001 &1570008026746936389
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -235,9 +264,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15a427cd09ccf3f4ca07b6fec887287e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6212354325958871496}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15a427cd09ccf3f4ca07b6fec887287e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2919941130869106115}
   m_SourcePrefab: {fileID: 100100000, guid: 15a427cd09ccf3f4ca07b6fec887287e, type: 3}
 --- !u!4 &1316019237327616942 stripped
 Transform:
@@ -276,30 +302,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2919941130869106115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803867755373289748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fa90e9e8e65eee45a3013e1d3abb12e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AdvancedEnemy
-  maxHealth: 20
-  targetZone: {fileID: 0}
-  enemyProjectileTag: EnemyProjectile
-  firePoint: {fileID: 0}
-  fireInterval: 4
-  projectilesPerShot: 2
-  projectileSpawnSpread: 2.5
-  projectileForwardForce: 19
-  projectileUpwardArc: 10
-  projectileScaleMultiplier: 3
-  swarmerTag: StandardSwarmer
-  minionSpawnPoint: {fileID: 0}
-  spawnInterval: 4
-  riseDuration: 4
-  riseSpeed: 5
