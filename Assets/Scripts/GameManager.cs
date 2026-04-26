@@ -115,7 +115,12 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f; // Freeze the physics and spawning entirely
         
         if (inGameUI != null) inGameUI.SetActive(false);
-        if (zoneTransitionScreen != null) zoneTransitionScreen.SetActive(true);
+        if (zoneTransitionScreen != null)
+        {
+            zoneTransitionScreen.SetActive(true);
+            CanvasGroup cg = zoneTransitionScreen.GetComponent<CanvasGroup>();
+            if (cg != null) cg.alpha = 1f; // Ensure it starts fully opaque
+        }
 
         // Lock the cursor so the player is ready to aim when it hits 0
         Cursor.lockState = CursorLockMode.Locked;
@@ -134,11 +139,31 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(1f); 
         }
 
-        if (zoneTransitionScreen != null) zoneTransitionScreen.SetActive(false);
+        if (zoneTransitionText != null)
+        {
+            zoneTransitionText.text = "GO!";
+        }
+
         if (inGameUI != null) inGameUI.SetActive(true);
 
         Time.timeScale = 1f; // Unfreeze the game!
         isTimerRunning = true; // Resume the background timer
+
+        // Fade out the transition screen smoothly over 0.5 seconds
+        if (zoneTransitionScreen != null)
+        {
+            CanvasGroup canvasGroup = zoneTransitionScreen.GetComponent<CanvasGroup>();
+            if (canvasGroup == null) canvasGroup = zoneTransitionScreen.AddComponent<CanvasGroup>();
+
+            float fadeDuration = 0.5f;
+            for (float t = 0; t < fadeDuration; t += Time.deltaTime)
+            {
+                canvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+                yield return null;
+            }
+            canvasGroup.alpha = 1f; // Reset the alpha so it's opaque for the next zone's transition
+            zoneTransitionScreen.SetActive(false);
+        }
     }
 
     private void UpdateQuotaText(int currentKills, int targetQuota)
