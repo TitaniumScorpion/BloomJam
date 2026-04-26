@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0, g: 0, b: 0, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.105
+  m_FogDensity: 0.08
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.038204376, g: 0.057805434, b: 0.084376216, a: 1}
@@ -29008,8 +29008,7 @@ MonoBehaviour:
   telegraphDuration: 3
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
-  zone3SpawnInterval: 1.5
-  zone3EnemiesPerWave: 8
+  maxAdvancedEnemiesToSpawn: 0
   spawnPoints: []
   advancedSpawnPoints: []
   spawnRadius: 25

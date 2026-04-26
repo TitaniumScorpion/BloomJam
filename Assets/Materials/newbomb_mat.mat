@@ -452,7 +452,7 @@ Material:
     - _Unlit_Intensity: 0
     - _UseShadowThreshold: 0
     - _Use_1stAs2nd: 0
-    - _Use_BaseAs1st: 0
+    - _Use_BaseAs1st: 1
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZOverDrawMode: 0
@@ -466,7 +466,7 @@ Material:
     - _utsTechnique: 0
     m_Colors:
     - _1st_ShadeColor: {r: 0, g: 0, b: 0, a: 1}
-    - _2nd_ShadeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _2nd_ShadeColor: {r: 0.9245283, g: 0.11774653, b: 0.11774653, a: 1}
     - _AngelRingMaskColor: {r: 0, g: 1, b: 0, a: 1}
     - _AngelRing_Color: {r: 1, g: 1, b: 1, a: 1}
     - _Ap_RimLightColor: {r: 1, g: 1, b: 1, a: 1}
