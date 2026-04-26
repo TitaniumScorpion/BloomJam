@@ -13,11 +13,31 @@ public class AutomaticPistol : MonoBehaviour
     public Transform firePoint;
     public Camera playerCamera;
 
+    [Header("Visual Weapon Sway")]
+    public GameObject displayWeapon;
+    public float tiltAmount = 5f;
+    public float tiltSpeed = 8f;
+    public float swayAmount = 0.05f;
+    public float swaySpeed = 8f;
+    public float bobSpeed = 14f;
+    public float bobAmount = 0.05f;
+
+    private Quaternion initialDisplayRotation;
+    private Vector3 initialDisplayPosition;
+    private float bobTimer;
+
     private void Start()
     {
         // Automatically grab the main camera if one isn't assigned in the inspector
         if (playerCamera == null)
             playerCamera = Camera.main;
+
+        // Ensure the weapon is visible at start and remember its default placement
+        if (displayWeapon != null)
+        {
+            initialDisplayRotation = displayWeapon.transform.localRotation;
+            initialDisplayPosition = displayWeapon.transform.localPosition;
+        }
     }
 
     private void Update()
@@ -37,6 +57,8 @@ public class AutomaticPistol : MonoBehaviour
                 Shoot();
             }
         }
+
+        HandleWeaponSway();
     }
 
     private void Shoot()
@@ -71,6 +93,45 @@ public class AutomaticPistol : MonoBehaviour
 
             // Grab a projectile from the Object Pool with the corrected rotation
             ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
+        }
+    }
+
+    private void HandleWeaponSway()
+    {
+        if (displayWeapon != null && displayWeapon.activeSelf)
+        {
+            float moveX = 0f;
+            float moveY = 0f;
+
+            if (Keyboard.current != null)
+            {
+                // Read raw keyboard input for movement
+                if (Keyboard.current.dKey.isPressed) moveX += 1f;
+                if (Keyboard.current.aKey.isPressed) moveX -= 1f;
+                if (Keyboard.current.wKey.isPressed) moveY += 1f;
+                if (Keyboard.current.sKey.isPressed) moveY -= 1f;
+            }
+
+            // Tilt
+            Quaternion targetRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
+            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, targetRotation, Time.deltaTime * tiltSpeed);
+
+            // Calculate continuous bobbing (Figure-8 pattern)
+            float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
+            if (speedMagnitude > 0.1f)
+            {
+                bobTimer += Time.deltaTime * bobSpeed;
+            }
+
+            Vector3 bobOffset = new Vector3(
+                Mathf.Cos(bobTimer * 0.5f) * (bobAmount * 0.5f), 
+                Mathf.Sin(bobTimer) * bobAmount, 
+                0f
+            ) * speedMagnitude;
+
+            // Positional sway
+            Vector3 targetPosition = initialDisplayPosition + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f) + bobOffset;
+            displayWeapon.transform.localPosition = Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed);
         }
     }
 }
