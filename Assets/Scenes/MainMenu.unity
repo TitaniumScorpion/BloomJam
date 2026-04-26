@@ -209,6 +209,7 @@ GameObject:
   - component: {fileID: 68823844}
   - component: {fileID: 68823846}
   - component: {fileID: 68823845}
+  - component: {fileID: 68823847}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -335,6 +336,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68823843}
   m_CullTransparentMesh: 1
+--- !u!114 &68823847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68823843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b0a29d12e1b5b4fbd9abe817a17651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonAnimator
+  normalScale: {x: 1, y: 1, z: 1}
+  hoverScale: {x: 1.1, y: 1.1, z: 1.1}
+  clickScale: {x: 0.9, y: 0.9, z: 0.9}
+  animationSpeed: 15
+  useGlowEffect: 1
+  autoGrabNormalColor: 1
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverGlowColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &362433964
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,7 +464,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 29}
+  m_AnchoredPosition: {x: 2.7, y: 29}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &499509267
@@ -1097,6 +1118,7 @@ GameObject:
   - component: {fileID: 1517627871}
   - component: {fileID: 1517627873}
   - component: {fileID: 1517627872}
+  - component: {fileID: 1517627874}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1223,6 +1245,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1517627870}
   m_CullTransparentMesh: 1
+--- !u!114 &1517627874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517627870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b0a29d12e1b5b4fbd9abe817a17651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonAnimator
+  normalScale: {x: 1, y: 1, z: 1}
+  hoverScale: {x: 1.1, y: 1.1, z: 1.1}
+  clickScale: {x: 0.9, y: 0.9, z: 0.9}
+  animationSpeed: 15
+  useGlowEffect: 1
+  autoGrabNormalColor: 1
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverGlowColor: {r: 0.73425645, g: 0.2066856, b: 0.7660377, a: 1}
 --- !u!1 &1697795112
 GameObject:
   m_ObjectHideFlags: 0

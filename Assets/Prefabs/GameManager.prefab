@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 6897797996962319294}
   - component: {fileID: 457899737277808500}
   - component: {fileID: 2282370735017262759}
+  - component: {fileID: 3361614922061635643}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -436,6 +437,26 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3361614922061635643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967378227058787672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b0a29d12e1b5b4fbd9abe817a17651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonAnimator
+  normalScale: {x: 1, y: 1, z: 1}
+  hoverScale: {x: 1.1, y: 1.1, z: 1.1}
+  clickScale: {x: 0.9, y: 0.9, z: 0.9}
+  animationSpeed: 15
+  useGlowEffect: 1
+  autoGrabNormalColor: 1
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverGlowColor: {r: 0.9924528, g: 0.8384934, b: 0.29773572, a: 1}
 --- !u!1 &973953942165700303
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,7 +474,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &51251366920436899
 RectTransform:
   m_ObjectHideFlags: 0
@@ -711,7 +732,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.08893842, b: 0, a: 0.015686275}
+  m_Color: {r: 1, g: 0.08893842, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -957,8 +978,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: -98.1}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 9.5, y: -98.1}
+  m_SizeDelta: {x: 180, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5867909680651023460
 CanvasRenderer:
@@ -981,7 +1002,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.08893842, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.08893842, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1499,6 +1520,7 @@ GameObject:
   - component: {fileID: 1645143747922967441}
   - component: {fileID: 304833577998396270}
   - component: {fileID: 2278583900255435821}
+  - component: {fileID: 2201497590158819622}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1580,8 +1602,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1625,6 +1647,26 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2201497590158819622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4337100896655540510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b0a29d12e1b5b4fbd9abe817a17651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonAnimator
+  normalScale: {x: 1, y: 1, z: 1}
+  hoverScale: {x: 1.1, y: 1.1, z: 1.1}
+  clickScale: {x: 0.9, y: 0.9, z: 0.9}
+  animationSpeed: 15
+  useGlowEffect: 1
+  autoGrabNormalColor: 1
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverGlowColor: {r: 1, g: 0.68490565, b: 0.9974019, a: 1}
 --- !u!1 &4447766726639563968
 GameObject:
   m_ObjectHideFlags: 0
@@ -2488,7 +2530,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
