@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     public GameObject zoneTransitionScreen;
     public TMP_Text zoneTransitionText;
 
+    [Header("Zone Cleared UI")]
+    public GameObject levelCompletedMessage;
+
     public static GameManager Instance;
     private Coroutine transitionCoroutine;
 
@@ -47,6 +50,7 @@ public class GameManager : MonoBehaviour
     {
         // Listen to events from our other systems
         QuotaManager.OnKillCountUpdated += UpdateQuotaText;
+        QuotaManager.OnZoneCleared += ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted += ShowVictoryScreen;
         PlayerHealth.OnPlayerDied += ShowDeathScreen;
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         QuotaManager.OnKillCountUpdated -= UpdateQuotaText;
+        QuotaManager.OnZoneCleared -= ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted -= ShowVictoryScreen;
         PlayerHealth.OnPlayerDied -= ShowDeathScreen;
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -64,6 +69,7 @@ public class GameManager : MonoBehaviour
     {
         if (deathScreen != null) deathScreen.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
         
         // If the scene loaded before OnEnable could catch it (often happens on the very first play), manually start transition
         if (transitionCoroutine == null && SceneManager.GetActiveScene().buildIndex != 0)
@@ -86,6 +92,7 @@ public class GameManager : MonoBehaviour
         // Hide the end screens just in case
         if (deathScreen != null) deathScreen.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
 
         // Do not trigger zone transition or lock cursor if returning to the Main Menu
         if (scene.buildIndex == 0)
@@ -140,6 +147,21 @@ public class GameManager : MonoBehaviour
         {
             quotaText.text = $"KILLS: {currentKills} / {targetQuota}";
         }
+    }
+
+    private void ShowLevelCompletedMessage()
+    {
+        if (levelCompletedMessage != null)
+        {
+            StartCoroutine(LevelCompletedRoutine());
+        }
+    }
+
+    private IEnumerator LevelCompletedRoutine()
+    {
+        levelCompletedMessage.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
     }
 
     private string FormatTime(float timeInSeconds)
