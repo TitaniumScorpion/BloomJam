@@ -434,7 +434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b224f46e719aa2742a0753bf32570be4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImpactBombWeapon
-  cooldownTime: 2
+  cooldownTime: 8
   bombPoolTag: ImpactBomb
   bombPoint: {fileID: 7644971892129784485}
   displayBomb: {fileID: 8462205320610491233}

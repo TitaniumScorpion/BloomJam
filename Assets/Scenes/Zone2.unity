@@ -10004,52 +10004,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1171470438070500581, guid: 9da726612bae8a84eb765b55390d4cc3, type: 3}
   m_PrefabInstance: {fileID: 619659648}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &627865836
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 627865838}
-  - component: {fileID: 627865837}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &627865837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627865836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
-  zoneKillQuotas: 0f000000320000002c010000
-  levelElevator: {fileID: 1354064558}
---- !u!4 &627865838
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627865836}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.41914, y: 0.39, z: -17.45486}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &632838374
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20821,7 +20775,7 @@ Transform:
   m_GameObject: {fileID: 1354064558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.58, y: 0.85, z: -10.33903}
+  m_LocalPosition: {x: -37.47, y: 1.61, z: -10.33903}
   m_LocalScale: {x: 7.5761, y: 0.19334592, z: 7.5761}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21751,14 +21705,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   swarmerPoolTag: StandardSwarmer
-  spawnInterval: 4
-  enemiesPerWave: 8
+  spawnInterval: 6.5
+  enemiesPerWave: 7
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3
   advancedEnemyPoolTag: AdvancedEnemy
-  advancedSpawnInterval: 10
-  zone3SpawnInterval: 1.5
-  zone3EnemiesPerWave: 8
+  advancedSpawnInterval: 8
+  maxAdvancedEnemiesToSpawn: 4
   spawnPoints: []
   advancedSpawnPoints:
   - {fileID: 951042133}
@@ -23430,6 +23383,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1171470438070500581, guid: 9da726612bae8a84eb765b55390d4cc3, type: 3}
   m_PrefabInstance: {fileID: 1487765295}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1495397908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1495397910}
+  - component: {fileID: 1495397909}
+  m_Layer: 0
+  m_Name: QuotaManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1495397909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1495397908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
+  targetQuota: 70
+  isFinalZone: 0
+  levelElevator: {fileID: 1354064558}
+--- !u!4 &1495397910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1495397908}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -37.81575, y: 1.80335, z: -11.90059}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1504824962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32907,7 +32907,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1321379219}
   - {fileID: 1392975723}
-  - {fileID: 627865838}
   - {fileID: 32438383}
   - {fileID: 1868889927}
   - {fileID: 799001077}
@@ -32919,3 +32918,4 @@ SceneRoots:
   - {fileID: 1669244860}
   - {fileID: 713666158}
   - {fileID: 1603903932}
+  - {fileID: 1495397910}

@@ -265,9 +265,9 @@ MonoBehaviour:
   fireInterval: 4
   projectilesPerShot: 2
   projectileSpawnSpread: 2.5
-  projectileForwardForce: 18
+  projectileForwardForce: 19
   projectileUpwardArc: 10
-  projectileScaleMultiplier: 2
+  projectileScaleMultiplier: 3
   swarmerTag: StandardSwarmer
   minionSpawnPoint: {fileID: 0}
   spawnInterval: 4

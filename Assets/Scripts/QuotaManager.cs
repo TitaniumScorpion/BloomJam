@@ -4,12 +4,16 @@ using System;
 public class QuotaManager : MonoBehaviour
 {
     [Header("Zone Progression")]
-    [Tooltip("Cumulative kills required to complete each zone. E.g., Zone 1 ends at 50, Zone 2 at 150, Zone 3 at 300.")]
-    public int[] zoneKillQuotas = { 50, 150, 300 };
+    [Tooltip("The total kills needed to clear THIS specific zone (e.g., 50 for Zone 1, 100 for Zone 2, 150 for Zone 3)")]
+    public int targetQuota = 50;
+    
+    [Tooltip("Check this ONLY in the final zone (Zone 3) to trigger the Victory Screen instead of an elevator")]
+    public bool isFinalZone = false;
     
     // Made static so progression persists across scene loads
     public static int currentKills = 0;
     public static int currentZoneIndex = 0;
+    private bool zoneCleared = false;
 
     [Header("Level Transition")]
     [Tooltip("The elevator object that appears when the zone is cleared.")]
@@ -34,12 +38,16 @@ public class QuotaManager : MonoBehaviour
 
     private void Start()
     {
-        // Initialize the UI with starting values
-        if (zoneKillQuotas.Length > 0)
-            OnKillCountUpdated?.Invoke(currentKills, zoneKillQuotas[currentZoneIndex]);
+        // Reset kills at the start of every zone so the quota starts at 0
+        currentKills = 0;
+
+        // Initialize the UI with starting values for this specific zone
+        OnKillCountUpdated?.Invoke(currentKills, targetQuota);
             
         if (levelElevator != null)
             levelElevator.SetActive(false); // Hide elevator at the start
+        else if (!isFinalZone)
+            Debug.LogWarning("Level Elevator is missing! Please assign it in the Inspector.");
     }
 
     // Call this from your Game Over or Main Menu script when starting a fresh run!
@@ -52,20 +60,14 @@ public class QuotaManager : MonoBehaviour
     private void HandleEnemyDied()
     {
         currentKills++;
-        
-        // If we've already beaten the game, just keep tracking extra kills
-        if (currentZoneIndex >= zoneKillQuotas.Length) 
-        {
-            OnKillCountUpdated?.Invoke(currentKills, currentKills);
-            return;
-        }
-
-        int targetQuota = zoneKillQuotas[currentZoneIndex];
         OnKillCountUpdated?.Invoke(currentKills, targetQuota);
+        
+        if (zoneCleared) return;
 
         // Check if we reached the milestone for the current zone
         if (currentKills >= targetQuota)
         {
+            zoneCleared = true;
             AdvanceZone();
         }
     }
@@ -74,7 +76,7 @@ public class QuotaManager : MonoBehaviour
     {
         currentZoneIndex++;
 
-        if (currentZoneIndex >= zoneKillQuotas.Length)
+        if (isFinalZone)
         {
             Debug.Log("All zones cleared! Game Completed!");
             if (AudioManager.Instance != null && AudioManager.Instance.levelCompleteSound != null)

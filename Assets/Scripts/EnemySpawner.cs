@@ -16,13 +16,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Advanced Escalation Settings")]
     public string advancedEnemyPoolTag = "AdvancedEnemy";
     public float advancedSpawnInterval = 20f; // Exactly 20 seconds between advanced enemies
-    
-    // Zone 3 Specifics for standard swarms
-    [Header("Zone 3 Settings")]
-    [Tooltip("How fast waves spawn in Zone 3 (Index 2)")]
-    public float zone3SpawnInterval = 1.5f;
-    [Tooltip("How many enemies spawn per wave in Zone 3")]
-    public int zone3EnemiesPerWave = 8;
+    public int maxAdvancedEnemiesToSpawn = 0; // Controls how many elites are allowed to spawn in this specific scene
 
     [Header("Spawn Locations")]
     [Tooltip("If empty, enemies will spawn in a random radius around this object.")]
@@ -34,7 +28,6 @@ public class EnemySpawner : MonoBehaviour
     private float spawnTimer;
     private bool isSpawningActive = true;
     private float advancedSpawnTimer;
-    private int maxAdvancedEnemiesToSpawn = 0;
     private int advancedEnemiesSpawned = 0;
 
     private void OnEnable()
@@ -52,9 +45,6 @@ public class EnemySpawner : MonoBehaviour
         // Start the timer
         spawnTimer = spawnInterval;
         advancedSpawnTimer = advancedSpawnInterval; // Start the 20s countdown for elites
-        
-        // Setup spawner based on the persistent current zone index
-        ApplyZoneSettings(QuotaManager.currentZoneIndex);
     }
 
     private void Update()
@@ -79,20 +69,6 @@ public class EnemySpawner : MonoBehaviour
                 advancedSpawnTimer = advancedSpawnInterval;
                 advancedEnemiesSpawned++;
             }
-        }
-    }
-
-    private void ApplyZoneSettings(int zoneIndex)
-    {
-        if (zoneIndex == 1) // Advanced to Zone 2
-        {
-            maxAdvancedEnemiesToSpawn = 4;
-        }
-        else if (zoneIndex >= 2) // Advanced to Zone 3
-        {
-            maxAdvancedEnemiesToSpawn = 8;
-            spawnInterval = zone3SpawnInterval;
-            enemiesPerWave = zone3EnemiesPerWave;
         }
     }
 

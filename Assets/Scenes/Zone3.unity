@@ -5228,7 +5228,7 @@ Transform:
   m_GameObject: {fileID: 383898832}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.58, y: 0.85, z: -10.33903}
+  m_LocalPosition: {x: -38.1, y: 1.61, z: -10.33903}
   m_LocalScale: {x: 7.5761, y: 0.19334592, z: 7.5761}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6234,14 +6234,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   swarmerPoolTag: StandardSwarmer
-  spawnInterval: 4
-  enemiesPerWave: 10
+  spawnInterval: 6.5
+  enemiesPerWave: 8
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3
   advancedEnemyPoolTag: AdvancedEnemy
-  advancedSpawnInterval: 10
-  zone3SpawnInterval: 4
-  zone3EnemiesPerWave: 10
+  advancedSpawnInterval: 8
+  maxAdvancedEnemiesToSpawn: 8
   spawnPoints: []
   advancedSpawnPoints:
   - {fileID: 938508704}
@@ -17391,9 +17390,29 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: isFinalZone
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: targetQuota
+      value: 225
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: levelElevator
       value: 
       objectReference: {fileID: 383898832}
+    - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: 'zoneKillQuotas.Array.data[0]'
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: 'zoneKillQuotas.Array.data[1]'
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748969995280522430, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: 'zoneKillQuotas.Array.data[2]'
+      value: 225
+      objectReference: {fileID: 0}
     - target: {fileID: 3144219802533734415, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -23434,6 +23453,53 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9da726612bae8a84eb765b55390d4cc3, type: 3}
+--- !u!1 &1515827379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1515827381}
+  - component: {fileID: 1515827380}
+  m_Layer: 0
+  m_Name: QuotaManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1515827380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515827379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
+  targetQuota: 100
+  isFinalZone: 1
+  levelElevator: {fileID: 383898832}
+--- !u!4 &1515827381
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515827379}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -37.81575, y: 1.80335, z: -11.90059}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1527214050
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32967,3 +33033,4 @@ SceneRoots:
   - {fileID: 1631162760}
   - {fileID: 1121185261}
   - {fileID: 1715002338}
+  - {fileID: 1515827381}

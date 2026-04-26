@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
     {
         if (quotaText != null)
         {
-            quotaText.text = $"QUOTA: {currentKills} / {targetQuota}";
+            quotaText.text = $"KILLS: {currentKills} / {targetQuota}";
         }
     }
 
