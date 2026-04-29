@@ -75,9 +75,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StandardSwarmer
   maxHealth: 2
-  moveSpeed: 17.5
-  minMoveSpeed: 4.5
-  acceleration: 7
+  moveSpeed: 16.5
+  minMoveSpeed: 4
+  acceleration: 6
   rotationSpeed: 4
   tiltAmount: 30
   pitchWobbleSpeed: 8

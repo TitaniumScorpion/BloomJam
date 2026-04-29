@@ -6382,12 +6382,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   swarmerPoolTag: StandardSwarmer
-  spawnInterval: 8
+  spawnInterval: 8.5
   enemiesPerWave: 8
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3
   advancedEnemyPoolTag: AdvancedEnemy
-  advancedSpawnInterval: 8
+  advancedSpawnInterval: 11
   maxAdvancedEnemiesToSpawn: 8
   spawnPoints: []
   advancedSpawnPoints:

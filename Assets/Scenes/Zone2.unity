@@ -21929,7 +21929,7 @@ MonoBehaviour:
   telegraphPoolTag: SpawnTelegraph
   telegraphDuration: 3
   advancedEnemyPoolTag: AdvancedEnemy
-  advancedSpawnInterval: 8
+  advancedSpawnInterval: 12
   maxAdvancedEnemiesToSpawn: 4
   spawnPoints: []
   advancedSpawnPoints:
