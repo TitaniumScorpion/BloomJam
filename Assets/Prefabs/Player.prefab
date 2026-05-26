@@ -427,6 +427,8 @@ MonoBehaviour:
   recoilKickback: 0.2
   recoilRotation: 14
   recoilRecoverySpeed: 13
+  camShakeMagnitude: 0.15
+  camShakeDuration: 0.1
 --- !u!114 &9079457312254447070
 MonoBehaviour:
   m_ObjectHideFlags: 0

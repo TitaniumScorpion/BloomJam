@@ -33214,10 +33214,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2239107502438115786, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: camShakeMagnitude
-      value: 0.15
-      objectReference: {fileID: 0}
     - target: {fileID: 2456856366881023602, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_Name
       value: Player
