@@ -33215,32 +33215,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2239107502438115786, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: recoilKickback
-      value: 0.2
+      propertyPath: camShakeMagnitude
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 2456856366881023602, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3029556981752308932, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.569
-      objectReference: {fileID: 0}
-    - target: {fileID: 3029556981752308932, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 1.321
-      objectReference: {fileID: 0}
-    - target: {fileID: 7323496235121137549, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: maxHealth
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7644971892129784485, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.313
-      objectReference: {fileID: 0}
-    - target: {fileID: 7644971892129784485, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.027
       objectReference: {fileID: 0}
     - target: {fileID: 8677833960182127638, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_LocalPosition.x

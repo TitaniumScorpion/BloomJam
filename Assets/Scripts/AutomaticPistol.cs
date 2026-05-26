@@ -29,12 +29,20 @@ public class AutomaticPistol : MonoBehaviour
     private Vector3 currentRecoilPosition;
     private Quaternion currentRecoilRotation = Quaternion.identity;
 
+    [Header("Camera Shake")]
+    public float camShakeMagnitude = 0.05f;
+    public float camShakeDuration = 0.05f;
+    private PlayerController playerController;
+
     private Quaternion initialDisplayRotation;
     private Vector3 initialDisplayPosition;
     private float bobTimer;
 
     private void Start()
     {
+        // Find the PlayerController so we can trigger screen shake
+        playerController = GetComponentInParent<PlayerController>();
+
         // Automatically grab the main camera if one isn't assigned in the inspector
         if (playerCamera == null)
             playerCamera = Camera.main;
@@ -104,6 +112,12 @@ public class AutomaticPistol : MonoBehaviour
 
             // Grab a projectile from the Object Pool with the corrected rotation
             ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
+        }
+        
+        // Trigger camera shake
+        if (playerController != null)
+        {
+            playerController.AddCameraShake(camShakeMagnitude, camShakeDuration);
         }
         
         // Apply Recoil

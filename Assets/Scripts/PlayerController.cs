@@ -52,6 +52,11 @@ public class PlayerController : MonoBehaviour
     private float defaultCameraY;
     private float timer = 0;
     
+    [Header("Camera Shake")]
+    private float shakeMagnitude;
+    private float shakeDuration;
+    private float shakeTimer;
+
     [Header("Audio")]
     public float stepInterval = 0.35f;
     private float stepTimer = 0f;
@@ -190,7 +195,21 @@ public class PlayerController : MonoBehaviour
         float targetZ = -horizontalInput * tiltAngle;
         zRotation = Mathf.Lerp(zRotation, targetZ, Time.deltaTime * tiltSpeed);
 
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, zRotation);
+        float currentShakeX = 0f;
+        float currentShakeY = 0f;
+        float currentShakeZ = 0f;
+        
+        if (shakeTimer > 0f && shakeDuration > 0f)
+        {
+            float damping = shakeTimer / shakeDuration; // Fade out smoothly over time
+            float mag = shakeMagnitude * damping;
+            currentShakeX = UnityEngine.Random.Range(-1f, 1f) * mag;
+            currentShakeY = UnityEngine.Random.Range(-1f, 1f) * mag;
+            currentShakeZ = UnityEngine.Random.Range(-1f, 1f) * mag;
+            shakeTimer -= Time.deltaTime;
+        }
+
+        cameraTransform.localRotation = Quaternion.Euler(xRotation + currentShakeX, currentShakeY, zRotation + currentShakeZ);
         transform.rotation *= Quaternion.Euler(0f, mouseX, 0f);
     }
 
@@ -308,5 +327,12 @@ public class PlayerController : MonoBehaviour
 
         float targetFOV = isDashing ? dashFOV : normalFOV;
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, Time.deltaTime * fovChangeSpeed);
+    }
+
+    public void AddCameraShake(float magnitude, float duration)
+    {
+        shakeMagnitude = magnitude;
+        shakeDuration = duration;
+        shakeTimer = duration;
     }
 }
