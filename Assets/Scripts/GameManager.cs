@@ -240,8 +240,8 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         QuotaManager.ResetProgression(); 
         
-        // Loading the scene will automatically trigger OnSceneLoaded, starting the transition and UI resets!
-        SceneManager.LoadScene(1); 
+        // Send the player back to the interactive Main Menu Elevator hub
+        SceneManager.LoadScene(0); 
     }
 
     public void QuitGame()
