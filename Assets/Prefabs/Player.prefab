@@ -424,6 +424,9 @@ MonoBehaviour:
   swaySpeed: 8
   bobSpeed: 14
   bobAmount: 0.05
+  recoilKickback: 1
+  recoilRotation: 14
+  recoilRecoverySpeed: 13
 --- !u!114 &9079457312254447070
 MonoBehaviour:
   m_ObjectHideFlags: 0
