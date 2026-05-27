@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public Transform cameraTransform;
     public float mouseSensitivity = 2f;
     private float xRotation = 0f;
+    private float yRotation = 0f;
 
     private float horizontalInput;
     private float verticalInput;
@@ -66,6 +67,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // Prevent the physics engine from tipping the player over
         rb.interpolation = RigidbodyInterpolation.Interpolate; // Smooths out movement between physics steps to prevent stutter
+
+        yRotation = transform.eulerAngles.y;
 
         // Lock the cursor to the center of the screen
         Cursor.lockState = CursorLockMode.Locked;
@@ -191,6 +194,8 @@ public class PlayerController : MonoBehaviour
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Prevent looking past straight up or down
+        
+        yRotation += mouseX;
 
         // Calculate target Z rotation (camera tilt) based on horizontal movement
         float targetZ = -horizontalInput * tiltAngle;
@@ -210,14 +215,18 @@ public class PlayerController : MonoBehaviour
             shakeTimer -= Time.deltaTime;
         }
 
-        cameraTransform.localRotation = Quaternion.Euler(xRotation + currentShakeX, currentShakeY, zRotation + currentShakeZ);
-        transform.rotation *= Quaternion.Euler(0f, mouseX, 0f);
+        // Apply both vertical AND horizontal rotation to the camera to prevent dirtying the Rigidbody's transform
+        cameraTransform.localRotation = Quaternion.Euler(xRotation + currentShakeX, yRotation + currentShakeY, zRotation + currentShakeZ);
     }
 
     private void MovePlayer()
     {
-        // Calculate movement direction based on where the player is currently looking
-        moveDirection = transform.forward * verticalInput + transform.right * horizontalInput;
+        // Calculate movement direction based strictly on the camera's yaw
+        // This ensures we move perfectly in the direction we are looking, regardless of the Rigidbody's rotation
+        Vector3 forward = Quaternion.Euler(0f, yRotation, 0f) * Vector3.forward;
+        Vector3 right = Quaternion.Euler(0f, yRotation, 0f) * Vector3.right;
+
+        moveDirection = forward * verticalInput + right * horizontalInput;
 
         // Apply force on the ground
         if (grounded)
@@ -245,7 +254,7 @@ public class PlayerController : MonoBehaviour
     {
         // Reset the Y velocity entirely before jumping so we always jump the exact same height
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     private void ResetJump()
@@ -263,10 +272,13 @@ public class PlayerController : MonoBehaviour
             AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.playerDashSound, transform.position, AudioManager.Instance.playerDashVolume, UnityEngine.Random.Range(0.9f, 1.1f));
         }
 
-        // Determine which direction we are pressing keys. If standing still, default to forward dash.
-        currentDashDirection = (transform.forward * verticalInput + transform.right * horizontalInput).normalized;
+        // Determine which direction we are pressing keys based on camera yaw.
+        Vector3 forward = Quaternion.Euler(0f, yRotation, 0f) * Vector3.forward;
+        Vector3 right = Quaternion.Euler(0f, yRotation, 0f) * Vector3.right;
+
+        currentDashDirection = (forward * verticalInput + right * horizontalInput).normalized;
         if (currentDashDirection == Vector3.zero)
-            currentDashDirection = transform.forward;
+            currentDashDirection = forward;
 
         // Temporarily freeze movement to create a "hang time" wind-up effect for the sound
         rb.linearVelocity = Vector3.zero;
