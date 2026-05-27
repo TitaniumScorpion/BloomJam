@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // Prevent the physics engine from tipping the player over
+        rb.interpolation = RigidbodyInterpolation.Interpolate; // Smooths out movement between physics steps to prevent stutter
 
         // Lock the cursor to the center of the screen
         Cursor.lockState = CursorLockMode.Locked;
