@@ -393,11 +393,11 @@ MonoBehaviour:
   bobAmount: 0.05
   recoilKickback: 0.25
   recoilRotation: 10
-  recoilRecoverySpeed: 11
-  camShakeMagnitude: 0.3
-  camShakeDuration: 0.3
+  recoilRecoverySpeed: 14
+  camShakeMagnitude: 0.25
+  camShakeDuration: 0.2
   weaponShakeMagnitude: 0.005
-  weaponShakeDuration: 0.3
+  weaponShakeDuration: 0.25
 --- !u!114 &7429899312607839502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -478,15 +478,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.569
+      value: 0.57
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.379
+      value: -0.38
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.321
+      value: 1.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
       propertyPath: m_LocalRotation.w

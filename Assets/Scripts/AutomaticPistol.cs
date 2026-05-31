@@ -27,7 +27,7 @@ public class AutomaticPistol : MonoBehaviour
     public float recoilRotation = 25f;
     public float recoilRecoverySpeed = 20f;
     private Vector3 currentRecoilPosition;
-    private Quaternion currentRecoilRotation = Quaternion.identity;
+    private Vector3 currentRecoilEuler;
 
     [Header("Camera Shake")]
     public float camShakeMagnitude = 0.05f;
@@ -75,7 +75,7 @@ public class AutomaticPistol : MonoBehaviour
 
         // Smoothly return recoil to zero
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
-        currentRecoilRotation = Quaternion.Slerp(currentRecoilRotation, Quaternion.identity, Time.deltaTime * recoilRecoverySpeed);
+        currentRecoilEuler = Vector3.Lerp(currentRecoilEuler, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
 
         // Manage the cooldown timer
         if (fireTimer > 0f)
@@ -120,7 +120,7 @@ public class AutomaticPistol : MonoBehaviour
             if (Physics.Raycast(ray, out RaycastHit hit))
                 targetPoint = hit.point; // We hit something, aim at the hit point
             else
-                targetPoint = ray.GetPoint(100f); // We didn't hit anything, aim at a point far away
+                targetPoint = ray.GetPoint(1000f); // We didn't hit anything, aim at a point very far away
 
             // Calculate a stable fire point that isn't affected by weapon shake, recoil, or bobbing
             Vector3 stableFirePointPos = playerCamera.transform.TransformPoint(stableFirePointLocalPos);
@@ -144,7 +144,7 @@ public class AutomaticPistol : MonoBehaviour
         
         // Apply Recoil
         currentRecoilPosition += new Vector3(0f, 0f, -recoilKickback);
-        currentRecoilRotation *= Quaternion.Euler(-recoilRotation, Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f), Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
+        currentRecoilEuler += new Vector3(-recoilRotation, Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f), Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
     }
 
     private void HandleWeaponSway()
@@ -185,7 +185,9 @@ public class AutomaticPistol : MonoBehaviour
 
             // Tilt
             Quaternion swayRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
-            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, swayRotation * currentRecoilRotation, Time.deltaTime * tiltSpeed) * randomRotShake;
+            Quaternion recoilRot = Quaternion.Euler(currentRecoilEuler);
+            
+            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, swayRotation * recoilRot, Time.deltaTime * tiltSpeed) * randomRotShake;
 
             // Calculate continuous bobbing (Figure-8 pattern)
             float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
@@ -202,6 +204,7 @@ public class AutomaticPistol : MonoBehaviour
 
             // Positional sway
             Vector3 targetPosition = initialDisplayPosition + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f) + bobOffset + currentRecoilPosition;
+            
             displayWeapon.transform.localPosition = Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed) + randomShake;
         }
     }
