@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
     public float dashForce = 35f;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.5f;
-    public float dashPreDelay = 0.05f; // Small delay to let the sound and FOV warp start before moving
     private bool isDashing;
     private float dashCooldownTimer;
     private Vector3 currentDashDirection;
@@ -280,14 +279,8 @@ public class PlayerController : MonoBehaviour
         if (currentDashDirection == Vector3.zero)
             currentDashDirection = forward;
 
-        // Temporarily freeze movement to create a "hang time" wind-up effect for the sound
-        rb.linearVelocity = Vector3.zero;
-
-        // Wait a tiny fraction of a second before applying the physical force
-        if (dashPreDelay > 0f)
-            Invoke(nameof(ApplyDashForce), dashPreDelay);
-        else
-            ApplyDashForce();
+        // Apply the dash instantly
+        ApplyDashForce();
     }
 
     private void ApplyDashForce()

@@ -208,10 +208,9 @@ MonoBehaviour:
   jumpForce: 15
   extraGravity: 30
   jumpCooldown: 0.25
-  dashForce: 65
+  dashForce: 75
   dashDuration: 0.2
   dashCooldown: 1.5
-  dashPreDelay: 0.15
   playerHeight: 2
   whatIsGround:
     serializedVersion: 2
@@ -220,8 +219,8 @@ MonoBehaviour:
   mouseSensitivity: 2
   playerCamera: {fileID: 0}
   normalFOV: 90
-  dashFOV: 110
-  fovChangeSpeed: 20
+  dashFOV: 112
+  fovChangeSpeed: 7
   bobSpeed: 14
   bobAmount: 0.05
   tiltAngle: 3
@@ -448,7 +447,7 @@ Transform:
   m_GameObject: {fileID: 8819543926169019555}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.369, y: -0.762, z: 1.667}
+  m_LocalPosition: {x: -1.369, y: -0.581, z: 1.667}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
