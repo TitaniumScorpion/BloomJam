@@ -42,6 +42,7 @@ public class AutomaticPistol : MonoBehaviour
     private Quaternion initialDisplayRotation;
     private Vector3 initialDisplayPosition;
     private float bobTimer;
+    private Vector3 stableFirePointLocalPos;
 
     private void Start()
     {
@@ -57,6 +58,13 @@ public class AutomaticPistol : MonoBehaviour
         {
             initialDisplayRotation = displayWeapon.transform.localRotation;
             initialDisplayPosition = displayWeapon.transform.localPosition;
+        }
+
+        // Store the exact local position of the fire point relative to the camera
+        // so we can calculate perfect bullet trajectories completely independent of weapon sway/shake
+        if (firePoint != null && playerCamera != null)
+        {
+            stableFirePointLocalPos = playerCamera.transform.InverseTransformPoint(firePoint.position);
         }
     }
 
@@ -114,11 +122,14 @@ public class AutomaticPistol : MonoBehaviour
             else
                 targetPoint = ray.GetPoint(100f); // We didn't hit anything, aim at a point far away
 
-            // Calculate the rotation needed to look from the gun's barrel to the target point
-            Vector3 direction = targetPoint - firePoint.position;
+            // Calculate a stable fire point that isn't affected by weapon shake, recoil, or bobbing
+            Vector3 stableFirePointPos = playerCamera.transform.TransformPoint(stableFirePointLocalPos);
+
+            // Calculate the perfect rotation needed to look from the stable point to the target point
+            Vector3 direction = targetPoint - stableFirePointPos;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-            // Grab a projectile from the Object Pool with the corrected rotation
+            // Grab a projectile from the Object Pool with the corrected rotation, but still spawn at the visual barrel
             ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
         }
         

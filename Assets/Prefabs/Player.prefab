@@ -209,7 +209,7 @@ MonoBehaviour:
   extraGravity: 30
   jumpCooldown: 0.25
   dashForce: 75
-  dashDuration: 0.2
+  dashDuration: 0.25
   dashCooldown: 1.5
   playerHeight: 2
   whatIsGround:
@@ -391,11 +391,13 @@ MonoBehaviour:
   swaySpeed: 8
   bobSpeed: 14
   bobAmount: 0.05
-  recoilKickback: 0.2
-  recoilRotation: 14
-  recoilRecoverySpeed: 13
-  camShakeMagnitude: 0.2
-  camShakeDuration: 0.1
+  recoilKickback: 0.25
+  recoilRotation: 10
+  recoilRecoverySpeed: 11
+  camShakeMagnitude: 0.3
+  camShakeDuration: 0.3
+  weaponShakeMagnitude: 0.005
+  weaponShakeDuration: 0.3
 --- !u!114 &7429899312607839502
 MonoBehaviour:
   m_ObjectHideFlags: 0
