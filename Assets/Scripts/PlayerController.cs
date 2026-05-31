@@ -135,7 +135,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // Apply extra gravity to make jump speed (time in air) shorter
-        if (!grounded)
+        // We disable this during a dash so we don't mess with the linear trajectory
+        if (!grounded && !isDashing)
         {
             rb.AddForce(Vector3.down * extraGravity, ForceMode.Acceleration);
         }
@@ -287,6 +288,11 @@ public class PlayerController : MonoBehaviour
     {
         // Temporarily reset velocity so the dash applies purely and consistently
         rb.linearVelocity = new Vector3(0f, 0f, 0f);
+        
+        // Lock Y position and disable gravity so the player dashes perfectly horizontally without bumping
+        rb.useGravity = false;
+        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+        
         rb.AddForce(currentDashDirection * dashForce, ForceMode.Impulse);
 
         // Stop the dash after 'dashDuration' seconds
@@ -296,6 +302,11 @@ public class PlayerController : MonoBehaviour
     private void EndDash()
     {
         isDashing = false;
+        
+        // Restore normal gravity and physical constraints
+        rb.useGravity = true;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        
         // Significantly reduce velocity immediately after a dash so the player doesn't slide uncontrollably
         rb.linearVelocity = new Vector3(rb.linearVelocity.x * 0.3f, rb.linearVelocity.y, rb.linearVelocity.z * 0.3f);
     }
