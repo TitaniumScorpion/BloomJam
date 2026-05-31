@@ -8,7 +8,6 @@ public class AudioManager : MonoBehaviour
 
     [Header("Audio Clips")]
     public AudioClip pistolShootSound;
-    public AudioClip bombExplosionSound;
     public AudioClip enemySpawnTelegraphSound;
     public AudioClip eliteShootSound;
     
@@ -25,7 +24,6 @@ public class AudioManager : MonoBehaviour
 
     [Header("Volumes")]
     [Range(0f, 5f)] public float pistolShootVolume = 0.15f;
-    [Range(0f, 5f)] public float bombExplosionVolume = 1f;
     [Range(0f, 5f)] public float enemySpawnTelegraphVolume = 1f;
     [Range(0f, 5f)] public float eliteShootVolume = 1f;
     [Range(0f, 5f)] public float backgroundVolume = 0.5f;

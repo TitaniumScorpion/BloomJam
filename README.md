@@ -19,9 +19,9 @@ Devil Engine is a fast-paced, skill-based, first-person arena shooter heavily in
 *   **Weapon 1 (Default): Automatic Pistol**
     *   **Description:** The starting weapon. A rapid-fire pistol that shoots a continuous stream of energy projectiles.
     *   **Function:** Designed for precision aiming and taking down individual or lined-up enemies quickly. It has no ammo limit.
-*   **Weapon 2 (Unlockable): Impact Bomb**
-    *   **Description:** A throwable explosive that detonates 2 seconds after being launched.
-    *   **Function:** Creates a large area-of-effect (AoE) blast, perfect for clearing dense clusters of weaker enemies. The explosion also launches the player into the air if they are caught in the blast radius, allowing for a high-skill "bomb jump" to reach greater heights and evade ground-based threats.
+*   **Weapon 2 (Unlockable): Katana**
+    *   **Description:** A close-range melee weapon wielded in the secondary hand.
+    *   **Function:** Delivers a sweeping slash in front of the player on right-click, dealing high damage to multiple enemies at once. Ideal for clearing dense clusters of Standard Swarmers that get too close.
 
 ## Enemy Types & Behaviors
 
@@ -31,7 +31,7 @@ Devil Engine is a fast-paced, skill-based, first-person arena shooter heavily in
     *   **Threat Level:** Low individually, but highly lethal when they form dense clusters that block movement and dash routes. Can be destroyed with a single pistol shot.
 *   **Elite Boss (e.g., "The Hive" or "Leviathan")**
     *   **Description:** A towering, imposing monstrosity that acts as the primary anchor for a wave.
-    *   **Behavior:** Moves slowly but acts as a mobile spawner, periodically expelling groups of Standard Swarmers into the arena. Requires sustained fire from the pistol or strategic use of Impact Bombs to take down.
+    *   **Behavior:** Moves slowly but acts as a mobile spawner, periodically expelling groups of Standard Swarmers into the arena. Requires sustained fire from the pistol to take down.
     *   **Threat Level:** High priority target. If left alive, it will quickly flood the arena and make survival impossible.
     *   **Reward:** Defeating this boss causes it to shatter and drop the currency (gems/souls) used to unlock new weapons in the pre-run menu.
 
@@ -48,7 +48,7 @@ Devil Engine is a fast-paced, skill-based, first-person arena shooter heavily in
     *   **Purpose:** To test the player's raw aim, movement, and ability to handle the initial swarms. This is a pure test of fundamental skills.
 *   **Zone 2: The Pillars of Ruin**
     *   **Layout:** A multi-tiered arena with several large, indestructible pillars. The area is larger than Zone 1, but sightlines are broken up. Ramps or stairs connect the different levels.
-    *   **Purpose:** To challenge the player's spatial awareness. Pillars can be used for cover but also create ambush points for enemies. Players must master bomb jumping and dashing to navigate the verticality effectively.
+    *   **Purpose:** To challenge the player's spatial awareness. Pillars can be used for cover but also create ambush points for enemies. Players must master dashing to navigate the verticality effectively.
 *   **Zone 3: The Collapsing Core**
     *   **Layout:** A chaotic and dynamic arena. The outer sections of the floor periodically crumble and fall away, shrinking the playable space. Environmental hazards, like energy beams that sweep across the arena, activate at set intervals.
     *   **Purpose:** The ultimate test of skill. Players must not only manage the most intense enemy waves but also constantly adapt to a shrinking and hostile environment. One wrong move can lead to an environmental death.
@@ -89,7 +89,7 @@ Devil Engine is a fast-paced, skill-based, first-person arena shooter heavily in
     *   Build the Wave Spawner, Zone Quota Manager, and robust Object Pooling system.
     *   Implement the Elite Boss enemy behavior and currency dropping.
 *   **Milestone 3: Arsenal & Meta-Progression**
-    *   Develop Weapon 2 (Impact Bomb) including AoE damage and physics-based blast jumping.
+    *   Develop Katana melee weapon and meta-progression systems.
     *   Create the pre-run unlock menu, persistent currency saving, and basic score tracking.
 *   **Milestone 4: Visuals & Sound (The "Bloom" & "Sin" Pass)**
     *   Develop and apply the custom graphic novel/ink shaders and high-contrast bloom effects.
