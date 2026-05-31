@@ -34,6 +34,11 @@ public class AutomaticPistol : MonoBehaviour
     public float camShakeDuration = 0.05f;
     private PlayerController playerController;
 
+    [Header("Weapon Shake")]
+    public float weaponShakeMagnitude = 0.015f;
+    public float weaponShakeDuration = 0.05f;
+    private float weaponShakeTimer;
+
     private Quaternion initialDisplayRotation;
     private Vector3 initialDisplayPosition;
     private float bobTimer;
@@ -67,6 +72,9 @@ public class AutomaticPistol : MonoBehaviour
         // Manage the cooldown timer
         if (fireTimer > 0f)
             fireTimer -= Time.deltaTime;
+            
+        if (weaponShakeTimer > 0f)
+            weaponShakeTimer -= Time.deltaTime;
 
         // Check if the left mouse button is held down
         if (Mouse.current != null && Mouse.current.leftButton.isPressed)
@@ -120,6 +128,9 @@ public class AutomaticPistol : MonoBehaviour
             playerController.AddCameraShake(camShakeMagnitude, camShakeDuration);
         }
         
+        // Trigger weapon shake
+        weaponShakeTimer = weaponShakeDuration;
+        
         // Apply Recoil
         currentRecoilPosition += new Vector3(0f, 0f, -recoilKickback);
         currentRecoilRotation *= Quaternion.Euler(-recoilRotation, Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f), Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
@@ -141,9 +152,29 @@ public class AutomaticPistol : MonoBehaviour
                 if (Keyboard.current.sKey.isPressed) moveY -= 1f;
             }
 
+            // Calculate random vibration while firing
+            Vector3 randomShake = Vector3.zero;
+            Quaternion randomRotShake = Quaternion.identity;
+            
+            if (weaponShakeTimer > 0f)
+            {
+                randomShake = new Vector3(
+                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
+                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
+                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude)
+                );
+                
+                float rotMag = weaponShakeMagnitude * 200f; // Scale position magnitude to degrees (0.015 -> ~3 degrees)
+                randomRotShake = Quaternion.Euler(
+                    Random.Range(-rotMag, rotMag), 
+                    Random.Range(-rotMag, rotMag), 
+                    Random.Range(-rotMag, rotMag)
+                );
+            }
+
             // Tilt
             Quaternion swayRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
-            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, swayRotation * currentRecoilRotation, Time.deltaTime * tiltSpeed);
+            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, swayRotation * currentRecoilRotation, Time.deltaTime * tiltSpeed) * randomRotShake;
 
             // Calculate continuous bobbing (Figure-8 pattern)
             float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
@@ -160,7 +191,7 @@ public class AutomaticPistol : MonoBehaviour
 
             // Positional sway
             Vector3 targetPosition = initialDisplayPosition + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f) + bobOffset + currentRecoilPosition;
-            displayWeapon.transform.localPosition = Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed);
+            displayWeapon.transform.localPosition = Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed) + randomShake;
         }
     }
 }
