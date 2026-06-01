@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: basic_enemy_mat
-    second: {fileID: 2100000, guid: 8b1be8f69651c0b4c9a7a1d7518912f2, type: 2}
+    second: {fileID: 2100000, guid: 55e5796df92aa294984031efe4432dd3, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
