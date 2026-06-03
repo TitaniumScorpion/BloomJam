@@ -7,6 +7,28 @@ public class AutomaticPistol : MonoBehaviour
     public float fireRate = 0.1f; // Time in seconds between shots (0.1 = 10 shots per second)
     private float fireTimer;
 
+    [Header("Overheat Mechanics")]
+    public float maxHeat = 100f;
+    public float heatPerShot = 12f;
+    public float coolingRate = 60f;
+    public float coolingDelay = 0.2f;
+    private float currentHeat = 0f;
+    private bool isOverheated = false;
+    private float coolingTimer = 0f;
+
+    [Header("Overheat Visuals")]
+    public Renderer weaponRenderer;
+    [ColorUsage(true, true)] public Color overheatGlowColor = new Color(2f, 0f, 0f, 1f); // HDR color for Bloom
+    public int materialIndex = 0;
+    [Tooltip("The exact Reference name in your custom Toon shader for emission/glow. Usually _EmissionColor, _Emission, or _Glow.")]
+    public string emissionPropertyName = "_EmissionColor";
+    [UnityEngine.Serialization.FormerlySerializedAs("visualHeatSpeed")]
+    public float visualHeatingSpeed = 10f;
+    public float visualCoolingSpeed = 10f;
+    private Material weaponMaterial;
+    private int emissionColorID;
+    private float visualHeat = 0f;
+
     [Header("References")]
     public string projectilePoolTag = "PlayerProjectile";
     public string muzzleFlashPoolTag = "MuzzleFlash";
@@ -66,6 +88,14 @@ public class AutomaticPistol : MonoBehaviour
         {
             stableFirePointLocalPos = playerCamera.transform.InverseTransformPoint(firePoint.position);
         }
+
+        // Cache the weapon's material so we can make it glow
+        if (weaponRenderer != null)
+        {
+            weaponMaterial = weaponRenderer.materials[materialIndex];
+            weaponMaterial.EnableKeyword("_EMISSION");
+            emissionColorID = Shader.PropertyToID(emissionPropertyName);
+        }
     }
 
     private void Update()
@@ -84,10 +114,41 @@ public class AutomaticPistol : MonoBehaviour
         if (weaponShakeTimer > 0f)
             weaponShakeTimer -= Time.deltaTime;
 
+        // Manage Overheat Cooling
+        if (coolingTimer > 0f)
+        {
+            coolingTimer -= Time.deltaTime;
+        }
+        else if (currentHeat > 0f)
+        {
+            currentHeat -= coolingRate * Time.deltaTime;
+            if (currentHeat <= 0f)
+            {
+                currentHeat = 0f;
+                isOverheated = false;
+            }
+        }
+
+        // Update weapon glow based on current heat
+        if (weaponMaterial != null)
+        {
+            float currentVisualSpeed = (currentHeat > visualHeat) ? visualHeatingSpeed : visualCoolingSpeed;
+
+            // Smoothly transition the visual heat to match the actual heat so it doesn't jump instantly when shooting
+            visualHeat = Mathf.Lerp(visualHeat, currentHeat, Time.deltaTime * currentVisualSpeed);
+            float heatPercent = visualHeat / maxHeat;
+            
+            // Square the percentage to create an exponential curve.
+            // This makes the glow stay subtle at lower heat, and ramp up aggressively as it approaches max heat.
+            float glowCurve = heatPercent * heatPercent;
+            Color currentGlow = Color.Lerp(Color.black, overheatGlowColor, glowCurve);
+            weaponMaterial.SetColor(emissionColorID, currentGlow);
+        }
+
         // Check if the left mouse button is held down
         if (Mouse.current != null && Mouse.current.leftButton.isPressed)
         {
-            if (fireTimer <= 0f)
+            if (fireTimer <= 0f && !isOverheated)
             {
                 Shoot();
             }
@@ -99,6 +160,14 @@ public class AutomaticPistol : MonoBehaviour
     private void Shoot()
     {
         fireTimer = fireRate;
+        coolingTimer = coolingDelay;
+
+        currentHeat += heatPerShot;
+        if (currentHeat >= maxHeat)
+        {
+            currentHeat = maxHeat;
+            isOverheated = true;
+        }
 
         if (AudioManager.Instance != null && AudioManager.Instance.pistolShootSound != null)
         {
