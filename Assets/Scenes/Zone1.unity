@@ -78069,21 +78069,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2396186214292455038, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2456856366881023602, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 2456856366881023602, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7833862840553551433, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8677833960182127638, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_LocalPosition.x
@@ -78124,10 +78112,6 @@ PrefabInstance:
     - target: {fileID: 8677833960182127638, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8819543926169019555, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
