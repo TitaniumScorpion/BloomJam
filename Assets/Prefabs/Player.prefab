@@ -380,6 +380,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutomaticPistol
   fireRate: 0.1
+  maxHeat: 100
+  heatPerShot: 2.5
+  coolingRate: 40
+  coolingDelay: 0.2
+  weaponRenderer: {fileID: 4197366786816565163}
+  overheatGlowColor: {r: 12.84447, g: 0, b: 0, a: 1}
+  materialIndex: 0
+  emissionPropertyName: _Emissive_Color
+  visualHeatingSpeed: 0.2
+  visualCoolingSpeed: 8
   projectilePoolTag: PlayerProjectile
   muzzleFlashPoolTag: MuzzleFlash
   firePoint: {fileID: 1891088213399507217}
@@ -395,9 +405,9 @@ MonoBehaviour:
   recoilRotation: 10
   recoilRecoverySpeed: 14
   camShakeMagnitude: 0.25
-  camShakeDuration: 0.2
+  camShakeDuration: 0.3
   weaponShakeMagnitude: 0.005
-  weaponShakeDuration: 0.25
+  weaponShakeDuration: 0.3
 --- !u!114 &7429899312607839502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,6 +550,11 @@ GameObject:
 --- !u!4 &3029556981752308932 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
+  m_PrefabInstance: {fileID: 3279077356255036207}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4197366786816565163 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 5dba82829400fbe458402028f4f43e90, type: 3}
   m_PrefabInstance: {fileID: 3279077356255036207}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8061372450329317808
