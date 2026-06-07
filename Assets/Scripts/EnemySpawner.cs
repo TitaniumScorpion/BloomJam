@@ -29,6 +29,7 @@ public class EnemySpawner : MonoBehaviour
     private bool isSpawningActive = true;
     private float advancedSpawnTimer;
     private int advancedEnemiesSpawned = 0;
+    private bool isSpawningWave = false;
 
     private void OnEnable()
     {
@@ -36,6 +37,7 @@ public class EnemySpawner : MonoBehaviour
         
         // Reset spawning state whenever the zone is turned on!
         isSpawningActive = true;
+        isSpawningWave = false;
         spawnTimer = 0f; // Set to 0 so the first wave spawns immediately!
         advancedSpawnTimer = advancedSpawnInterval;
         advancedEnemiesSpawned = 0; // Reset boss count so they are allowed to spawn again
@@ -48,15 +50,10 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
+        // Don't process spawning logic if the game is paused (e.g., during the countdown)
+        if (Time.timeScale == 0f) return;
+        
         if (!isSpawningActive) return;
-
-        spawnTimer -= Time.deltaTime;
-
-        if (spawnTimer <= 0f)
-        {
-            StartCoroutine(SpawnWaveRoutine());
-            spawnTimer = spawnInterval; // Reset timer
-        }
 
         // Separate timer logic for Advanced Enemies
         if (advancedEnemiesSpawned < maxAdvancedEnemiesToSpawn)
@@ -69,6 +66,16 @@ public class EnemySpawner : MonoBehaviour
                 advancedEnemiesSpawned++;
             }
         }
+
+        // Don't tick down the spawn timer while a wave is currently in the middle of spawning
+        if (isSpawningWave) return;
+
+        spawnTimer -= Time.deltaTime;
+
+        if (spawnTimer <= 0f)
+        {
+            StartCoroutine(SpawnWaveRoutine());
+        }
     }
 
     private void StopSpawning()
@@ -78,6 +85,8 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnWaveRoutine()
     {
+        isSpawningWave = true;
+
         // Pick ONE spawn location for the entire swarm
         Vector3 waveBasePosition = GetSpawnPosition();
 
@@ -99,7 +108,11 @@ public class EnemySpawner : MonoBehaviour
         }
 
         // If the zone was cleared while we were waiting, abort the spawn
-        if (!isSpawningActive) yield break;
+        if (!isSpawningActive)
+        {
+            isSpawningWave = false;
+            yield break;
+        }
 
         for (int i = 0; i < enemiesPerWave; i++)
         {
@@ -112,6 +125,9 @@ public class EnemySpawner : MonoBehaviour
             // Small delay between individual spawns so they don't perfectly overlap
             yield return new WaitForSeconds(0.1f);
         }
+
+        isSpawningWave = false;
+        spawnTimer = spawnInterval; // Reset timer AFTER the wave finishes spawning
     }
 
     private void SpawnAdvancedEnemy()
