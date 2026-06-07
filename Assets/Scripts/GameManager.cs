@@ -36,19 +36,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern: Ensure only ONE GameManager ever exists
-        if (Instance == null)
+        // Singleton pattern for the CURRENT scene only
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            transform.SetParent(null); // Must be at the root of the hierarchy to persist
-            DontDestroyOnLoad(gameObject); // Carry this object into the next scene!
+            Destroy(gameObject);
+            return;
         }
-        else
-        {
-            // Instantly disable the duplicate to prevent its EventSystem child from running OnEnable
-            gameObject.SetActive(false); 
-            Destroy(gameObject); // If we reload Zone 1, destroy the duplicate
-        }
+        
+        Instance = this;
     }
 
     private void OnEnable()
@@ -151,6 +146,18 @@ public class GameManager : MonoBehaviour
         QuotaManager qm = FindObjectOfType<QuotaManager>();
         if (qm != null) qm.StartNextZone();
         // ----------------------------------
+        
+        // --- ARENA CLEANUP ---
+        // Despawn any surviving enemies or stray bullets from the previous zone
+        foreach (StandardSwarmer swarmer in FindObjectsOfType<StandardSwarmer>())
+            swarmer.gameObject.SetActive(false);
+        foreach (AdvancedEnemy boss in FindObjectsOfType<AdvancedEnemy>())
+            boss.gameObject.SetActive(false);
+        foreach (Projectile proj in FindObjectsOfType<Projectile>())
+            proj.gameObject.SetActive(false);
+        foreach (EnemyProjectile eProj in FindObjectsOfType<EnemyProjectile>())
+            eProj.gameObject.SetActive(false);
+        // ---------------------
 
         // Lock the cursor so the player is ready to aim when it hits 0
         Cursor.lockState = CursorLockMode.Locked;

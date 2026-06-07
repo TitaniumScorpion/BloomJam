@@ -33,18 +33,17 @@ public class EnemySpawner : MonoBehaviour
     private void OnEnable()
     {
         QuotaManager.OnZoneCleared += StopSpawning;
+        
+        // Reset spawning state whenever the zone is turned on!
+        isSpawningActive = true;
+        spawnTimer = 0f; // Set to 0 so the first wave spawns immediately!
+        advancedSpawnTimer = advancedSpawnInterval;
+        advancedEnemiesSpawned = 0; // Reset boss count so they are allowed to spawn again
     }
 
     private void OnDisable()
     {
         QuotaManager.OnZoneCleared -= StopSpawning;
-    }
-
-    private void Start()
-    {
-        // Start the timer
-        spawnTimer = spawnInterval;
-        advancedSpawnTimer = advancedSpawnInterval; // Start the 20s countdown for elites
     }
 
     private void Update()
