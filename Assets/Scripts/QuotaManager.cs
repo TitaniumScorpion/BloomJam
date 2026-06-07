@@ -4,11 +4,11 @@ using System;
 public class QuotaManager : MonoBehaviour
 {
     [Header("Zone Progression")]
-    [Tooltip("The total kills needed to clear THIS specific zone (e.g., 50 for Zone 1, 100 for Zone 2, 150 for Zone 3)")]
-    public int targetQuota = 50;
+    [Tooltip("The total kills needed to clear each zone (Index 0 = Zone 1, Index 1 = Zone 2, etc.)")]
+    public int[] targetQuotas = { 50, 100, 150 };
     
-    [Tooltip("Check this ONLY in the final zone (Zone 3) to trigger the Victory Screen instead of an elevator")]
-    public bool isFinalZone = false;
+    [Tooltip("The index of the final zone that triggers victory (e.g., 2 for Zone 3)")]
+    public int finalZoneIndex = 2;
     
     // Made static so progression persists across scene loads
     public static int currentKills = 0;
@@ -17,7 +17,7 @@ public class QuotaManager : MonoBehaviour
 
     [Header("Level Transition")]
     [Tooltip("The elevator object that appears when the zone is cleared.")]
-    public GameObject levelElevator;
+    public GameObject[] levelElevators; // Assign one elevator per zone here
 
     // Events to broadcast progression state to the UI, Spawner, or Game Manager
     public static event Action<int, int> OnKillCountUpdated; // Sends (currentKills, targetQuota)
@@ -40,14 +40,26 @@ public class QuotaManager : MonoBehaviour
     {
         // Reset kills at the start of every zone so the quota starts at 0
         currentKills = 0;
+        zoneCleared = false;
 
         // Initialize the UI with starting values for this specific zone
-        OnKillCountUpdated?.Invoke(currentKills, targetQuota);
+        int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
+        OnKillCountUpdated?.Invoke(currentKills, currentQuota);
             
-        if (levelElevator != null)
-            levelElevator.SetActive(false); // Hide elevator at the start
-        else if (!isFinalZone)
-            Debug.LogWarning("Level Elevator is missing! Please assign it in the Inspector.");
+        // Hide all elevators at start
+        foreach (GameObject elevator in levelElevators)
+        {
+            if (elevator != null) elevator.SetActive(false);
+        }
+    }
+
+    // Called by GameManager when actually starting the next zone after the elevator ride
+    public void StartNextZone()
+    {
+        currentKills = 0;
+        zoneCleared = false;
+        int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
+        OnKillCountUpdated?.Invoke(currentKills, currentQuota);
     }
 
     // Call this from your Game Over or Main Menu script when starting a fresh run!
@@ -60,12 +72,13 @@ public class QuotaManager : MonoBehaviour
     private void HandleEnemyDied()
     {
         currentKills++;
-        OnKillCountUpdated?.Invoke(currentKills, targetQuota);
+        int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
+        OnKillCountUpdated?.Invoke(currentKills, currentQuota);
         
         if (zoneCleared) return;
 
         // Check if we reached the milestone for the current zone
-        if (currentKills >= targetQuota)
+        if (currentKills >= currentQuota)
         {
             zoneCleared = true;
             AdvanceZone();
@@ -74,9 +87,7 @@ public class QuotaManager : MonoBehaviour
 
     private void AdvanceZone()
     {
-        currentZoneIndex++;
-
-        if (isFinalZone)
+        if (currentZoneIndex >= finalZoneIndex)
         {
             Debug.Log("All zones cleared! Game Completed!");
             if (AudioManager.Instance != null && AudioManager.Instance.levelCompleteSound != null)
@@ -96,8 +107,13 @@ public class QuotaManager : MonoBehaviour
             }
             OnZoneCleared?.Invoke(); // Tell spawners to stop
             
-            if (levelElevator != null)
-                levelElevator.SetActive(true); // Reveal the elevator
+            if (currentZoneIndex < levelElevators.Length && levelElevators[currentZoneIndex] != null)
+            {
+                levelElevators[currentZoneIndex].SetActive(true); // Reveal the elevator for the current zone
+            }
+
+            // Increment the index so the GameManager knows which zone to load next
+            currentZoneIndex++;
         }
     }
 }

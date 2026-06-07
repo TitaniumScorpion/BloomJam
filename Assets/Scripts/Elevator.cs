@@ -7,9 +7,6 @@ public class Elevator : MonoBehaviour
     public float ascensionTime = 6.5f; // Time in seconds to reach the target height
     public float targetHeight = 20f;
     
-    [Tooltip("Leave empty to just load the next scene sequentially in the Build Settings")]
-    public string nextSceneName; 
-    
     private bool isPlayerOnBoard = false;
     private bool isLifting = false;
     private Transform playerTransform;
@@ -85,22 +82,10 @@ public class Elevator : MonoBehaviour
             playerTransform.SetParent(null);
         }
 
-        if (!string.IsNullOrEmpty(nextSceneName))
+        // Trigger the GameManager to swap zones within the same scene
+        if (GameManager.Instance != null)
         {
-            SceneManager.LoadScene(nextSceneName);
-        }
-        else
-        {
-            // Fallback: Load the next scene in the build settings
-            int nextBuildIndex = SceneManager.GetActiveScene().buildIndex + 1;
-            if (nextBuildIndex < SceneManager.sceneCountInBuildSettings)
-            {
-                SceneManager.LoadScene(nextBuildIndex);
-            }
-            else
-            {
-                Debug.LogWarning("No more scenes in build index! Game Completed.");
-            }
+            GameManager.Instance.AdvanceToNextZone();
         }
     }
 }

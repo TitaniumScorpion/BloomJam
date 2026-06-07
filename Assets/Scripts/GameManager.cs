@@ -29,6 +29,11 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     private Coroutine transitionCoroutine;
 
+    [Header("Single Scene Progression")]
+    public GameObject[] zones; // Drag Zone 1, Zone 2, Zone 3 parent objects here
+    public Transform[] playerSpawnPoints; // Drag the spawn point transforms for each zone here
+    public GameObject playerObject; // Drag the Player here
+
     private void Awake()
     {
         // Singleton pattern: Ensure only ONE GameManager ever exists
@@ -109,6 +114,13 @@ public class GameManager : MonoBehaviour
         transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
     }
 
+    public void AdvanceToNextZone()
+    {
+        // Called by the Elevator when it reaches the top
+        if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
+        transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
+    }
+
     private IEnumerator ZoneTransitionRoutine()
     {
         isTimerRunning = false;
@@ -121,6 +133,24 @@ public class GameManager : MonoBehaviour
             CanvasGroup cg = zoneTransitionScreen.GetComponent<CanvasGroup>();
             if (cg != null) cg.alpha = 1f; // Ensure it starts fully opaque
         }
+
+        // --- SINGLE SCENE ZONE SWAPPING ---
+        // Enable the current zone and disable all others
+        for (int i = 0; i < zones.Length; i++)
+        {
+            if (zones[i] != null)
+                zones[i].SetActive(i == QuotaManager.currentZoneIndex);
+        }
+
+        // Teleport the player to the correct spawn point
+        if (playerObject != null && playerSpawnPoints.Length > QuotaManager.currentZoneIndex && playerSpawnPoints[QuotaManager.currentZoneIndex] != null)
+        {
+            playerObject.transform.position = playerSpawnPoints[QuotaManager.currentZoneIndex].position;
+        }
+        
+        QuotaManager qm = FindObjectOfType<QuotaManager>();
+        if (qm != null) qm.StartNextZone();
+        // ----------------------------------
 
         // Lock the cursor so the player is ready to aim when it hits 0
         Cursor.lockState = CursorLockMode.Locked;
