@@ -44,25 +44,22 @@ public class AdvancedEnemy : MonoBehaviour
         moveAudioSource.maxDistance = 150f; // Can be heard clearly across the entire arena
         moveAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         moveAudioSource.playOnAwake = false;
-
-        // Automatically find the Target Zone in the scene since Prefabs can't hold scene references
-        if (targetZone == null)
-        {
-            GameObject zoneObj = GameObject.Find("TargetZone");
-            if (zoneObj != null)
-            {
-                targetZone = zoneObj.GetComponent<BoxCollider>();
-            }
-            else
-            {
-                Debug.LogWarning("Could not find a GameObject named 'TargetZone' in the scene! Advanced Enemy artillery will fail.", this);
-            }
-        }
     }
 
     private void OnEnable()
     {
         currentHealth = maxHealth;
+        
+        // Automatically find the currently active Target Zone in the scene (since zones swap and prefabs can't hold scene references)
+        GameObject zoneObj = GameObject.Find("TargetZone");
+        if (zoneObj != null)
+        {
+            targetZone = zoneObj.GetComponent<BoxCollider>();
+        }
+        else
+        {
+            Debug.LogWarning("Could not find an active GameObject named 'TargetZone' in the scene! Advanced Enemy artillery will fail.", this);
+        }
         
         // Enter the rising state as soon as it spawns
         isRising = true;
