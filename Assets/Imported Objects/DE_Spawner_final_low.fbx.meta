@@ -18,7 +18,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: DE_Spawner_low_2
-    second: {fileID: 2100000, guid: 24130e4087308964eb45bd282dd303fa, type: 2}
+    second: {fileID: 2100000, guid: e5bff72722516314db99340061b0e4b2, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
