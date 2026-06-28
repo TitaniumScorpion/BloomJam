@@ -69,6 +69,15 @@ public class QuotaManager : MonoBehaviour
         currentZoneIndex = 0;
     }
 
+    // Called by UpgradeManager after the player picks their upgrade
+    public void RevealElevator()
+    {
+        if (currentZoneIndex < levelElevators.Length && levelElevators[currentZoneIndex] != null)
+            levelElevators[currentZoneIndex].SetActive(true);
+
+        currentZoneIndex++;
+    }
+
     private void HandleEnemyDied()
     {
         currentKills++;
@@ -105,15 +114,7 @@ public class QuotaManager : MonoBehaviour
                 // Play as a global 2D sound (spatialBlend = 0f) with highest priority (0)
                 AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.levelCompleteSound, Vector3.zero, AudioManager.Instance.levelCompleteVolume, 1f, 0, 0f);
             }
-            OnZoneCleared?.Invoke(); // Tell spawners to stop
-            
-            if (currentZoneIndex < levelElevators.Length && levelElevators[currentZoneIndex] != null)
-            {
-                levelElevators[currentZoneIndex].SetActive(true); // Reveal the elevator for the current zone
-            }
-
-            // Increment the index so the GameManager knows which zone to load next
-            currentZoneIndex++;
+            OnZoneCleared?.Invoke(); // Tell spawners to stop. UpgradeManager reveals elevator after upgrade choice.
         }
     }
 }
