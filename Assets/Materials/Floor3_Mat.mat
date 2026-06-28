@@ -405,8 +405,8 @@ Material:
     - _RimLightOverridden: 0
     - _RimLightVisible: 1
     - _RimLight_FeatherOff: 1
-    - _RimLight_InsideMask: 0.28
-    - _RimLight_Power: 0.339
+    - _RimLight_InsideMask: 0.26
+    - _RimLight_Power: 0.014
     - _Rotate_EmissiveUV: 0
     - _Rotate_MatCapUV: 0
     - _Rotate_NormalMapForMatCapUV: 0
