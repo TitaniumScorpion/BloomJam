@@ -1,100 +1,93 @@
-# BloomJam - Game Design Document
+# Devil Engine Game Design Doc
 
 ## Game Overview
-Devil Engine is a fast-paced, skill-based, first-person arena shooter heavily inspired by *Devil Daggers*. Players are dropped into a dark, confined arena with no cover and must battle their way through 3 distinct zones filled with otherworldly enemies. The primary focus is on intense, split-second decision-making, fluid movement, and aiming precision. The ultimate goal is to clear all 3 zones as quickly as possible, maximizing your score to climb the leaderboards.
+
+A fast-paced, skill-based, first-person roguelike arena shooter prioritizing fluid movement and speed. Players are dropped into a dark, sprawling, brutalist megastructure and must battle through 5 escalating arenas. The goal is to clear all 5 zones as quickly as possible to achieve high rating in global speedrun leaderboards. Death is permanent, sending players back to the beginning, but victory unlocks new difficulty modifiers and expanded weapon choice.
 
 ## Core Gameplay Loop
-1. **Spawn:** The player drops into the first of 3 distinct zones.
-2. **Eliminate & Advance:** Swarms of enemies spawn aggressively. The player must kill a specific quota of enemies to complete the current zone and unlock the next.
-3. **Collect Currency:** Defeating specific elite enemies drops currency (e.g., gems/souls). This collected currency persists between runs.
-4. **Die, Unlock & Repeat:** The player is extremely fragile. Upon death or victory, the clear time is logged. Before starting a new run, a pre-run menu appears where the player can spend retained currency to unlock the next weapon (starting with the second weapon) before jumping back in.
+
+1. **Spawn:** The player drops into the first of 5 arenas.
+2. **Slaughter:** Enemies spawn aggressively in packs. The player must survive and kill a hidden quota of enemies to trigger the arena's completion.
+3. **Upgrade:** Upon clearing an arena, the player is presented with a choice: upgrade their Pistol or upgrade their Sword for the next level.
+4. **Advance or Die:**
+    - **Death:** The player is fragile. Upon death, the run ends entirely. A death screen displays exactly how far they made it as a percentage (e.g., "Run Failed: 42% Complete"). All weapon upgrades are lost.
+    - **Advance:** Proceed to the next arena with escalating enemy types and density.
+5. **Ascend (Win State):** Clearing Level 5 unlocks the next Difficulty Tier (Hell and Hell) and, on the first full clear, a brand-new 3rd weapon for future runs.
 
 ## Player Mechanics & Movement
-*   **Base Movement:** Extremely fast, highly responsive first-person controls (WASD) prioritizing momentum and situational awareness.
-*   **Normal Jumping:** A standard jump mechanic allowing the player to leap over smaller ground enemies or evade sweeping, low-level attacks.
-*   **Dash:** A quick, directional burst of speed (forward, backward, or strafing) used to instantly reposition, dodge incoming projectiles, or escape from being swarmed. The dash operates on a short cooldown (or stamina system) to encourage tactical use rather than continuous spamming.
+
+*   **Base Movement:** Extremely fast, highly responsive first-person controls (WASD) prioritizing momentum and spatial awareness.
+*   **Normal Jumping:** A standard jump to clear small gaps, vault low hazards, or evade ground sweeps. (Bunnyhop maybe?)
+*   **Dash:** A quick, directional burst of speed to instantly reposition or dodge. Operates on a short cooldown to encourage a reactionary use rather than spamming.
+*   **Dual-Wielding:** The player constantly wields two weapons simultaneously: A gun in one hand and a blade in the other, allowing for seamless transitions between ranged and close-quarters battle.
 
 ## Weapons & Combat System
 
-*   **Weapon 1 (Default): Automatic Pistol**
-    *   **Description:** The starting weapon. A rapid-fire pistol that shoots a continuous stream of energy projectiles.
-    *   **Function:** Designed for precision aiming and taking down individual or lined-up enemies quickly. It has no ammo limit.
-*   **Weapon 2 (Unlockable): Katana**
-    *   **Description:** A close-range melee weapon wielded in the secondary hand.
-    *   **Function:** Delivers a sweeping slash in front of the player on right-click, dealing high damage to multiple enemies at once. Ideal for clearing dense clusters of Standard Swarmers that get too close.
+*   **Weapon 1: Automatic Pistol (Ranged)**
+    *   **Function:** Shoots a continuous stream of energy projectiles.
+    *   **Upgrades:** Upgrading increases its Tier (1 to 5). Upgrades could introduce ricochets, explosive rounds, or piercing beams, accompanied by subtle visual changes to the gun model and projectile FX.
+*   **Weapon 2: Sword (Melee)**
+    *   **Function:** Wide, sweeping melee attacks that deal heavy damage up close and can potentially parry or deflect specific incoming threats.
+    *   **Upgrades:** Upgrading increases its Tier (1 to 5). Upgrades could increase swing speed, add a lunge effect, or introduce energy waves on consecutive hits. The blade's visual aura and geometry shift with each tier.
+*   **Weapon 3: Bilmemne Gun**
+    *   **Function:** Unlocked only after defeating Level 5 for the first time. Adds a new starting option or mechanic to drastically alter the playstyle for higher difficulty runs.
 
 ## Enemy Types & Behaviors
 
-*   **Standard Swarmer (e.g., "Skull" or "Skitter")**
-    *   **Description:** A small, fragile, and aggressive otherworldly entity.
-    *   **Behavior:** Spawns in massive numbers. Relentlessly chases the player in a direct path.
-    *   **Threat Level:** Low individually, but highly lethal when they form dense clusters that block movement and dash routes. Can be destroyed with a single pistol shot.
-*   **Elite Boss (e.g., "The Hive" or "Leviathan")**
-    *   **Description:** A towering, imposing monstrosity that acts as the primary anchor for a wave.
-    *   **Behavior:** Moves slowly but acts as a mobile spawner, periodically expelling groups of Standard Swarmers into the arena. Requires sustained fire from the pistol to take down.
-    *   **Threat Level:** High priority target. If left alive, it will quickly flood the arena and make survival impossible.
-    *   **Reward:** Defeating this boss causes it to shatter and drop the currency (gems/souls) used to unlock new weapons in the pre-run menu.
+*Enemy variety increases as the player progresses deeper into the 5 arenas.*
 
-## Wave Progression & Spawning System
-*   **Zone Progression:** The game is divided into 3 distinct zones/levels. To progress to the next zone, the player must kill a stated amount of mobs.
-*   **Spawn Telegraphing:** Enemies spawn rapidly from the darkness or dimensional rifts. A brief visual and spatial audio cue warns the player just before a spawn occurs, allowing for split-second tactical positioning.
-*   **Milestone Events:** Reaching certain kill count thresholds triggers "Milestone Events," guaranteeing the spawn of an Elite Boss (or multiple), abruptly shifting the flow of combat and forcing the player to prioritize targets to get currency.
-*   **Swarm Density:** The system constantly pressures the player. Failing to clear enemies fast enough will result in the arena filling up, boxing the player in and making it harder to survive and achieve a fast clear time.
+*   **Standard Swarmer:** Small, fragile, and aggressive. Spawns in massive numbers and relentlessly chases the player. (Zone 1 Addition: a secondary basic enemy (e.g. a ranged attacker that fires projectiles or a heavily armored charger that requires dodging)).
+*   **Escalating Roster:** Each subsequent arena introduces new enemy archetypes into the spawn pools, forcing players to constantly re-evaluate target prioritization as the swarms become more diverse.
+*   **Boss:** There are no bosses in Levels 1-4. The climax of the run features a massive monstrosity at the end of Level 5, testing everything the player has built.
 
-## Arena Design & Environment
+## Wave Progression & Arena Design
 
-*   **Zone 1: The Threshold**
-    *   **Layout:** A large, perfectly flat, circular platform suspended in a void. There is no cover and no verticality.
-    *   **Purpose:** To test the player's raw aim, movement, and ability to handle the initial swarms. This is a pure test of fundamental skills.
-*   **Zone 2: The Pillars of Ruin**
-    *   **Layout:** A multi-tiered arena with several large, indestructible pillars. The area is larger than Zone 1, but sightlines are broken up. Ramps or stairs connect the different levels.
-    *   **Purpose:** To challenge the player's spatial awareness. Pillars can be used for cover but also create ambush points for enemies. Players must master dashing to navigate the verticality effectively.
-*   **Zone 3: The Collapsing Core**
-    *   **Layout:** A chaotic and dynamic arena. The outer sections of the floor periodically crumble and fall away, shrinking the playable space. Environmental hazards, like energy beams that sweep across the arena, activate at set intervals.
-    *   **Purpose:** The ultimate test of skill. Players must not only manage the most intense enemy waves but also constantly adapt to a shrinking and hostile environment. One wrong move can lead to an environmental death.
+*   **The Hidden Quota:** To progress, the player must kill a specific amount of enemies. The lack of a UI counter creates psychological pressure, forcing the player to stay aggressive rather than hiding.
+*   **Pack Spawning:** Enemies do not trickle in; they spawn in coordinated bursts or packs via dimensional rifts or dark corners.
+*   **Unified Arena Logic:** All 5 arenas share a similar aesthetic and core layout logic. While the architecture might grow more chaotic or visually corrupted in later levels, the fundamental strategy of movement and line-of-sight management remains consistent.
 
-## Upgrades & Power-ups
+## Scoring, Leaderboards & Ascensions
 
-## Scoring & Leaderboards
-*   **Time-Based Scoring:** The score is directly tied to how quickly the player clears zones. A faster completion time yields a significantly higher score.
-*   **Leaderboards:** Players will be ranked on a global leaderboard based on their final score (shortest time taken to complete all 3 zones).
+*   **Speedrun Focus:** The primary metric of success is the run's finish time.
+*   **Additional Difficulties:** Beating Level 5 unlocks "Difficulty 2," which introduces permanent run modifiers (e.g., faster enemies, environmental hazards, tighter quotas).
+*   **Segmented Leaderboards:** Global leaderboards rank players by completion time, with separate boards for each difficulty tier, ensuring a highly competitive endgame.
 
 ## Art Style & Visual Aesthetics
-*   **Graphic Novel / Ink Aesthetic:** The game features a striking, highly stylized visual style heavily inspired by *Mortal Sin*. It utilizes thick black outlines, dramatic crosshatching, and a gritty, hand-drawn-in-ink look.
-*   **High-Contrast Monochromatic Palette:** The world and standard enemies are primarily rendered in deep, oppressive blacks and stark whites (or a very restricted color palette), creating a grim and intense atmosphere.
-*   **Striking Accent Colors & "Bloom":** To ensure gameplay readability and tie into the "BloomJam" name, vital elements like player projectiles, enemy weak points, and currency are rendered in blinding, hyper-saturated neon colors with heavy bloom effects. This creates a spectacular contrast against the dark, sketchy backgrounds.
-*   **Visceral Combat Feedback:** Combat feels incredibly impactful with aggressive, exaggerated enemy animations, dramatic action lines, and intense hit-stop effects that fit the frantic graphic-novel style.
+
+*   **Tsutomu Nihei meets Mortal Sin:** A striking, high-contrast visual style heavily utilizing thick black outlines and a gritty, hand-drawn ink aesthetic layered over colossal, brutalist megastructures.
+*   **Colour Palette:** The environment and enemies are rendered in deep blacks and stark whites. Vital elements; player projectiles, enemy weak points, and sword trails are rendered in hyper-saturated neon colours (CRT/Cyberpunk accents) with heavy bloom.
+*   **Visceral Feedback:** Combat features simplistic enemy animations, dramatic action lines, and intense hit-stop effects.
 
 ## Audio Design & Music
-*   **Visceral Sound Effects:** Combat audio is punchy, crunchy, and heavily stylized. Gunshots are loud and impactful, and enemy deaths feature aggressive, shattered, or tearing sounds that complement the grim graphic novel aesthetic.
-*   **Crucial Spatial Audio:** High-fidelity 3D audio is mandatory for survival. Players must be able to pinpoint spawn locations, approaching swarmers, and incoming projectiles purely by sound cues before they even see them.
-*   **Aggressive Soundtrack:** The music features a high-BPM, adrenaline-pumping blend of industrial metal, breakcore, or dark synthwave. It is designed to induce a flow state while feeling oppressive and frantic.
-*   **Dynamic Escalation:** The audio landscape is dynamic; the music adds layers or increases in intensity as the player's kill count approaches the zone's milestone, or when an Elite Boss spawns, elevating the tension.
+
+*   **Spatial Audio:** High-fidelity 3D audio. Players must be able to pinpoint spawn locations and approaching swarmers purely by sound cues.
+*   **Aggressive Soundtrack:** High-BPM blend of breakcore, or dark synthwave designed to induce a flow state.
 
 ## Technical Architecture & Milestones
 
 ### Technical Architecture
-*   **Engine:** Unity 3D (using Universal Render Pipeline for optimal performance, custom shader graphs, and advanced bloom post-processing).
-*   **Object Pooling:** A mandatory, highly optimized system for managing all projectiles, standard enemies, and particle effects to prevent garbage collection stutters and maintain high frame rates during massive swarms.
-*   **Event-Driven Architecture:** Decoupled systems utilizing C# Actions or ScriptableObject events. For example, an enemy dying broadcasts an event that the Score Manager, Quota Manager, and Audio Manager all listen to independently.
-*   **State Machine (FSM):** Used for cleanly managing overall game flow (Pre-Run Menu, Zone Active, Death Screen, Victory) as well as structured enemy AI behaviors.
-*   **Custom First-Person Controller:** A highly responsive, momentum-based custom character controller (Rigidbody or Kinematic) tailored to support snappy inputs, dashing, and the physics-based bomb-jumping.
+
+*   **Engine:** Unity 6 (leveraging the Universal Render Pipeline for optimal performance, custom shader graphs for the ink/hatching effects, and advanced bloom post-processing).
+*   **Object Pooling:** Mandatory for managing projectiles, swarmers, and particle effects to prevent garbage collection spikes during high-density combat.
+*   **Event-Driven Architecture:** Decoupled systems (C# Actions) to manage the hidden quota, audio cues, and state transitions seamlessly.
+*   **Custom FPS Controller:** A highly responsive, momentum-based Rigidbody controller tailored for snappy dual-wielding combat and dashing.
 
 ### Development Milestones
-*   **Milestone 1: First Playable (Graybox)**
-    *   Implement core player movement (WASD, Jump, Dash) in a flat test arena.
-    *   Implement Weapon 1 (Pistol) with basic raycast or projectile hit detection.
-    *   Create the Standard Swarmer enemy with basic pathfinding/chasing logic.
-*   **Milestone 2: The Swarm & Core Loop**
-    *   Build the Wave Spawner, Zone Quota Manager, and robust Object Pooling system.
-    *   Implement the Elite Boss enemy behavior and currency dropping.
-*   **Milestone 3: Arsenal & Meta-Progression**
-    *   Develop Katana melee weapon and meta-progression systems.
-    *   Create the pre-run unlock menu, persistent currency saving, and basic score tracking.
-*   **Milestone 4: Visuals & Sound (The "Bloom" & "Sin" Pass)**
-    *   Develop and apply the custom graphic novel/ink shaders and high-contrast bloom effects.
-    *   Integrate spatial 3D audio, dynamic music switching, and visceral combat SFX.
-*   **Milestone 5: Polish, Optimization & Leaderboards**
-    *   Finalize blockouts for Zones 2 and 3, including environmental hazards.
-    *   Aggressively balance enemy spawn rates, weapon damage, and quota thresholds.
-    *   Integrate a global leaderboard system and perform deep profiling to ensure performance.
+
+*   **Milestone 1: The Core Feel (Graybox)**
+    *   Implement WASD, Jump, Dash.
+    *   Implement dual-wielding basics (Pistol fire and Sword swing hitboxes).
+    *   Create the Standard Swarmer and the pack-spawning logic.
+*   **Milestone 2: The Roguelike Loop**
+    *   Build the 5-level progression system with the hidden kill quota.
+    *   Implement the post-arena upgrade choice (Tier 1 to 2 transitions).
+    *   Build the percentage-based Death Screen and run reset logic.
+*   **Milestone 3: Escalation & The Boss**
+    *   Design and integrate the remaining enemy types for Levels 2-5.
+    *   Develop the Level 5 Boss fight and the Victory state.
+*   **Milestone 4: Art, Audio & Ascensions**
+    *   Apply the custom graphic novel/ink shaders and neon bloom effects.
+    *   Implement the Slay the Spire-style difficulty modifiers for subsequent runs.
+*   **Milestone 5: Polish & Leaderboards**
+    *   Integrate the speedrun timer and global leaderboards per difficulty.
+    *   Aggressive optimization and profiling in Unity 6 for massive enemy counts.
