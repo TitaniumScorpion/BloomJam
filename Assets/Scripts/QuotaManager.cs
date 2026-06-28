@@ -5,10 +5,10 @@ public class QuotaManager : MonoBehaviour
 {
     [Header("Zone Progression")]
     [Tooltip("The total kills needed to clear each zone (Index 0 = Zone 1, Index 1 = Zone 2, etc.)")]
-    public int[] targetQuotas = { 50, 100, 150 };
-    
-    [Tooltip("The index of the final zone that triggers victory (e.g., 2 for Zone 3)")]
-    public int finalZoneIndex = 2;
+    public int[] targetQuotas = { 50, 100, 150, 200, 250 };
+
+    [Tooltip("The index of the final zone that triggers victory (e.g., 4 for Zone 5)")]
+    public int finalZoneIndex = 4;
     
     // Made static so progression persists across scene loads
     public static int currentKills = 0;
