@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7ac9f49d8f240b34e973244348416d42
+guid: a042eded908f7104c91fb7afc57b8689
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: emil_mat
-    second: {fileID: 2100000, guid: f9ed2eba93bb88649bd7b3c339b1b2bb, type: 2}
+      name: Floor_mat
+    second: {fileID: 2100000, guid: 94165a38d4f194a4dbda9a86484e4e8c, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -99,7 +99,7 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
