@@ -1,10 +1,12 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyProjectile : MonoBehaviour
+public class SwordWave : MonoBehaviour
 {
-    public int damage = 1;
-    public float lifetime = 5f;
+    public float speed = 20f;
+    public float lifetime = 1.5f;
+    public int damage = 2;
+
     private Rigidbody rb;
     private bool wasFrozen;
     private Vector3 frozenVelocity;
@@ -12,20 +14,20 @@ public class EnemyProjectile : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = true;
+        rb.useGravity = false;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
     private void OnEnable()
     {
         wasFrozen = false;
+        rb.linearVelocity = transform.forward * speed;
         Invoke(nameof(Deactivate), lifetime);
     }
 
-    private void OnDisable()
-    {
-        CancelInvoke();
-    }
+    private void OnDisable() => CancelInvoke();
+
+    private void Deactivate() => gameObject.SetActive(false);
 
     private void FixedUpdate()
     {
@@ -35,7 +37,6 @@ public class EnemyProjectile : MonoBehaviour
             {
                 frozenVelocity = rb.linearVelocity;
                 rb.linearVelocity = Vector3.zero;
-                rb.useGravity = false;
                 wasFrozen = true;
             }
             return;
@@ -44,33 +45,27 @@ public class EnemyProjectile : MonoBehaviour
         if (wasFrozen)
         {
             rb.linearVelocity = frozenVelocity;
-            rb.useGravity = true;
             wasFrozen = false;
         }
     }
 
-    private void Deactivate()
-    {
-        gameObject.SetActive(false);
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        // 1. If it hits the player, deal damage and explode
-        if (other.CompareTag("Player") && other.TryGetComponent(out PlayerHealth playerHealth))
+        if (other.CompareTag("Player")) return;
+
+        if (other.TryGetComponent(out StandardSwarmer swarmer))
         {
-            playerHealth.TakeDamage(damage);
+            swarmer.TakeDamage(damage);
+            return; // Pierce through enemies
+        }
+        if (other.TryGetComponent(out EnemyWeakPoint weakPoint))
+        {
+            weakPoint.TakeDamage(damage);
+            return;
+        }
+
+        // Stop on solid environment
+        if (!other.isTrigger && other.GetComponentInParent<AdvancedEnemy>() == null)
             gameObject.SetActive(false);
-            return;
-        }
-        
-        // 2. Ignore collisions with the boss itself, standard swarmers, and abstract trigger zones
-        if (other.isTrigger || other.GetComponentInParent<AdvancedEnemy>() != null || other.GetComponent<StandardSwarmer>() != null)
-        {
-            return;
-        }
-        
-        // 3. If it hits anything else (the floor, walls), deactivate it
-        gameObject.SetActive(false);
     }
 }

@@ -9,28 +9,33 @@ public class Projectile : MonoBehaviour
     public int damage = 1; // Standard swarmer takes 1 shot, so 1 damage is perfect
 
     private Rigidbody rb;
+    private Vector3 originalScale;
+    private bool inGracePeriod;
 
     private void Awake()
     {
-        // Awake is called once when the object is first instantiated by the ObjectPooler
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false; // Energy projectiles fly straight
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // Prevents fast bullets from passing through walls
+        rb.useGravity = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
-        // OnEnable is called every time the ObjectPooler activates this bullet
+        transform.localScale = originalScale;
         rb.linearVelocity = transform.forward * speed;
-
-        // Deactivate after a set time instead of destroying
+        inGracePeriod = true;
+        Invoke(nameof(EndGracePeriod), 0.05f);
         Invoke(nameof(Deactivate), lifetime);
     }
 
     private void OnDisable()
     {
-        CancelInvoke(); // Clean up the invoke if the bullet hits something early
+        CancelInvoke();
+        inGracePeriod = false;
     }
+
+    private void EndGracePeriod() => inGracePeriod = false;
 
     private void Deactivate()
     {
@@ -39,6 +44,8 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (inGracePeriod) return;
+        if (other.CompareTag("Player")) return;
         bool hitEnemy = false;
 
         // Check if the object we hit has the StandardSwarmer script

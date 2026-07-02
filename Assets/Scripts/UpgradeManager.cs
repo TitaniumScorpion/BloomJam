@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UpgradeManager : MonoBehaviour
@@ -7,29 +8,46 @@ public class UpgradeManager : MonoBehaviour
     public GameObject upgradePanel;
     public TMP_Text pistolUpgradeDescription;
     public TMP_Text swordUpgradeDescription;
+    public Button pistolUpgradeButton;
+    public Button swordUpgradeButton;
 
     [Header("Weapon References")]
     public AutomaticPistol pistol;
     public KatanaWeapon katana;
 
-    [Header("Zone 1 - Pistol Upgrade")]
+    // ── Zone 1 ────────────────────────────────────────────────────────────────
+    [Header("Zone 1 - Pistol")]
     public float z1_PistolFireRate = 0.07f;
 
-    [Header("Zone 1 - Sword Upgrade")]
-    public float z1_SwordRangeIncrease = 1.5f;
+    [Header("Zone 1 - Sword")]
+    public float z1_SwordRadiusIncrease = 1.2f;
+
+    // ── Zone 3 ────────────────────────────────────────────────────────────────
+    [Header("Zone 3 - Pistol")]
+    public float z3_MaxHeatMultiplier = 2f;
+
+    [Header("Zone 3 - Sword")]
+    public float z3_CooldownMultiplier = 0.55f;
 
     private static readonly string[] PistolDescriptions =
     {
-        "Fire Rate Up\nOverheat adjusted to maintain the same duration.", // Zone 1
+        "FIRE RATE UP\nOverheat takes slightly longer.",
+        "CHARGE SHOT\nTap to fire. Hold Q to charge a piercing laser beam.",
+        "HEAT CAPACITY UP\nOverheat threshold doubled.",
+        "AUTO SHOTGUN\nFiring for 3s triggers a wide burst. Interval drops to 2s with sustained fire.",
     };
 
     private static readonly string[] SwordDescriptions =
     {
-        "Attack Range Up\n+1.5m reach on each slash.", // Zone 1
+        "WIDE SLASH\nIncreased attack radius for a broader sweep.",
+        "ENERGY WAVES\nEach swing sends a piercing energy wave forward.",
+        "SWIFT STRIKES\nSwing cooldown reduced by 45%.",
+        "BULLET TIME  [E]\nFreeze all enemies. Mark them with your blade and unleash damage all at once on exit.",
     };
 
+    private int pistolUpgradeLevel = 0;
+    private int katanaUpgradeLevel = 0;
     private QuotaManager quotaManager;
-    private int upgradeZoneIndex;
 
     private void Start()
     {
@@ -50,26 +68,31 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnZoneCleared()
     {
-        upgradeZoneIndex = QuotaManager.currentZoneIndex;
-
-        // If no upgrade is defined for this zone, just reveal the elevator immediately
-        if (upgradeZoneIndex >= PistolDescriptions.Length)
+        // Skip panel if both weapons are fully upgraded
+        if (pistolUpgradeLevel >= PistolDescriptions.Length && katanaUpgradeLevel >= SwordDescriptions.Length)
         {
             quotaManager?.RevealElevator();
             return;
         }
 
-        // Wait for the zone-cleared message to finish before showing the upgrade panel
         Invoke(nameof(ShowPanel), 2.5f);
     }
 
     private void ShowPanel()
     {
+        // Pistol card
+        bool pistolAvailable = pistolUpgradeLevel < PistolDescriptions.Length;
         if (pistolUpgradeDescription != null)
-            pistolUpgradeDescription.text = PistolDescriptions[upgradeZoneIndex];
+            pistolUpgradeDescription.text = pistolAvailable ? PistolDescriptions[pistolUpgradeLevel] : "FULLY UPGRADED";
+        if (pistolUpgradeButton != null)
+            pistolUpgradeButton.interactable = pistolAvailable;
 
+        // Sword card
+        bool swordAvailable = katanaUpgradeLevel < SwordDescriptions.Length;
         if (swordUpgradeDescription != null)
-            swordUpgradeDescription.text = SwordDescriptions[upgradeZoneIndex];
+            swordUpgradeDescription.text = swordAvailable ? SwordDescriptions[katanaUpgradeLevel] : "FULLY UPGRADED";
+        if (swordUpgradeButton != null)
+            swordUpgradeButton.interactable = swordAvailable;
 
         if (upgradePanel != null) upgradePanel.SetActive(true);
 
@@ -82,17 +105,26 @@ public class UpgradeManager : MonoBehaviour
     {
         if (pistol != null)
         {
-            switch (upgradeZoneIndex)
+            switch (pistolUpgradeLevel)
             {
                 case 0:
                     float oldRate = pistol.fireRate;
                     pistol.fireRate = z1_PistolFireRate;
-                    // Scale heatPerShot proportionally so overheat takes the same real-world time
-                    pistol.heatPerShot *= z1_PistolFireRate / oldRate;
+                    pistol.heatPerShot *= (z1_PistolFireRate / oldRate) * 0.75f;
+                    break;
+                case 1:
+                    pistol.UnlockChargeAttack();
+                    break;
+                case 2:
+                    pistol.maxHeat *= z3_MaxHeatMultiplier;
+                    break;
+                case 3:
+                    pistol.UnlockShotgun();
                     break;
             }
         }
 
+        pistolUpgradeLevel++;
         ClosePanel();
     }
 
@@ -100,14 +132,24 @@ public class UpgradeManager : MonoBehaviour
     {
         if (katana != null)
         {
-            switch (upgradeZoneIndex)
+            switch (katanaUpgradeLevel)
             {
                 case 0:
-                    katana.attackRange += z1_SwordRangeIncrease;
+                    katana.attackRadius += z1_SwordRadiusIncrease;
+                    break;
+                case 1:
+                    katana.UnlockWaves();
+                    break;
+                case 2:
+                    katana.cooldownTime *= z3_CooldownMultiplier;
+                    break;
+                case 3:
+                    katana.UnlockBulletTime();
                     break;
             }
         }
 
+        katanaUpgradeLevel++;
         ClosePanel();
     }
 

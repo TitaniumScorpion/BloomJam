@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class AutomaticPistol : MonoBehaviour
 {
     [Header("Weapon Settings")]
-    public float fireRate = 0.1f; // Time in seconds between shots (0.1 = 10 shots per second)
+    public float fireRate = 0.1f;
     private float fireTimer;
 
     [Header("Overheat Mechanics")]
@@ -18,9 +19,9 @@ public class AutomaticPistol : MonoBehaviour
 
     [Header("Overheat Visuals")]
     public Renderer weaponRenderer;
-    [ColorUsage(true, true)] public Color overheatGlowColor = new Color(2f, 0f, 0f, 1f); // HDR color for Bloom
+    [ColorUsage(true, true)] public Color overheatGlowColor = new Color(2f, 0f, 0f, 1f);
     public int materialIndex = 0;
-    [Tooltip("The exact Reference name in your custom Toon shader for emission/glow. Usually _EmissionColor, _Emission, or _Glow.")]
+    [Tooltip("The exact Reference name in your custom Toon shader for emission/glow.")]
     public string emissionPropertyName = "_EmissionColor";
     [UnityEngine.Serialization.FormerlySerializedAs("visualHeatSpeed")]
     public float visualHeatingSpeed = 10f;
@@ -43,7 +44,7 @@ public class AutomaticPistol : MonoBehaviour
     public float swaySpeed = 8f;
     public float bobSpeed = 14f;
     public float bobAmount = 0.05f;
-    
+
     [Header("Recoil Settings")]
     public float recoilKickback = 0.3f;
     public float recoilRotation = 25f;
@@ -61,6 +62,32 @@ public class AutomaticPistol : MonoBehaviour
     public float weaponShakeDuration = 0.05f;
     private float weaponShakeTimer;
 
+    // ── Charge Attack (unlocked at Lv2) ──────────────────────────────────────
+    [Header("Charge Attack (Lv2 Unlock)")]
+    public bool chargeUnlocked = false;
+    public float chargeTapThreshold = 0.15f;
+    public float maxChargeTime = 2.5f;
+    public int chargeMinDamage = 3;
+    public int chargeMaxDamage = 20;
+    public float beamMinWidth = 0.02f;
+    public float beamMaxWidth = 0.15f;
+    public Material beamMaterial;
+    private LineRenderer beamRenderer;
+    private bool isCharging = false;
+    private float chargeTime = 0f;
+    private float holdTimer = 0f;
+    private bool mouseIsHeld = false;
+
+    // ── Auto Shotgun (unlocked at Lv4) ───────────────────────────────────────
+    [Header("Auto Shotgun (Lv4 Unlock)")]
+    public bool shotgunUnlocked = false;
+    public int shotgunPellets = 4;
+    public float shotgunRingAngle = 8f; // degrees each bullet is offset from center
+    public float shotgunSpawnSideOffset = 0.6f; // horizontal offset from fire point
+    private float continuousFireTimer = 0f;
+    private float currentShotgunThreshold = 3f;
+    private const float shotgunThresholdMin = 2f;
+
     private Quaternion initialDisplayRotation;
     private Vector3 initialDisplayPosition;
     private float bobTimer;
@@ -68,28 +95,20 @@ public class AutomaticPistol : MonoBehaviour
 
     private void Start()
     {
-        // Find the PlayerController so we can trigger screen shake
         playerController = GetComponentInParent<PlayerController>();
 
-        // Automatically grab the main camera if one isn't assigned in the inspector
         if (playerCamera == null)
             playerCamera = Camera.main;
 
-        // Ensure the weapon is visible at start and remember its default placement
         if (displayWeapon != null)
         {
             initialDisplayRotation = displayWeapon.transform.localRotation;
             initialDisplayPosition = displayWeapon.transform.localPosition;
         }
 
-        // Store the exact local position of the fire point relative to the camera
-        // so we can calculate perfect bullet trajectories completely independent of weapon sway/shake
         if (firePoint != null && playerCamera != null)
-        {
             stableFirePointLocalPos = playerCamera.transform.InverseTransformPoint(firePoint.position);
-        }
 
-        // Cache the weapon's material so we can make it glow
         if (weaponRenderer != null)
         {
             weaponMaterial = weaponRenderer.materials[materialIndex];
@@ -100,21 +119,41 @@ public class AutomaticPistol : MonoBehaviour
 
     private void Update()
     {
-        // Don't process input or cooldowns if the game is paused (e.g., during the countdown)
         if (Time.timeScale == 0f) return;
+        if (KatanaWeapon.IsBulletTimeActive) return;
 
-        // Smoothly return recoil to zero
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
         currentRecoilEuler = Vector3.Lerp(currentRecoilEuler, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
 
-        // Manage the cooldown timer
-        if (fireTimer > 0f)
-            fireTimer -= Time.deltaTime;
-            
-        if (weaponShakeTimer > 0f)
-            weaponShakeTimer -= Time.deltaTime;
+        if (fireTimer > 0f) fireTimer -= Time.deltaTime;
+        if (weaponShakeTimer > 0f) weaponShakeTimer -= Time.deltaTime;
 
-        // Manage Overheat Cooling
+        HandleOverheatCooling();
+        UpdateWeaponGlow();
+
+        // LMB always fires normally regardless of charge unlock
+        bool isActivelyShooting = false;
+        if (Mouse.current != null && Mouse.current.leftButton.isPressed)
+        {
+            isActivelyShooting = true;
+            if (fireTimer <= 0f && !isOverheated)
+                Shoot();
+        }
+
+        // Q key handles charge attack independently
+        if (chargeUnlocked)
+            HandleChargeAttack();
+
+        if (shotgunUnlocked)
+            HandleShotgunMechanic(isActivelyShooting);
+
+        HandleWeaponSway();
+    }
+
+    // ── Overheat & Glow ──────────────────────────────────────────────────────
+
+    private void HandleOverheatCooling()
+    {
         if (coolingTimer > 0f)
         {
             coolingTimer -= Time.deltaTime;
@@ -128,34 +167,20 @@ public class AutomaticPistol : MonoBehaviour
                 isOverheated = false;
             }
         }
-
-        // Update weapon glow based on current heat
-        if (weaponMaterial != null)
-        {
-            float currentVisualSpeed = (currentHeat > visualHeat) ? visualHeatingSpeed : visualCoolingSpeed;
-
-            // Smoothly transition the visual heat to match the actual heat so it doesn't jump instantly when shooting
-            visualHeat = Mathf.Lerp(visualHeat, currentHeat, Time.deltaTime * currentVisualSpeed);
-            float heatPercent = visualHeat / maxHeat;
-            
-            // Square the percentage to create an exponential curve.
-            // This makes the glow stay subtle at lower heat, and ramp up aggressively as it approaches max heat.
-            float glowCurve = heatPercent * heatPercent;
-            Color currentGlow = Color.Lerp(Color.black, overheatGlowColor, glowCurve);
-            weaponMaterial.SetColor(emissionColorID, currentGlow);
-        }
-
-        // Check if the left mouse button is held down
-        if (Mouse.current != null && Mouse.current.leftButton.isPressed)
-        {
-            if (fireTimer <= 0f && !isOverheated)
-            {
-                Shoot();
-            }
-        }
-
-        HandleWeaponSway();
     }
+
+    private void UpdateWeaponGlow()
+    {
+        if (weaponMaterial == null) return;
+
+        float currentVisualSpeed = (currentHeat > visualHeat) ? visualHeatingSpeed : visualCoolingSpeed;
+        visualHeat = Mathf.Lerp(visualHeat, currentHeat, Time.deltaTime * currentVisualSpeed);
+        float heatPercent = visualHeat / maxHeat;
+        float glowCurve = heatPercent * heatPercent;
+        weaponMaterial.SetColor(emissionColorID, Color.Lerp(Color.black, overheatGlowColor, glowCurve));
+    }
+
+    // ── Normal Shot ───────────────────────────────────────────────────────────
 
     private void Shoot()
     {
@@ -163,118 +188,268 @@ public class AutomaticPistol : MonoBehaviour
         coolingTimer = coolingDelay;
 
         currentHeat += heatPerShot;
-        if (currentHeat >= maxHeat)
-        {
-            currentHeat = maxHeat;
-            isOverheated = true;
-        }
+        if (currentHeat >= maxHeat) { currentHeat = maxHeat; isOverheated = true; }
 
         if (AudioManager.Instance != null && AudioManager.Instance.pistolShootSound != null)
         {
-            float randomPitch = Random.Range(0.9f, 1.1f); // Add slight pitch variation for machine gun effect
-            // Give player shooting a high priority (64) so it doesn't get culled by the audio engine
-            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.pistolShootSound, firePoint != null ? firePoint.position : transform.position, AudioManager.Instance.pistolShootVolume, randomPitch, 64);
+            float randomPitch = Random.Range(0.9f, 1.1f);
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.pistolShootSound,
+                firePoint != null ? firePoint.position : transform.position,
+                AudioManager.Instance.pistolShootVolume, randomPitch, 64);
         }
 
         if (firePoint != null && playerCamera != null)
         {
-            // Spawn the muzzle flash and instantly parent it to the firePoint so it moves with the gun
             GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
             if (flash != null) flash.transform.SetParent(firePoint);
 
-            // Raycast from the center of the screen to find exactly what the player is aiming at
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            Vector3 targetPoint;
+            Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit) ? hit.point : ray.GetPoint(1000f);
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
-                targetPoint = hit.point; // We hit something, aim at the hit point
-            else
-                targetPoint = ray.GetPoint(1000f); // We didn't hit anything, aim at a point very far away
-
-            // Calculate a stable fire point that isn't affected by weapon shake, recoil, or bobbing
             Vector3 stableFirePointPos = playerCamera.transform.TransformPoint(stableFirePointLocalPos);
-
-            // Calculate the perfect rotation needed to look from the stable point to the target point
             Vector3 direction = targetPoint - stableFirePointPos;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-            // Grab a projectile from the Object Pool with the corrected rotation, but still spawn at the visual barrel
             ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
         }
-        
-        // Trigger camera shake
-        if (playerController != null)
-        {
-            playerController.AddCameraShake(camShakeMagnitude, camShakeDuration);
-        }
-        
-        // Trigger weapon shake
+
+        playerController?.AddCameraShake(camShakeMagnitude, camShakeDuration);
         weaponShakeTimer = weaponShakeDuration;
-        
-        // Apply Recoil
         currentRecoilPosition += new Vector3(0f, 0f, -recoilKickback);
-        currentRecoilEuler += new Vector3(-recoilRotation, Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f), Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
+        currentRecoilEuler += new Vector3(-recoilRotation,
+            Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f),
+            Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
     }
+
+    // ── Charge Attack ─────────────────────────────────────────────────────────
+
+    private void HandleChargeAttack()
+    {
+        if (isOverheated) { CancelCharge(); return; }
+        if (Keyboard.current == null) return;
+
+        bool buttonDown = Keyboard.current.qKey.wasPressedThisFrame;
+        bool buttonHeld = Keyboard.current.qKey.isPressed;
+        bool buttonUp = Keyboard.current.qKey.wasReleasedThisFrame;
+
+        if (buttonDown)
+        {
+            mouseIsHeld = true;
+            chargeTime = 0f;
+            isCharging = true;
+            if (beamRenderer != null) beamRenderer.enabled = true;
+        }
+
+        if (mouseIsHeld && buttonHeld)
+        {
+            chargeTime = Mathf.Min(chargeTime + Time.deltaTime, maxChargeTime);
+            UpdateBeamVisual();
+        }
+
+        if (buttonUp && mouseIsHeld)
+        {
+            FireChargedBeam();
+            CancelCharge();
+        }
+    }
+
+    private void UpdateBeamVisual()
+    {
+        if (beamRenderer == null || playerCamera == null || firePoint == null) return;
+
+        float t = chargeTime / maxChargeTime;
+        float width = Mathf.Lerp(beamMinWidth, beamMaxWidth, t);
+        beamRenderer.startWidth = width;
+        beamRenderer.endWidth = width * 0.3f;
+
+        beamRenderer.SetPosition(0, firePoint.position);
+
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        Vector3 endPoint = Physics.Raycast(ray, out RaycastHit hit, 500f) ? hit.point : ray.GetPoint(500f);
+        beamRenderer.SetPosition(1, endPoint);
+    }
+
+    private void FireChargedBeam()
+    {
+        float chargePercent = chargeTime / maxChargeTime;
+        int damage = Mathf.RoundToInt(Mathf.Lerp(chargeMinDamage, chargeMaxDamage, chargePercent));
+
+        // Full charge adds extra heat
+        currentHeat += heatPerShot * (1f + chargePercent * 3f);
+        if (currentHeat >= maxHeat) { currentHeat = maxHeat; isOverheated = true; }
+        coolingTimer = coolingDelay;
+
+        if (AudioManager.Instance != null && AudioManager.Instance.pistolShootSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.pistolShootSound,
+                firePoint != null ? firePoint.position : transform.position,
+                AudioManager.Instance.pistolShootVolume * 2f, 0.6f + chargePercent * 0.3f, 64);
+        }
+
+        if (playerCamera != null)
+        {
+            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            RaycastHit[] hits = Physics.RaycastAll(ray, 500f);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider.TryGetComponent(out StandardSwarmer swarmer))
+                    swarmer.TakeDamage(damage);
+                else if (hit.collider.TryGetComponent(out EnemyWeakPoint weakPoint))
+                    weakPoint.TakeDamage(damage);
+                else if (!hit.collider.isTrigger && hit.rigidbody == null)
+                    break; // Stop piercing at solid environment
+            }
+        }
+
+        playerController?.AddCameraShake(camShakeMagnitude * 4f, camShakeDuration * 3f);
+        StartCoroutine(BeamFlashRoutine());
+    }
+
+    private IEnumerator BeamFlashRoutine()
+    {
+        yield return new WaitForSeconds(0.12f);
+        if (beamRenderer != null) beamRenderer.enabled = false;
+    }
+
+    private void CancelCharge()
+    {
+        isCharging = false;
+        mouseIsHeld = false;
+        holdTimer = 0f;
+        chargeTime = 0f;
+        if (beamRenderer != null) beamRenderer.enabled = false;
+    }
+
+    // ── Auto Shotgun ──────────────────────────────────────────────────────────
+
+    private void HandleShotgunMechanic(bool isActivelyShooting)
+    {
+        if (isActivelyShooting && !isOverheated)
+        {
+            continuousFireTimer += Time.deltaTime;
+
+            if (continuousFireTimer >= currentShotgunThreshold)
+            {
+                FireShotgunBlast();
+                continuousFireTimer = 0f;
+                currentShotgunThreshold = Mathf.Max(currentShotgunThreshold - 1f, shotgunThresholdMin);
+            }
+        }
+        else
+        {
+            continuousFireTimer = 0f;
+            currentShotgunThreshold = 3f; // Reset threshold when player stops firing
+        }
+    }
+
+    private void FireShotgunBlast()
+    {
+        if (playerCamera == null) return;
+
+        currentHeat += heatPerShot * shotgunPellets * 0.4f;
+        if (currentHeat >= maxHeat) { currentHeat = maxHeat; isOverheated = true; }
+        coolingTimer = coolingDelay;
+
+        playerController?.AddCameraShake(camShakeMagnitude * 5f, camShakeDuration * 2f);
+
+        if (AudioManager.Instance != null && AudioManager.Instance.pistolShootSound != null)
+        {
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.pistolShootSound,
+                firePoint != null ? firePoint.position : transform.position,
+                AudioManager.Instance.pistolShootVolume * 3f, 0.5f, 64);
+        }
+
+        Vector3 basePos = firePoint != null ? firePoint.position : transform.position;
+        Vector3 spawnPos = basePos + playerCamera.transform.right * shotgunSpawnSideOffset;
+        for (int i = 0; i < shotgunPellets; i++)
+        {
+            float angle = (360f / shotgunPellets) * i * Mathf.Deg2Rad;
+            float offsetX = Mathf.Sin(angle) * shotgunRingAngle;
+            float offsetY = Mathf.Cos(angle) * shotgunRingAngle;
+            Quaternion ringRot = playerCamera.transform.rotation * Quaternion.Euler(offsetX, offsetY, 0f);
+            ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, spawnPos, ringRot);
+        }
+    }
+
+    // ── Public Unlock Methods (called by UpgradeManager) ─────────────────────
+
+    public void UnlockChargeAttack()
+    {
+        chargeUnlocked = true;
+
+        beamRenderer = gameObject.AddComponent<LineRenderer>();
+        beamRenderer.positionCount = 2;
+        beamRenderer.startWidth = beamMinWidth;
+        beamRenderer.endWidth = beamMinWidth;
+        beamRenderer.useWorldSpace = true;
+        beamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        beamRenderer.receiveShadows = false;
+        beamRenderer.material = beamMaterial != null ? beamMaterial : new Material(Shader.Find("Sprites/Default"));
+        beamRenderer.enabled = false;
+    }
+
+    public void UnlockShotgun()
+    {
+        shotgunUnlocked = true;
+        currentShotgunThreshold = 4f;
+    }
+
+    // ── Weapon Sway ───────────────────────────────────────────────────────────
 
     private void HandleWeaponSway()
     {
-        if (displayWeapon != null && displayWeapon.activeSelf)
+        if (displayWeapon == null || !displayWeapon.activeSelf) return;
+
+        float moveX = 0f;
+        float moveY = 0f;
+
+        if (Keyboard.current != null)
         {
-            float moveX = 0f;
-            float moveY = 0f;
-
-            if (Keyboard.current != null)
-            {
-                // Read raw keyboard input for movement
-                if (Keyboard.current.dKey.isPressed) moveX += 1f;
-                if (Keyboard.current.aKey.isPressed) moveX -= 1f;
-                if (Keyboard.current.wKey.isPressed) moveY += 1f;
-                if (Keyboard.current.sKey.isPressed) moveY -= 1f;
-            }
-
-            // Calculate random vibration while firing
-            Vector3 randomShake = Vector3.zero;
-            Quaternion randomRotShake = Quaternion.identity;
-            
-            if (weaponShakeTimer > 0f)
-            {
-                randomShake = new Vector3(
-                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
-                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
-                    Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude)
-                );
-                
-                float rotMag = weaponShakeMagnitude * 200f; // Scale position magnitude to degrees (0.015 -> ~3 degrees)
-                randomRotShake = Quaternion.Euler(
-                    Random.Range(-rotMag, rotMag), 
-                    Random.Range(-rotMag, rotMag), 
-                    Random.Range(-rotMag, rotMag)
-                );
-            }
-
-            // Tilt
-            Quaternion swayRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
-            Quaternion recoilRot = Quaternion.Euler(currentRecoilEuler);
-            
-            displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation, swayRotation * recoilRot, Time.deltaTime * tiltSpeed) * randomRotShake;
-
-            // Calculate continuous bobbing (Figure-8 pattern)
-            float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
-            if (speedMagnitude > 0.1f)
-            {
-                bobTimer += Time.deltaTime * bobSpeed;
-            }
-
-            Vector3 bobOffset = new Vector3(
-                Mathf.Cos(bobTimer * 0.5f) * (bobAmount * 0.5f), 
-                Mathf.Sin(bobTimer) * bobAmount, 
-                0f
-            ) * speedMagnitude;
-
-            // Positional sway
-            Vector3 targetPosition = initialDisplayPosition + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f) + bobOffset + currentRecoilPosition;
-            
-            displayWeapon.transform.localPosition = Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed) + randomShake;
+            if (Keyboard.current.dKey.isPressed) moveX += 1f;
+            if (Keyboard.current.aKey.isPressed) moveX -= 1f;
+            if (Keyboard.current.wKey.isPressed) moveY += 1f;
+            if (Keyboard.current.sKey.isPressed) moveY -= 1f;
         }
+
+        Vector3 randomShake = Vector3.zero;
+        Quaternion randomRotShake = Quaternion.identity;
+
+        if (weaponShakeTimer > 0f)
+        {
+            randomShake = new Vector3(
+                Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
+                Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
+                Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude));
+
+            float rotMag = weaponShakeMagnitude * 200f;
+            randomRotShake = Quaternion.Euler(
+                Random.Range(-rotMag, rotMag),
+                Random.Range(-rotMag, rotMag),
+                Random.Range(-rotMag, rotMag));
+        }
+
+        Quaternion swayRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
+        Quaternion recoilRot = Quaternion.Euler(currentRecoilEuler);
+        displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation,
+            swayRotation * recoilRot, Time.deltaTime * tiltSpeed) * randomRotShake;
+
+        float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
+        if (speedMagnitude > 0.1f) bobTimer += Time.deltaTime * bobSpeed;
+
+        Vector3 bobOffset = new Vector3(
+            Mathf.Cos(bobTimer * 0.5f) * (bobAmount * 0.5f),
+            Mathf.Sin(bobTimer) * bobAmount,
+            0f) * speedMagnitude;
+
+        Vector3 targetPosition = initialDisplayPosition
+            + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f)
+            + bobOffset
+            + currentRecoilPosition;
+
+        displayWeapon.transform.localPosition =
+            Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed)
+            + randomShake;
     }
 }

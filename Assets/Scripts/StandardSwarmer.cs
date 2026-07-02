@@ -94,9 +94,27 @@ public class StandardSwarmer : MonoBehaviour
         gameObject.SetActive(false); // Return to pool without triggering death events
     }
 
+    public void Mark(Material markedMaterial)
+    {
+        if (enemyRenderer != null && markedMaterial != null)
+            enemyRenderer.sharedMaterial = markedMaterial;
+    }
+
+    public void Unmark()
+    {
+        if (enemyRenderer != null && originalMaterial != null)
+            enemyRenderer.sharedMaterial = originalMaterial;
+    }
+
     private void FixedUpdate()
     {
         if (playerTransform == null) return;
+
+        if (KatanaWeapon.IsBulletTimeActive)
+        {
+            rb.linearVelocity = Vector3.zero;
+            return;
+        }
 
         // Aim for the center of the player's body rather than their feet
         Vector3 targetPosition = playerTransform.position + Vector3.up * 1.5f;

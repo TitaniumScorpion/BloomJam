@@ -84,6 +84,8 @@ public class AdvancedEnemy : MonoBehaviour
 
     private void Update()
     {
+        if (KatanaWeapon.IsBulletTimeActive) return;
+
         HandleRotation();
 
         // Handle Movement/Presence Sound
