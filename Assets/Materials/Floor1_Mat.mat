@@ -138,7 +138,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 5eb04a056cea95f40978180ca82940db, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
@@ -250,7 +250,7 @@ Material:
     m_Floats:
     - _1st2nd_Shades_Feather: 0.0001
     - _1st_ShadeColor_Feather: 0.042
-    - _1st_ShadeColor_Step: 0.909
+    - _1st_ShadeColor_Step: 0.902
     - _2nd_ShadeColor_Feather: 0.0001
     - _2nd_ShadeColor_Step: 1
     - _AORemapMax: 1
@@ -281,7 +281,7 @@ Material:
     - _AutoRenderQueue: 1
     - _BaseColorOverridden: 0
     - _BaseColorVisible: 1
-    - _BaseColor_Step: 0.909
+    - _BaseColor_Step: 0.902
     - _BaseShade_Feather: 0.042
     - _Base_Speed: 0
     - _Blend: 0
