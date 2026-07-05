@@ -2297,7 +2297,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   pistolShootSound: {fileID: 8300000, guid: e7677a76d5d04b54a8ee39bb49112cad, type: 3}
-  bombExplosionSound: {fileID: 8300000, guid: 6226c3c8dc27dd643a091f18102b6b18, type: 3}
   enemySpawnTelegraphSound: {fileID: 8300000, guid: 7b71395ddbd28c7419fe047d8da3f8e6, type: 3}
   eliteShootSound: {fileID: 8300000, guid: 515f7062d96882e42b9b737e91b4de12, type: 3}
   backgroundSound: {fileID: 8300000, guid: be4f3c88b1bf78147a9c58aec2d31881, type: 3}
@@ -2310,7 +2309,6 @@ MonoBehaviour:
   playerDashSound: {fileID: 8300000, guid: 9dd93974e70e37341aacd3f970ca1f3d, type: 3}
   elevatorAscendSound: {fileID: 8300000, guid: 22b7fb832b0d64e4d9a8d7b8c1a516d6, type: 3}
   pistolShootVolume: 0.25
-  bombExplosionVolume: 4.34
   enemySpawnTelegraphVolume: 3.29
   eliteShootVolume: 1
   backgroundVolume: 0.409
