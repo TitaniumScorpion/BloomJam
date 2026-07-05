@@ -65,7 +65,8 @@ public class AutomaticPistol : MonoBehaviour
     // ── Charge Attack (unlocked at Lv2) ──────────────────────────────────────
     [Header("Charge Attack (Lv2 Unlock)")]
     public bool chargeUnlocked = false;
-    public float chargeTapThreshold = 0.15f;
+    [Tooltip("Seconds after releasing LMB in which a second hold triggers charge mode")]
+    public float chargeActivationWindow = 0.5f;
     public float maxChargeTime = 2.5f;
     public int chargeMinDamage = 3;
     public int chargeMaxDamage = 20;
@@ -75,8 +76,10 @@ public class AutomaticPistol : MonoBehaviour
     private LineRenderer beamRenderer;
     private bool isCharging = false;
     private float chargeTime = 0f;
-    private float holdTimer = 0f;
-    private bool mouseIsHeld = false;
+    private float chargeWindowTimer = 0f;
+
+    private enum FireState { Idle, NormalFire, WaitForCharge, Charging }
+    private FireState fireState = FireState.Idle;
 
     // ── Auto Shotgun (unlocked at Lv4) ───────────────────────────────────────
     [Header("Auto Shotgun (Lv4 Unlock)")]
@@ -131,21 +134,10 @@ public class AutomaticPistol : MonoBehaviour
         HandleOverheatCooling();
         UpdateWeaponGlow();
 
-        // LMB always fires normally regardless of charge unlock
-        bool isActivelyShooting = false;
-        if (Mouse.current != null && Mouse.current.leftButton.isPressed)
-        {
-            isActivelyShooting = true;
-            if (fireTimer <= 0f && !isOverheated)
-                Shoot();
-        }
-
-        // Q key handles charge attack independently
-        if (chargeUnlocked)
-            HandleChargeAttack();
+        HandleFiring();
 
         if (shotgunUnlocked)
-            HandleShotgunMechanic(isActivelyShooting);
+            HandleShotgunMechanic(fireState == FireState.NormalFire);
 
         HandleWeaponSway();
     }
@@ -221,35 +213,71 @@ public class AutomaticPistol : MonoBehaviour
             Random.Range(-recoilRotation * 0.2f, recoilRotation * 0.2f));
     }
 
-    // ── Charge Attack ─────────────────────────────────────────────────────────
+    // ── Firing State Machine ──────────────────────────────────────────────────
 
-    private void HandleChargeAttack()
+    private void HandleFiring()
     {
-        if (isOverheated) { CancelCharge(); return; }
-        if (Keyboard.current == null) return;
+        if (Mouse.current == null) return;
 
-        bool buttonDown = Keyboard.current.qKey.wasPressedThisFrame;
-        bool buttonHeld = Keyboard.current.qKey.isPressed;
-        bool buttonUp = Keyboard.current.qKey.wasReleasedThisFrame;
+        bool lmbDown = Mouse.current.leftButton.wasPressedThisFrame;
+        bool lmbUp   = Mouse.current.leftButton.wasReleasedThisFrame;
 
-        if (buttonDown)
+        switch (fireState)
         {
-            mouseIsHeld = true;
-            chargeTime = 0f;
-            isCharging = true;
-            if (beamRenderer != null) beamRenderer.enabled = true;
-        }
+            case FireState.Idle:
+                if (lmbDown)
+                    fireState = FireState.NormalFire;
+                break;
 
-        if (mouseIsHeld && buttonHeld)
-        {
-            chargeTime = Mathf.Min(chargeTime + Time.deltaTime, maxChargeTime);
-            UpdateBeamVisual();
-        }
+            case FireState.NormalFire:
+                if (fireTimer <= 0f && !isOverheated)
+                    Shoot();
 
-        if (buttonUp && mouseIsHeld)
-        {
-            FireChargedBeam();
-            CancelCharge();
+                if (lmbUp)
+                {
+                    if (chargeUnlocked)
+                    {
+                        fireState = FireState.WaitForCharge;
+                        chargeWindowTimer = chargeActivationWindow;
+                    }
+                    else
+                    {
+                        fireState = FireState.Idle;
+                    }
+                }
+                break;
+
+            case FireState.WaitForCharge:
+                chargeWindowTimer -= Time.deltaTime;
+                if (chargeWindowTimer <= 0f)
+                {
+                    fireState = FireState.Idle;
+                    break;
+                }
+                if (lmbDown)
+                {
+                    fireState = FireState.Charging;
+                    chargeTime = 0f;
+                    isCharging = true;
+                    if (beamRenderer != null) beamRenderer.enabled = true;
+                }
+                break;
+
+            case FireState.Charging:
+                if (isOverheated)
+                {
+                    CancelCharge();
+                    break;
+                }
+                chargeTime = Mathf.Min(chargeTime + Time.deltaTime, maxChargeTime);
+                UpdateBeamVisual();
+
+                if (lmbUp)
+                {
+                    FireChargedBeam();
+                    CancelCharge();
+                }
+                break;
         }
     }
 
@@ -318,9 +346,8 @@ public class AutomaticPistol : MonoBehaviour
     private void CancelCharge()
     {
         isCharging = false;
-        mouseIsHeld = false;
-        holdTimer = 0f;
         chargeTime = 0f;
+        fireState = FireState.Idle;
         if (beamRenderer != null) beamRenderer.enabled = false;
     }
 
