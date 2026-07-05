@@ -158,6 +158,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneWeakPoint
   parentDrone: {fileID: 7310990627363050863}
   damage: 1
+  weakPointRenderer: {fileID: 7513247816249738284}
+  weakPointRenderer2: {fileID: 8921109098890653654}
+  flashEmissionColor: {r: 0.7830189, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  emissionPropertyName: _Emissive_Color
 --- !u!1 &618732689242264005
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,6 +410,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneWeakPoint
   parentDrone: {fileID: 7310990627363050863}
   damage: 1
+  weakPointRenderer: {fileID: 281597672397696406}
+  weakPointRenderer2: {fileID: 5333230344899865196}
+  flashEmissionColor: {r: 1.0666684, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  emissionPropertyName: _Emissive_Color
 --- !u!1 &1196231034217296884
 GameObject:
   m_ObjectHideFlags: 0
@@ -833,6 +843,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneWeakPoint
   parentDrone: {fileID: 7310990627363050863}
   damage: 1
+  weakPointRenderer: {fileID: 8079976099221764212}
+  weakPointRenderer2: {fileID: 8342869770866370866}
+  flashEmissionColor: {r: 1.0393832, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  emissionPropertyName: _Emissive_Color
 --- !u!1 &2451717797449865326
 GameObject:
   m_ObjectHideFlags: 0
