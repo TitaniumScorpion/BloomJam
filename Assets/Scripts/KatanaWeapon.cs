@@ -119,6 +119,10 @@ public class KatanaWeapon : MonoBehaviour
                 {
                     weakPoint.TakeDamage(damage);
                 }
+                else if (aimHit.collider.TryGetComponent(out DroneWeakPoint dronePoint))
+                {
+                    dronePoint.TakeDamage(damage);
+                }
             }
         }
         else
@@ -134,6 +138,8 @@ public class KatanaWeapon : MonoBehaviour
                     swarmer.TakeDamage(damage);
                 else if (col.TryGetComponent(out EnemyWeakPoint weakPoint))
                     weakPoint.TakeDamage(damage);
+                else if (col.TryGetComponent(out DroneWeakPoint dronePoint))
+                    dronePoint.TakeDamage(damage);
             }
         }
 

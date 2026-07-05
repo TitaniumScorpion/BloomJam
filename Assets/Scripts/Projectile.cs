@@ -60,7 +60,12 @@ public class Projectile : MonoBehaviour
             weakPoint.TakeDamage(damage);
             hitEnemy = true;
         }
-        
+        else if (other.TryGetComponent(out DroneWeakPoint dronePoint))
+        {
+            dronePoint.TakeDamage(damage);
+            hitEnemy = true;
+        }
+
         if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
         {
             // Give hit sounds a high priority (80) so they don't get lost in the mix

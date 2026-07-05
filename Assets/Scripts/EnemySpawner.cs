@@ -1,61 +1,63 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [Header("Spawner Settings")]
-    public string swarmerPoolTag = "StandardSwarmer";
-    public float spawnInterval = 6f; // Increased time to decrease spawn rate
-    public int enemiesPerWave = 7;   // Increased to spawn 7 enemies at once
+    [Header("Spawner Drone")]
+    public SpawnerDrone dronePrefab;
+    [Tooltip("Empty Transform at the arena center — drone orbits this point")]
+    public Transform arenaCenter;
+    public float droneRespawnDelay = 10f;
 
-    [Header("Telegraph Settings")]
-    public string telegraphPoolTag = "SpawnTelegraph";
-    public float telegraphDuration = 3f; // Time the warning effect stays before enemies appear
-
-    [Header("Advanced Escalation Settings")]
+    [Header("Advanced Enemy")]
     public string advancedEnemyPoolTag = "AdvancedEnemy";
-    public float advancedSpawnInterval = 20f; // Exactly 20 seconds between advanced enemies
-    public int maxAdvancedEnemiesToSpawn = 0; // Controls how many elites are allowed to spawn in this specific scene
-
-    [Header("Spawn Locations")]
-    [Tooltip("If empty, enemies will spawn in a random radius around this object.")]
-    public Transform[] spawnPoints;
-    [Tooltip("Specific spawn points strictly for Advanced Enemies (e.g. outside the arena).")]
+    public float advancedSpawnInterval = 20f;
+    public int maxAdvancedEnemiesToSpawn = 0;
     public Transform[] advancedSpawnPoints;
     public float spawnRadius = 20f;
 
-    private float spawnTimer;
-    private bool isSpawningActive = true;
+    private SpawnerDrone activeDrone;
+    private bool isSpawningActive;
+    private bool droneRespawnPending;
     private float advancedSpawnTimer;
-    private int advancedEnemiesSpawned = 0;
-    private bool isSpawningWave = false;
+    private int advancedEnemiesSpawned;
 
     private void OnEnable()
     {
-        QuotaManager.OnZoneCleared += StopSpawning;
-        
-        // Reset spawning state whenever the zone is turned on!
         isSpawningActive = true;
-        isSpawningWave = false;
-        spawnTimer = 0f; // Set to 0 so the first wave spawns immediately!
+        droneRespawnPending = false;
         advancedSpawnTimer = advancedSpawnInterval;
-        advancedEnemiesSpawned = 0; // Reset boss count so they are allowed to spawn again
+        advancedEnemiesSpawned = 0;
+
+        QuotaManager.OnZoneCleared += StopSpawning;
+        QuotaManager.OnGameCompleted += StopSpawning;
+
+        SpawnDrone();
     }
 
     private void OnDisable()
     {
+        isSpawningActive = false;
+        CancelInvoke();
+
         QuotaManager.OnZoneCleared -= StopSpawning;
+        QuotaManager.OnGameCompleted -= StopSpawning;
+
+        if (activeDrone != null && activeDrone.gameObject.activeSelf)
+            activeDrone.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        // Don't process spawning logic if the game is paused (e.g., during the countdown)
-        if (Time.timeScale == 0f) return;
-        
-        if (!isSpawningActive) return;
+        if (Time.timeScale == 0f || !isSpawningActive) return;
 
-        // Separate timer logic for Advanced Enemies
+        // Detect when drone is shot down → schedule a replacement
+        if (activeDrone != null && !activeDrone.gameObject.activeSelf && !droneRespawnPending)
+        {
+            droneRespawnPending = true;
+            Invoke(nameof(SpawnDrone), droneRespawnDelay);
+        }
+
         if (advancedEnemiesSpawned < maxAdvancedEnemiesToSpawn)
         {
             advancedSpawnTimer -= Time.deltaTime;
@@ -66,146 +68,69 @@ public class EnemySpawner : MonoBehaviour
                 advancedEnemiesSpawned++;
             }
         }
+    }
 
-        // Don't tick down the spawn timer while a wave is currently in the middle of spawning
-        if (isSpawningWave) return;
+    private void SpawnDrone()
+    {
+        droneRespawnPending = false;
+        if (!isSpawningActive || dronePrefab == null) return;
 
-        spawnTimer -= Time.deltaTime;
+        if (activeDrone == null)
+            activeDrone = Instantiate(dronePrefab);
 
-        if (spawnTimer <= 0f)
-        {
-            StartCoroutine(SpawnWaveRoutine());
-        }
+        activeDrone.arenaCenter = arenaCenter != null ? arenaCenter : transform;
+        activeDrone.gameObject.SetActive(true);
     }
 
     private void StopSpawning()
     {
         isSpawningActive = false;
-    }
+        CancelInvoke();
 
-    private IEnumerator SpawnWaveRoutine()
-    {
-        isSpawningWave = true;
-
-        // Pick ONE spawn location for the entire swarm
-        Vector3 waveBasePosition = GetSpawnPosition();
-
-        // Spawn the telegraph particle/object
-        GameObject telegraph = ObjectPooler.Instance.SpawnFromPool(telegraphPoolTag, waveBasePosition, Quaternion.identity);
-
-        if (AudioManager.Instance != null && AudioManager.Instance.enemySpawnTelegraphSound != null)
-        {
-            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.enemySpawnTelegraphSound, waveBasePosition, AudioManager.Instance.enemySpawnTelegraphVolume, 1f);
-        }
-
-        // Wait for the telegraph duration before actually spawning the enemies
-        yield return new WaitForSeconds(telegraphDuration);
-
-        // Deactivate the telegraph object (returning it to the pool)
-        if (telegraph != null)
-        {
-            telegraph.SetActive(false);
-        }
-
-        // If the zone was cleared while we were waiting, abort the spawn
-        if (!isSpawningActive)
-        {
-            isSpawningWave = false;
-            yield break;
-        }
-
-        for (int i = 0; i < enemiesPerWave; i++)
-        {
-            // Add a small random offset so the swarm doesn't spawn exactly inside each other
-            Vector3 randomOffset = new Vector3(Random.Range(-2f, 2f), Random.Range(0f, 2f), Random.Range(-2f, 2f));
-            Vector3 spawnPos = waveBasePosition + randomOffset;
-
-            ObjectPooler.Instance.SpawnFromPool(swarmerPoolTag, spawnPos, Quaternion.identity);
-            
-            // Small delay between individual spawns so they don't perfectly overlap
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        isSpawningWave = false;
-        spawnTimer = spawnInterval; // Reset timer AFTER the wave finishes spawning
+        if (activeDrone != null)
+            activeDrone.gameObject.SetActive(false);
     }
 
     private void SpawnAdvancedEnemy()
     {
-        // Spawn the elite independently around the edge of the arena
         Vector3 spawnPos = GetAdvancedSpawnPosition();
-        
-        // Make the boss face the center of the arena
-        Vector3 directionToCenter = transform.position - spawnPos;
-        directionToCenter.y = 0; // Keep the rotation perfectly level
-        Quaternion spawnRot = directionToCenter != Vector3.zero ? Quaternion.LookRotation(directionToCenter) : Quaternion.identity;
-        
+
+        Vector3 center = arenaCenter != null ? arenaCenter.position : transform.position;
+        Vector3 dir = center - spawnPos;
+        dir.y = 0f;
+        Quaternion spawnRot = dir != Vector3.zero ? Quaternion.LookRotation(dir) : Quaternion.identity;
+
         ObjectPooler.Instance.SpawnFromPool(advancedEnemyPoolTag, spawnPos, spawnRot);
     }
 
     private Vector3 GetAdvancedSpawnPosition()
     {
-        // If you assigned specific spawn points for the boss in the inspector, pick one!
         if (advancedSpawnPoints != null && advancedSpawnPoints.Length > 0)
         {
-            List<Transform> availablePoints = new List<Transform>();
-            AdvancedEnemy[] activeElites = FindObjectsOfType<AdvancedEnemy>(); // Only finds currently active/spawned bosses
+            List<Transform> available = new List<Transform>();
+            AdvancedEnemy[] active = FindObjectsOfType<AdvancedEnemy>();
 
-            foreach (Transform point in advancedSpawnPoints)
+            foreach (Transform pt in advancedSpawnPoints)
             {
-                bool isOccupied = false;
-                foreach (AdvancedEnemy elite in activeElites)
+                bool occupied = false;
+                foreach (AdvancedEnemy ae in active)
                 {
-                    // Calculate horizontal distance only, ignoring the fact that they start deep underground
-                    Vector2 pointPos2D = new Vector2(point.position.x, point.position.z);
-                    Vector2 elitePos2D = new Vector2(elite.transform.position.x, elite.transform.position.z);
-                    
-                    if (Vector2.Distance(pointPos2D, elitePos2D) < 10f) // 10 units safe zone radius
-                    {
-                        isOccupied = true;
-                        break;
-                    }
+                    Vector2 p2 = new Vector2(pt.position.x, pt.position.z);
+                    Vector2 e2 = new Vector2(ae.transform.position.x, ae.transform.position.z);
+                    if (Vector2.Distance(p2, e2) < 10f) { occupied = true; break; }
                 }
-
-                if (!isOccupied) availablePoints.Add(point);
+                if (!occupied) available.Add(pt);
             }
 
-            // Pick from the safe available points, or fallback to ANY point if the arena is entirely full
-            Transform selectedPoint = availablePoints.Count > 0 
-                ? availablePoints[Random.Range(0, availablePoints.Count)] 
+            Transform chosen = available.Count > 0
+                ? available[Random.Range(0, available.Count)]
                 : advancedSpawnPoints[Random.Range(0, advancedSpawnPoints.Length)];
-            
-            // Start deep below the chosen point
-            return new Vector3(selectedPoint.position.x, selectedPoint.position.y - 15f, selectedPoint.position.z);
+
+            return new Vector3(chosen.position.x, chosen.position.y - 15f, chosen.position.z);
         }
 
-        // Pick a random direction from the center
-        Vector2 randomDir = Random.insideUnitCircle;
-        if (randomDir == Vector2.zero) randomDir = Vector2.right; // Safety check
-        
-        // Push the spawn point strictly to the outer perimeter (spawnRadius + extra padding)
-        Vector2 edgePoint = randomDir.normalized * (spawnRadius + 8f); 
-        
-        // Start deep below the arena floor
-        float startHeight = -15f; 
-        return transform.position + new Vector3(edgePoint.x, startHeight, edgePoint.y);
-    }
-
-    private Vector3 GetSpawnPosition()
-    {
-        if (spawnPoints != null && spawnPoints.Length > 0)
-        {
-            int randomIndex = Random.Range(0, spawnPoints.Length);
-            return spawnPoints[randomIndex].position;
-        }
-
-        // Fallback: Random point ON THE EDGE of a circle around the spawner (Zone 1 style)
-        Vector2 randomDir = Random.insideUnitCircle;
-        if (randomDir == Vector2.zero) randomDir = Vector2.right; // Safety check
-        
-        Vector2 edgePoint = randomDir.normalized * spawnRadius; // .normalized pushes it to the outer boundary
-        
-        float randomHeight = Random.Range(2f, 6f); // Give them a randomized floating spawn height
-        return transform.position + new Vector3(edgePoint.x, randomHeight, edgePoint.y);
+        Vector3 c = arenaCenter != null ? arenaCenter.position : transform.position;
+        Vector2 dir = Random.insideUnitCircle.normalized;
+        return c + new Vector3(dir.x * (spawnRadius + 8f), -15f, dir.y * (spawnRadius + 8f));
     }
 }
