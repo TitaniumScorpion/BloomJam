@@ -7,7 +7,10 @@ public class EnemySpawner : MonoBehaviour
     public SpawnerDrone dronePrefab;
     [Tooltip("Empty Transform at the arena center — drone orbits this point")]
     public Transform arenaCenter;
-    public float droneRespawnDelay = 10f;
+    [Tooltip("Seconds between each new drone entering the arena")]
+    public float droneSpawnInterval = 10f;
+    [Tooltip("Maximum simultaneous alive drones. 0 = unlimited")]
+    public int maxDrones = 0;
 
     [Header("Advanced Enemy")]
     public string advancedEnemyPoolTag = "AdvancedEnemy";
@@ -16,23 +19,25 @@ public class EnemySpawner : MonoBehaviour
     public Transform[] advancedSpawnPoints;
     public float spawnRadius = 20f;
 
-    private SpawnerDrone activeDrone;
+    private List<SpawnerDrone> spawnedDrones = new List<SpawnerDrone>();
+    private float droneSpawnTimer;
     private bool isSpawningActive;
-    private bool droneRespawnPending;
     private float advancedSpawnTimer;
     private int advancedEnemiesSpawned;
 
     private void OnEnable()
     {
         isSpawningActive = true;
-        droneRespawnPending = false;
+        droneSpawnTimer = 0f; // first drone appears immediately
         advancedSpawnTimer = advancedSpawnInterval;
         advancedEnemiesSpawned = 0;
+        spawnedDrones.Clear();
 
         QuotaManager.OnZoneCleared += StopSpawning;
         QuotaManager.OnGameCompleted += StopSpawning;
 
         SpawnDrone();
+        droneSpawnTimer = droneSpawnInterval; // next drone after a full interval
     }
 
     private void OnDisable()
@@ -43,21 +48,34 @@ public class EnemySpawner : MonoBehaviour
         QuotaManager.OnZoneCleared -= StopSpawning;
         QuotaManager.OnGameCompleted -= StopSpawning;
 
-        if (activeDrone != null && activeDrone.gameObject.activeSelf)
-            activeDrone.gameObject.SetActive(false);
+        foreach (SpawnerDrone drone in spawnedDrones)
+            if (drone != null) drone.gameObject.SetActive(false);
+        spawnedDrones.Clear();
     }
 
     private void Update()
     {
         if (Time.timeScale == 0f || !isSpawningActive) return;
 
-        // Detect when drone is shot down → schedule a replacement
-        if (activeDrone != null && !activeDrone.gameObject.activeSelf && !droneRespawnPending)
+        // Drone accumulation timer
+        droneSpawnTimer -= Time.deltaTime;
+        if (droneSpawnTimer <= 0f)
         {
-            droneRespawnPending = true;
-            Invoke(nameof(SpawnDrone), droneRespawnDelay);
+            droneSpawnTimer = droneSpawnInterval;
+
+            bool underCap = true;
+            if (maxDrones > 0)
+            {
+                int alive = 0;
+                foreach (SpawnerDrone d in spawnedDrones)
+                    if (d != null && d.gameObject.activeSelf) alive++;
+                underCap = alive < maxDrones;
+            }
+
+            if (underCap) SpawnDrone();
         }
 
+        // Advanced enemy timer
         if (advancedEnemiesSpawned < maxAdvancedEnemiesToSpawn)
         {
             advancedSpawnTimer -= Time.deltaTime;
@@ -72,14 +90,12 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnDrone()
     {
-        droneRespawnPending = false;
         if (!isSpawningActive || dronePrefab == null) return;
 
-        if (activeDrone == null)
-            activeDrone = Instantiate(dronePrefab);
-
-        activeDrone.arenaCenter = arenaCenter != null ? arenaCenter : transform;
-        activeDrone.gameObject.SetActive(true);
+        SpawnerDrone drone = Instantiate(dronePrefab);
+        drone.arenaCenter = arenaCenter != null ? arenaCenter : transform;
+        spawnedDrones.Add(drone);
+        drone.gameObject.SetActive(true);
     }
 
     private void StopSpawning()
@@ -87,8 +103,9 @@ public class EnemySpawner : MonoBehaviour
         isSpawningActive = false;
         CancelInvoke();
 
-        if (activeDrone != null)
-            activeDrone.gameObject.SetActive(false);
+        foreach (SpawnerDrone drone in spawnedDrones)
+            if (drone != null) drone.gameObject.SetActive(false);
+        spawnedDrones.Clear();
     }
 
     private void SpawnAdvancedEnemy()
@@ -130,7 +147,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         Vector3 c = arenaCenter != null ? arenaCenter.position : transform.position;
-        Vector2 dir = Random.insideUnitCircle.normalized;
-        return c + new Vector3(dir.x * (spawnRadius + 8f), -15f, dir.y * (spawnRadius + 8f));
+        Vector2 d2 = Random.insideUnitCircle.normalized;
+        return c + new Vector3(d2.x * (spawnRadius + 8f), -15f, d2.y * (spawnRadius + 8f));
     }
 }

@@ -19,6 +19,8 @@ public class SpawnerDrone : MonoBehaviour
     public int enemiesPerPack = 7;
     public float spawnInterval = 6f;
     public float spawnStagger = 0.1f;
+    [Tooltip("Assign an empty child Transform at the top of the drone mesh. If left empty, falls back to the offset below.")]
+    public Transform spawnPoint;
     public float packHeightOffset = 1.5f;
 
     [Header("Health")]
@@ -104,7 +106,7 @@ public class SpawnerDrone : MonoBehaviour
 
     private IEnumerator SpawnPack()
     {
-        Vector3 basePos = transform.position + Vector3.up * packHeightOffset;
+        Vector3 basePos = spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up * packHeightOffset;
         for (int i = 0; i < enemiesPerPack; i++)
         {
             Vector3 offset = new Vector3(Random.Range(-2f, 2f), 0f, Random.Range(-2f, 2f));
