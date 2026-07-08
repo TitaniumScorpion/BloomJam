@@ -23,19 +23,21 @@ public class SpawnerDrone : MonoBehaviour
     public Transform spawnPoint;
     public float packHeightOffset = 1.5f;
 
-    [Header("Health")]
-    [Range(15, 25)]
-    public int maxHealth = 18;
-
-    private int currentHealth;
+    private DroneWeakPoint[] weakPoints;
+    private int destroyedWeakPoints;
     private float orbitAngle;
     private float entryTargetAngle;
     private float spawnTimer;
     private bool isOrbiting;
 
+    private void Awake()
+    {
+        weakPoints = GetComponentsInChildren<DroneWeakPoint>(true);
+    }
+
     private void OnEnable()
     {
-        currentHealth = maxHealth;
+        destroyedWeakPoints = 0;
         isOrbiting = false;
         spawnTimer = spawnInterval;
 
@@ -44,7 +46,6 @@ public class SpawnerDrone : MonoBehaviour
         entryTargetAngle = Random.Range(0f, Mathf.PI * 2f);
         orbitAngle = entryTargetAngle;
 
-        // Start far outside the arena along the same angle
         transform.position = new Vector3(
             center.x + Mathf.Cos(entryTargetAngle) * entryStartRadius,
             center.y + orbitHeight,
@@ -72,7 +73,6 @@ public class SpawnerDrone : MonoBehaviour
 
         if (!isOrbiting)
         {
-            // Glide straight toward the ring entry point
             Vector3 entryTarget = new Vector3(
                 center.x + Mathf.Cos(entryTargetAngle) * orbitRadius,
                 center.y + orbitHeight,
@@ -85,7 +85,6 @@ public class SpawnerDrone : MonoBehaviour
         }
         else
         {
-            // Circular orbit
             orbitAngle += orbitSpeed * Time.deltaTime;
             transform.position = new Vector3(
                 center.x + Mathf.Cos(orbitAngle) * orbitRadius,
@@ -115,12 +114,11 @@ public class SpawnerDrone : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void OnWeakPointDestroyed()
     {
-        currentHealth -= damage;
-        if (currentHealth <= 0)
+        destroyedWeakPoints++;
+        if (weakPoints.Length > 0 && destroyedWeakPoints >= weakPoints.Length)
         {
-            currentHealth = 0;
             StandardSwarmer.ReportDeath();
             gameObject.SetActive(false);
         }

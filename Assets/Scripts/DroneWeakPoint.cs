@@ -5,7 +5,10 @@ public class DroneWeakPoint : MonoBehaviour
 {
     [Tooltip("Drag the SpawnerDrone root object here")]
     public SpawnerDrone parentDrone;
-    public int damage = 1;
+
+    [Header("Health")]
+    public int maxHealth = 8;
+    private int currentHealth;
 
     [Header("Hit Flash")]
     public Renderer weakPointRenderer;
@@ -39,6 +42,8 @@ public class DroneWeakPoint : MonoBehaviour
             originalEmissionColor2 = instanceMaterial2.GetColor(emissionColorID);
             instanceMaterial2.EnableKeyword("_EMISSION");
         }
+
+        currentHealth = maxHealth;
     }
 
     private void OnDestroy()
@@ -49,14 +54,45 @@ public class DroneWeakPoint : MonoBehaviour
 
     public void TakeDamage(int incomingDamage)
     {
-        if (parentDrone != null)
-            parentDrone.TakeDamage(damage);
+        if (currentHealth <= 0) return;
 
-        if (gameObject.activeInHierarchy)
+        currentHealth -= incomingDamage;
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            Deactivate();
+        }
+        else if (gameObject.activeInHierarchy)
         {
             if (flashCoroutine != null) StopCoroutine(flashCoroutine);
             flashCoroutine = StartCoroutine(FlashRoutine());
         }
+    }
+
+    private void Deactivate()
+    {
+        // Stop any in-progress flash
+        if (flashCoroutine != null) { StopCoroutine(flashCoroutine); flashCoroutine = null; }
+
+        // Kill emission — go dark
+        if (instanceMaterial != null)
+        {
+            instanceMaterial.SetColor(emissionColorID, Color.black);
+            instanceMaterial.DisableKeyword("_EMISSION");
+        }
+        if (instanceMaterial2 != null)
+        {
+            instanceMaterial2.SetColor(emissionColorID, Color.black);
+            instanceMaterial2.DisableKeyword("_EMISSION");
+        }
+
+        // Disable all colliders so this weak point can't be hit again
+        foreach (Collider col in GetComponents<Collider>())
+            col.enabled = false;
+
+        if (parentDrone != null)
+            parentDrone.OnWeakPointDestroyed();
     }
 
     private IEnumerator FlashRoutine()
