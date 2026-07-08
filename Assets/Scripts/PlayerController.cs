@@ -88,6 +88,14 @@ public class PlayerController : MonoBehaviour
         // Completely freeze the player's inputs and camera movement during the countdown
         if (Time.timeScale == 0f) return;
 
+        if (KatanaWeapon.IsBulletTimeActive)
+        {
+            horizontalInput = 0f;
+            verticalInput = 0f;
+            HandleLook();
+            return;
+        }
+
         // Ground check using a simple Raycast downward
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
@@ -128,6 +136,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (KatanaWeapon.IsBulletTimeActive)
+        {
+            rb.linearVelocity = Vector3.zero;
+            return;
+        }
+
         // We only move normally if we aren't currently locked into a dash animation/movement
         if (!isDashing)
         {
