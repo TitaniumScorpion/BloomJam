@@ -407,22 +407,35 @@ public class AutomaticPistol : MonoBehaviour
     public void UnlockChargeAttack()
     {
         chargeUnlocked = true;
+        if (beamRenderer == null)
+        {
+            beamRenderer = gameObject.AddComponent<LineRenderer>();
+            beamRenderer.positionCount = 2;
+            beamRenderer.startWidth = beamMinWidth;
+            beamRenderer.endWidth = beamMinWidth;
+            beamRenderer.useWorldSpace = true;
+            beamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            beamRenderer.receiveShadows = false;
+            beamRenderer.material = beamMaterial != null ? beamMaterial : new Material(Shader.Find("Sprites/Default"));
+            beamRenderer.enabled = false;
+        }
+    }
 
-        beamRenderer = gameObject.AddComponent<LineRenderer>();
-        beamRenderer.positionCount = 2;
-        beamRenderer.startWidth = beamMinWidth;
-        beamRenderer.endWidth = beamMinWidth;
-        beamRenderer.useWorldSpace = true;
-        beamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        beamRenderer.receiveShadows = false;
-        beamRenderer.material = beamMaterial != null ? beamMaterial : new Material(Shader.Find("Sprites/Default"));
-        beamRenderer.enabled = false;
+    public void LockChargeAttack()
+    {
+        chargeUnlocked = false;
+        CancelCharge(); // resets fireState to Idle
     }
 
     public void UnlockShotgun()
     {
         shotgunUnlocked = true;
         currentShotgunThreshold = 4f;
+    }
+
+    public void LockShotgun()
+    {
+        shotgunUnlocked = false;
     }
 
     // ── Weapon Sway ───────────────────────────────────────────────────────────

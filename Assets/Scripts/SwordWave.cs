@@ -63,9 +63,15 @@ public class SwordWave : MonoBehaviour
             weakPoint.TakeDamage(damage);
             return;
         }
+        if (other.TryGetComponent(out DroneWeakPoint dronePoint))
+        {
+            dronePoint.TakeDamage(damage);
+            return;
+        }
 
         // Stop on solid environment
-        if (!other.isTrigger && other.GetComponentInParent<AdvancedEnemy>() == null)
+        if (!other.isTrigger && other.GetComponentInParent<AdvancedEnemy>() == null
+            && other.GetComponentInParent<SpawnerDrone>() == null)
             gameObject.SetActive(false);
     }
 }

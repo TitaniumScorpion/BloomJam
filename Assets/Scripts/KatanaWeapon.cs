@@ -283,15 +283,24 @@ public class KatanaWeapon : MonoBehaviour
 
     // ── Public Unlock Methods (called by UpgradeManager) ─────────────────────
 
-    public void UnlockWaves()
-    {
-        wavesUnlocked = true;
-    }
+    public void UnlockWaves() => wavesUnlocked = true;
+
+    public void LockWaves() => wavesUnlocked = false;
 
     public void UnlockBulletTime()
     {
         bulletTimeUnlocked = true;
-        CreateBulletTimeBar();
+        if (bulletTimeBarObj == null)
+            CreateBulletTimeBar();
+        else
+            bulletTimeBarObj.SetActive(true);
+    }
+
+    public void LockBulletTime()
+    {
+        if (isBulletTimeRunning) EndBulletTime();
+        bulletTimeUnlocked = false;
+        if (bulletTimeBarObj != null) bulletTimeBarObj.SetActive(false);
     }
 
     // ── Weapon Sway ───────────────────────────────────────────────────────────
