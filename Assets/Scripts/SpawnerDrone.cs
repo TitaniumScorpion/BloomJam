@@ -121,6 +121,7 @@ public class SpawnerDrone : MonoBehaviour
         if (currentHealth <= 0)
         {
             currentHealth = 0;
+            StandardSwarmer.ReportDeath();
             gameObject.SetActive(false);
         }
     }
