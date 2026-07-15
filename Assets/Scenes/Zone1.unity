@@ -37242,7 +37242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 410403391}
   m_Layer: 0
-  m_Name: Level 3
+  m_Name: SwordLv3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104778,7 +104778,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1190395576}
   m_Layer: 0
-  m_Name: Level 2
+  m_Name: SwordLv2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114568,7 +114568,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1298689126}
   m_Layer: 0
-  m_Name: Level 4
+  m_Name: SwordLv4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -170179,7 +170179,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1908027263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180746,7 +180746,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2023714910}
   m_Layer: 0
-  m_Name: Level 1
+  m_Name: SwordLv1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -194031,7 +194031,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6591932663722804188}
   m_Layer: 0
-  m_Name: Sword
+  m_Name: SwordParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -194395,8 +194395,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5778381627550751078}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.97624135, z: -0, w: 0.21668632}
-  m_LocalPosition: {x: -36.68, y: 3.376, z: -23.294}
+  m_LocalRotation: {x: -0.050240275, y: -0.69621974, z: -0.11440939, w: 0.7068695}
+  m_LocalPosition: {x: -0.88, y: 0.18, z: 1.66}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -194404,8 +194404,8 @@ Transform:
   - {fileID: 1190395576}
   - {fileID: 410403391}
   - {fileID: 1298689126}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -154.971, z: 0}
+  m_Father: {fileID: 7735761706090348632}
+  m_LocalEulerAnglesHint: {x: -13.317, y: -88.498, z: -5.412}
 --- !u!1 &6605732668302287264
 GameObject:
   m_ObjectHideFlags: 0
@@ -195129,9 +195129,33 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: displayWeapon
+      value: 
+      objectReference: {fileID: 5778381627550751078}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: markedMaterial
       value: 
       objectReference: {fileID: 2100000, guid: c0172bbcc4e40fa4db8815e3c7b3298c, type: 2}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: swordLevelVisuals.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: 'swordLevelVisuals.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2023714909}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: 'swordLevelVisuals.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1190395575}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: 'swordLevelVisuals.Array.data[2]'
+      value: 
+      objectReference: {fileID: 410403390}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: 'swordLevelVisuals.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1298689125}
     - target: {fileID: 8677833960182127638, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_LocalPosition.x
       value: -36.65
@@ -195173,8 +195197,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7193532161941760443, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+    - {fileID: 8819543926169019555, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6555746620384684486, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6591932663722804188}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
 --- !u!1 &7735761706090348626 stripped
@@ -195204,6 +195233,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c25c02a060119b94abc6bfddaf127086, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutomaticPistol
+--- !u!4 &7735761706090348632 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6555746620384684486, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+  m_PrefabInstance: {fileID: 7735761706090348625}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &7738121433621905566
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -195878,4 +195912,3 @@ SceneRoots:
   - {fileID: 935299041}
   - {fileID: 306246494}
   - {fileID: 1883257993}
-  - {fileID: 6591932663722804188}

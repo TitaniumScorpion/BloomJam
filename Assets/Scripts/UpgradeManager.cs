@@ -150,6 +150,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         katanaUpgradeLevel++;
+        katana?.SetSwordVisual(katanaUpgradeLevel);
         ClosePanel();
     }
 

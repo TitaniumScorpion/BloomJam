@@ -126,6 +126,12 @@ public class DebugUpgradeKeys : MonoBehaviour
                 case 3: katana.LockBulletTime(); break;
             }
         }
+
+        // Count how many sword upgrades are currently active and sync the visual
+        int activeCount = 0;
+        for (int i = 0; i < swordActive.Length; i++)
+            if (swordActive[i]) activeCount++;
+        katana.SetSwordVisual(activeCount);
     }
 
     private void OnGUI()

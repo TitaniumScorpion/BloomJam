@@ -37,6 +37,11 @@ public class KatanaWeapon : MonoBehaviour
     private Quaternion initialDisplayRotation;
     private Quaternion targetSwingRotation;
 
+    // ── Sword Visuals (per upgrade level) ────────────────────────────────────
+    [Header("Sword Visuals")]
+    [Tooltip("One entry per upgrade level: [0]=base, [1]=Lv2, [2]=Lv3, [3]=Lv4")]
+    public GameObject[] swordLevelVisuals;
+
     // ── Sword Waves (unlocked at Lv2) ─────────────────────────────────────────
     [Header("Sword Waves (Lv2 Unlock)")]
     public bool wavesUnlocked = false;
@@ -72,6 +77,8 @@ public class KatanaWeapon : MonoBehaviour
             initialDisplayPosition = displayWeapon.transform.localPosition;
             targetSwingRotation = initialDisplayRotation;
         }
+
+        SetSwordVisual(0);
     }
 
     private void Update()
@@ -282,6 +289,15 @@ public class KatanaWeapon : MonoBehaviour
     }
 
     // ── Public Unlock Methods (called by UpgradeManager) ─────────────────────
+
+    public void SetSwordVisual(int level)
+    {
+        if (swordLevelVisuals == null || swordLevelVisuals.Length == 0) return;
+        int clamped = Mathf.Clamp(level, 0, swordLevelVisuals.Length - 1);
+        for (int i = 0; i < swordLevelVisuals.Length; i++)
+            if (swordLevelVisuals[i] != null)
+                swordLevelVisuals[i].SetActive(i <= clamped);
+    }
 
     public void UnlockWaves() => wavesUnlocked = true;
 
