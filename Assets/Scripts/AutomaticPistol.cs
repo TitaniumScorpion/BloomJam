@@ -328,6 +328,8 @@ public class AutomaticPistol : MonoBehaviour
                     weakPoint.TakeDamage(damage);
                 else if (hit.collider.TryGetComponent(out DroneWeakPoint dronePoint))
                     dronePoint.TakeDamage(damage);
+                else if (hit.collider.TryGetComponent(out DasherEnemy dasher))
+                    dasher.TakeDamage(damage);
                 else if (!hit.collider.isTrigger && hit.rigidbody == null)
                     break; // Stop piercing at solid environment
             }

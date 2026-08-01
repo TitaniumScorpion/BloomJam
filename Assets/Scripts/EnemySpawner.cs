@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    // Static arena info read by DasherEnemy to pick wander targets
+    public static Vector3 CurrentArenaCenter;
+    public static float CurrentSpawnRadius;
+
     [Header("Spawner Drone")]
     public SpawnerDrone dronePrefab;
     [Tooltip("Empty Transform at the arena center — drone orbits this point")]
@@ -11,6 +15,11 @@ public class EnemySpawner : MonoBehaviour
     public float droneSpawnInterval = 10f;
     [Tooltip("Maximum simultaneous alive drones. 0 = unlimited")]
     public int maxDrones = 0;
+
+    [Header("Dasher Enemy")]
+    public string dasherPoolTag = "DasherEnemy";
+    [Tooltip("Seconds between each new Dasher spawning. 0 = disabled")]
+    public float dasherSpawnInterval = 8f;
 
     [Header("Advanced Enemy")]
     public string advancedEnemyPoolTag = "AdvancedEnemy";
@@ -21,6 +30,7 @@ public class EnemySpawner : MonoBehaviour
 
     private List<SpawnerDrone> spawnedDrones = new List<SpawnerDrone>();
     private float droneSpawnTimer;
+    private float dasherSpawnTimer;
     private bool isSpawningActive;
     private float advancedSpawnTimer;
     private int advancedEnemiesSpawned;
@@ -29,9 +39,14 @@ public class EnemySpawner : MonoBehaviour
     {
         isSpawningActive = true;
         droneSpawnTimer = 0f; // first drone appears immediately
+        dasherSpawnTimer = dasherSpawnInterval;
         advancedSpawnTimer = advancedSpawnInterval;
         advancedEnemiesSpawned = 0;
         spawnedDrones.Clear();
+
+        // Publish arena info so DasherEnemy can pick wander targets
+        CurrentArenaCenter = arenaCenter != null ? arenaCenter.position : transform.position;
+        CurrentSpawnRadius = spawnRadius;
 
         QuotaManager.OnZoneCleared += StopSpawning;
         QuotaManager.OnGameCompleted += StopSpawning;
@@ -75,6 +90,17 @@ public class EnemySpawner : MonoBehaviour
             if (underCap) SpawnDrone();
         }
 
+        // Dasher accumulation timer
+        if (dasherSpawnInterval > 0f)
+        {
+            dasherSpawnTimer -= Time.deltaTime;
+            if (dasherSpawnTimer <= 0f)
+            {
+                dasherSpawnTimer = dasherSpawnInterval;
+                SpawnDasher();
+            }
+        }
+
         // Advanced enemy timer
         if (advancedEnemiesSpawned < maxAdvancedEnemiesToSpawn)
         {
@@ -106,6 +132,18 @@ public class EnemySpawner : MonoBehaviour
         foreach (SpawnerDrone drone in spawnedDrones)
             if (drone != null) drone.gameObject.SetActive(false);
         spawnedDrones.Clear();
+    }
+
+    private void SpawnDasher()
+    {
+        if (!isSpawningActive || string.IsNullOrEmpty(dasherPoolTag)) return;
+
+        Vector2 circle = Random.insideUnitCircle * spawnRadius * 0.75f;
+        float height = Random.Range(2f, 6f);
+        Vector3 center = arenaCenter != null ? arenaCenter.position : transform.position;
+        Vector3 spawnPos = center + new Vector3(circle.x, height, circle.y);
+
+        ObjectPooler.Instance.SpawnFromPool(dasherPoolTag, spawnPos, Quaternion.identity);
     }
 
     private void SpawnAdvancedEnemy()

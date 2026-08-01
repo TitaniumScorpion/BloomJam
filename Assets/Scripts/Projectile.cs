@@ -65,6 +65,11 @@ public class Projectile : MonoBehaviour
             dronePoint.TakeDamage(damage);
             hitEnemy = true;
         }
+        else if (other.TryGetComponent(out DasherEnemy dasher))
+        {
+            dasher.TakeDamage(damage);
+            hitEnemy = true;
+        }
 
         if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
         {
