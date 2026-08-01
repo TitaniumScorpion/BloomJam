@@ -24,9 +24,10 @@ public class DasherEnemy : MonoBehaviour
     public float dashSpeed = 22f;
     public float dashDuration = 0.5f;
 
-    [Header("Hit Flash")]
+    [Header("Materials")]
     public Renderer enemyRenderer;
-    public Material flashMaterial;
+    public Material triggeredMaterial;  // shown while preparing/dashing
+    public Material flashMaterial;      // brief flash on hit
     public float flashDuration = 0.1f;
 
     private enum DasherState { Wandering, Preparing, Dashing }
@@ -42,6 +43,8 @@ public class DasherEnemy : MonoBehaviour
     private bool wasFrozen;
     private Vector3 frozenVelocity;
     private Material originalMaterial;
+    private Material currentBaseMaterial;
+    private bool isFlashing;
     private Coroutine flashCoroutine;
 
     private void Awake()
@@ -53,6 +56,7 @@ public class DasherEnemy : MonoBehaviour
 
         if (enemyRenderer != null)
             originalMaterial = enemyRenderer.sharedMaterial;
+        currentBaseMaterial = originalMaterial;
     }
 
     private void OnEnable()
@@ -64,6 +68,8 @@ public class DasherEnemy : MonoBehaviour
         dashTimer = 0f;
         wanderTarget = PickWanderTarget();
 
+        isFlashing = false;
+        currentBaseMaterial = originalMaterial;
         if (enemyRenderer != null && originalMaterial != null)
             enemyRenderer.sharedMaterial = originalMaterial;
 
@@ -98,6 +104,7 @@ public class DasherEnemy : MonoBehaviour
                     state = DasherState.Preparing;
                     prepareTimer = 0f;
                     rb.linearVelocity = Vector3.zero;
+                    SetBaseMaterial(triggeredMaterial);
                 }
                 break;
 
@@ -114,6 +121,7 @@ public class DasherEnemy : MonoBehaviour
                 {
                     state = DasherState.Wandering;
                     wanderTarget = PickWanderTarget();
+                    SetBaseMaterial(originalMaterial);
                     break;
                 }
 
@@ -123,6 +131,7 @@ public class DasherEnemy : MonoBehaviour
                     dashDirection = (playerTransform.position - transform.position).normalized;
                     dashTimer = 0f;
                     state = DasherState.Dashing;
+                    // stays on triggeredMaterial
                 }
                 break;
 
@@ -137,11 +146,13 @@ public class DasherEnemy : MonoBehaviour
                         // Player still nearby — prepare another dash
                         state = DasherState.Preparing;
                         prepareTimer = 0f;
+                        // stays on triggeredMaterial
                     }
                     else
                     {
                         state = DasherState.Wandering;
                         wanderTarget = PickWanderTarget();
+                        SetBaseMaterial(originalMaterial);
                     }
                 }
                 break;
@@ -196,6 +207,13 @@ public class DasherEnemy : MonoBehaviour
             health.TakeDamage(dashDamage);
     }
 
+    private void SetBaseMaterial(Material mat)
+    {
+        currentBaseMaterial = mat;
+        if (!isFlashing && enemyRenderer != null && mat != null)
+            enemyRenderer.sharedMaterial = mat;
+    }
+
     private Vector3 PickWanderTarget()
     {
         Vector2 circle = Random.insideUnitCircle * EnemySpawner.CurrentSpawnRadius * 0.75f;
@@ -221,9 +239,11 @@ public class DasherEnemy : MonoBehaviour
 
     private IEnumerator FlashRoutine()
     {
+        isFlashing = true;
         enemyRenderer.sharedMaterial = flashMaterial;
         yield return new WaitForSeconds(flashDuration);
-        if (enemyRenderer != null && originalMaterial != null)
-            enemyRenderer.sharedMaterial = originalMaterial;
+        if (enemyRenderer != null)
+            enemyRenderer.sharedMaterial = currentBaseMaterial;
+        isFlashing = false;
     }
 }

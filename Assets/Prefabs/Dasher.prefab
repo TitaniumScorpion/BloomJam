@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -52.91838, y: 2.53, z: -15.51994}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -153,16 +153,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e17f1b0015dd49438a30fdb73c67d14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DasherEnemy
-  maxHealth: 3
+  maxHealth: 5
   dashDamage: 1
   wanderSpeed: 3
   minWanderHeight: 2
-  maxWanderHeight: 6
-  detectRadius: 6
-  escapeRadius: 10
-  prepareDuration: 1.5
-  dashSpeed: 22
-  dashDuration: 0.5
+  maxWanderHeight: 4
+  detectRadius: 8
+  escapeRadius: 18
+  prepareDuration: 1.2
+  dashSpeed: 38
+  dashDuration: 0.4
   enemyRenderer: {fileID: 7706712254015422841}
+  triggeredMaterial: {fileID: 2100000, guid: fffbd6195d8cab040a850cec34e0a59a, type: 2}
   flashMaterial: {fileID: 2100000, guid: 001da46b96c6a9a4288358ec418ba1d8, type: 2}
   flashDuration: 0.1

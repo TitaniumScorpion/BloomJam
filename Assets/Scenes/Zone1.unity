@@ -167,6 +167,8 @@ MonoBehaviour:
   arenaCenter: {fileID: 253881225}
   droneSpawnInterval: 10
   maxDrones: 0
+  dasherPoolTag: DasherEnemy
+  dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
   maxAdvancedEnemiesToSpawn: 6
@@ -11443,6 +11445,8 @@ MonoBehaviour:
   arenaCenter: {fileID: 915526828}
   droneSpawnInterval: 10
   maxDrones: 0
+  dasherPoolTag: DasherEnemy
+  dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
   maxAdvancedEnemiesToSpawn: 6
@@ -125180,6 +125184,8 @@ MonoBehaviour:
   arenaCenter: {fileID: 741174423}
   droneSpawnInterval: 10
   maxDrones: 0
+  dasherPoolTag: DasherEnemy
+  dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
   maxAdvancedEnemiesToSpawn: 4
@@ -135019,6 +135025,8 @@ MonoBehaviour:
   arenaCenter: {fileID: 1929630348}
   droneSpawnInterval: 10
   maxDrones: 0
+  dasherPoolTag: DasherEnemy
+  dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
   maxAdvancedEnemiesToSpawn: 6
@@ -170196,6 +170204,8 @@ MonoBehaviour:
   arenaCenter: {fileID: 346145077}
   droneSpawnInterval: 18
   maxDrones: 0
+  dasherPoolTag: DasherEnemy
+  dasherSpawnInterval: 3
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
   maxAdvancedEnemiesToSpawn: 0
@@ -193880,7 +193890,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.size
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[7].tag
@@ -193888,7 +193898,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[8].tag
-      value: ShotgunProjectile
+      value: DasherEnemy
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[7].size
@@ -193896,7 +193906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[8].size
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[7].prefab
@@ -193905,7 +193915,7 @@ PrefabInstance:
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[8].prefab
       value: 
-      objectReference: {fileID: 9194846395807770034, guid: 9e7a675929111144a8617d3b8ed64ba3, type: 3}
+      objectReference: {fileID: 8687382240258577881, guid: faeb40a2fc50d5742a4ca59c29f726d3, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
