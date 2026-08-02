@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3257b74bb1a9cb458dbc90b0cd6be31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordWave
-  speed: 20
+  speed: 60
   lifetime: 1.5
   damage: 2
 --- !u!65 &8083242270223831632
