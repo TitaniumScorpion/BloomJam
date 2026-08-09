@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: gun_mat
-    second: {fileID: 2100000, guid: ba965a6926af604419a11cdccaf41789, type: 2}
+    second: {fileID: 2100000, guid: e0e4529cbfcb3a645b3c6e0f5d09be0f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
