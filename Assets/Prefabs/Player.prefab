@@ -1404,7 +1404,7 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.8, z: 0}
 --- !u!54 &8569231005957018973
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1447,13 +1447,13 @@ MonoBehaviour:
   moveSpeed: 16
   groundDrag: 6
   airMultiplier: 0.4
-  jumpForce: 15
-  extraGravity: 30
-  jumpCooldown: 0.25
+  jumpForce: 18
+  extraGravity: 40
+  jumpCooldown: 0.4
   dashForce: 75
   dashDuration: 0.25
   dashCooldown: 1.5
-  playerHeight: 2
+  playerHeight: 4
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
