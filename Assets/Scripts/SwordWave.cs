@@ -73,11 +73,17 @@ public class SwordWave : MonoBehaviour
             dasher.TakeDamage(damage);
             return;
         }
+        if (other.TryGetComponent(out TrailEnemy trailEnemy))
+        {
+            trailEnemy.TakeDamage(damage);
+            return;
+        }
 
         // Stop on solid environment
         if (!other.isTrigger && other.GetComponentInParent<AdvancedEnemy>() == null
             && other.GetComponentInParent<SpawnerDrone>() == null
-            && other.GetComponentInParent<DasherEnemy>() == null)
+            && other.GetComponentInParent<DasherEnemy>() == null
+            && other.GetComponentInParent<TrailEnemy>() == null)
             gameObject.SetActive(false);
     }
 }

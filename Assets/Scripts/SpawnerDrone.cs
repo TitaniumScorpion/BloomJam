@@ -16,6 +16,9 @@ public class SpawnerDrone : MonoBehaviour
 
     [Header("Enemy Spawning")]
     public string swarmerPoolTag = "StandardSwarmer";
+    public string trailEnemyPoolTag = "TrailEnemy";
+    [Tooltip("1 trail enemy spawns with every pack")]
+    public bool spawnTrailEnemy = true;
     public int enemiesPerPack = 7;
     public float spawnInterval = 6f;
     public float spawnStagger = 0.1f;
@@ -111,6 +114,12 @@ public class SpawnerDrone : MonoBehaviour
             Vector3 offset = new Vector3(Random.Range(-2f, 2f), 0f, Random.Range(-2f, 2f));
             ObjectPooler.Instance.SpawnFromPool(swarmerPoolTag, basePos + offset, Quaternion.identity);
             yield return new WaitForSeconds(spawnStagger);
+        }
+
+        if (spawnTrailEnemy && !string.IsNullOrEmpty(trailEnemyPoolTag))
+        {
+            Vector3 offset = new Vector3(Random.Range(-2f, 2f), 0f, Random.Range(-2f, 2f));
+            ObjectPooler.Instance.SpawnFromPool(trailEnemyPoolTag, basePos + offset, Quaternion.identity);
         }
     }
 

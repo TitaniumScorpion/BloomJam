@@ -70,6 +70,11 @@ public class Projectile : MonoBehaviour
             dasher.TakeDamage(damage);
             hitEnemy = true;
         }
+        else if (other.TryGetComponent(out TrailEnemy trailEnemy))
+        {
+            trailEnemy.TakeDamage(damage);
+            hitEnemy = true;
+        }
 
         if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
         {
