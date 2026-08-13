@@ -12,6 +12,14 @@ public class Projectile : MonoBehaviour
     private Vector3 originalScale;
     private bool inGracePeriod;
 
+    //YILMAZ KOD MAESTER WAS HERE
+    [SerializeField] private GameObject bulletGFX;
+    [SerializeField] private float minSpeed = 450f;
+    [SerializeField] private float maxSpeed = 600f;
+    private float rotationSpeed;
+    //YILMAZ KOD MAESTER WAS HERE
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -19,6 +27,25 @@ public class Projectile : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         originalScale = transform.localScale;
     }
+
+
+    //YILMAZ KOD MAESTER WAS HERE
+    private void Start()
+    {
+        rotationSpeed = Random.Range(minSpeed, maxSpeed);
+
+        // %50 ihtimalle negatif yap
+        if (Random.value < 0.5f)
+        {
+            rotationSpeed *= -1f;
+        }
+    }
+    private void Update()
+    {
+        bulletGFX.transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
+    }
+    //YILMAZ KOD MAESTER WAS HERE
+
 
     private void OnEnable()
     {
