@@ -192663,7 +192663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.size
-      value: 11
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[7].tag
@@ -192682,6 +192682,10 @@ PrefabInstance:
       value: TrailSegment
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].tag
+      value: BulletTimeSwordWave
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[7].size
       value: 10
       objectReference: {fileID: 0}
@@ -192696,6 +192700,10 @@ PrefabInstance:
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[10].size
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].size
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[0].prefab
@@ -192717,6 +192725,10 @@ PrefabInstance:
       propertyPath: pools.Array.data[10].prefab
       value: 
       objectReference: {fileID: 3667184909392613680, guid: e02cd48ac065ab24b985dee7b9c84733, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].prefab
+      value: 
+      objectReference: {fileID: 1679428047145151834, guid: 3e3147fa3ceb3f04fb8aa7be98e536e7, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

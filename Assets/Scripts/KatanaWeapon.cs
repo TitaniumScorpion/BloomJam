@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -52,15 +53,24 @@ public class KatanaWeapon : MonoBehaviour
     public bool bulletTimeUnlocked = false;
     public float bulletTimeDuration = 5f;
     public float bulletTimeCooldown = 15f;
-    public int markedDamagePerHit = 5;
     public Material markedMaterial;
 
+    [Header("Bullet Time Waves")]
+    [Tooltip("Pool tag for the faster/larger sword wave spawned during bullet time")]
+    public string bulletTimeWavePoolTag = "BulletTimeSwordWave";
+    [Tooltip("Attack cooldown while bullet time is active")]
+    public float bulletTimeAttackCooldown = 0.15f;
+
     public static bool IsBulletTimeActive = false;
+    public static Material BulletTimeMarkMaterial { get; private set; }
+    public static event Action OnBulletTimeStart;
+    public static event Action OnBulletTimeEnd;
+
+    private static readonly List<GameObject> pendingBulletTimeDeaths = new List<GameObject>();
 
     private bool isBulletTimeRunning = false;
     private float bulletTimeTimer = 0f;
     private float bulletTimeCooldownTimer = 0f;
-    private Dictionary<StandardSwarmer, int> swarmerHitCounts = new Dictionary<StandardSwarmer, int>();
 
     private GameObject bulletTimeBarObj;
     private RectTransform bulletTimeBarFill;
@@ -79,6 +89,7 @@ public class KatanaWeapon : MonoBehaviour
         }
 
         SetSwordVisual(0);
+        BulletTimeMarkMaterial = markedMaterial;
     }
 
     private void Update()
@@ -100,7 +111,7 @@ public class KatanaWeapon : MonoBehaviour
 
     private void Attack()
     {
-        cooldownTimer = cooldownTime;
+        cooldownTimer = IsBulletTimeActive ? bulletTimeAttackCooldown : cooldownTime;
 
         if (displayWeapon != null)
             StartCoroutine(SwingRoutine());
@@ -109,61 +120,33 @@ public class KatanaWeapon : MonoBehaviour
 
         if (IsBulletTimeActive)
         {
-            // Raycast from crosshair — no range cap, marks whatever enemy the player aims at
-            Ray aimRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            if (Physics.Raycast(aimRay, out RaycastHit aimHit, Mathf.Infinity))
-            {
-                if (aimHit.collider.TryGetComponent(out StandardSwarmer targeted))
-                {
-                    if (!swarmerHitCounts.ContainsKey(targeted))
-                    {
-                        swarmerHitCounts[targeted] = 0;
-                        if (markedMaterial != null) targeted.Mark(markedMaterial);
-                    }
-                    swarmerHitCounts[targeted]++;
-                }
-                else if (aimHit.collider.TryGetComponent(out EnemyWeakPoint weakPoint))
-                {
-                    weakPoint.TakeDamage(damage);
-                }
-                else if (aimHit.collider.TryGetComponent(out DroneWeakPoint dronePoint))
-                {
-                    dronePoint.TakeDamage(damage);
-                }
-                else if (aimHit.collider.TryGetComponent(out DasherEnemy dasher))
-                {
-                    dasher.TakeDamage(damage);
-                }
-                else if (aimHit.collider.TryGetComponent(out TrailEnemy trailEnemy))
-                {
-                    trailEnemy.TakeDamage(damage);
-                }
-            }
+            // Fire a fast, large bullet-time wave forward
+            Vector3 wavePos = cameraTransform.position + cameraTransform.forward * 0.5f;
+            ObjectPooler.Instance.SpawnFromPool(bulletTimeWavePoolTag, wavePos, cameraTransform.rotation);
+            return;
         }
-        else
+
+        // Normal melee: OverlapCapsule for reliable close-range detection
+        Vector3 startPoint = cameraTransform.position;
+        Vector3 endPoint = cameraTransform.position + cameraTransform.forward * attackRange;
+        Collider[] hitColliders = Physics.OverlapCapsule(startPoint, endPoint, attackRadius);
+
+        foreach (Collider col in hitColliders)
         {
-            // Normal melee: OverlapCapsule for reliable close-range detection
-            Vector3 startPoint = cameraTransform.position;
-            Vector3 endPoint = cameraTransform.position + cameraTransform.forward * attackRange;
-            Collider[] hitColliders = Physics.OverlapCapsule(startPoint, endPoint, attackRadius);
-
-            foreach (Collider col in hitColliders)
-            {
-                if (col.TryGetComponent(out StandardSwarmer swarmer))
-                    swarmer.TakeDamage(damage);
-                else if (col.TryGetComponent(out EnemyWeakPoint weakPoint))
-                    weakPoint.TakeDamage(damage);
-                else if (col.TryGetComponent(out DroneWeakPoint dronePoint))
-                    dronePoint.TakeDamage(damage);
-                else if (col.TryGetComponent(out DasherEnemy dasher))
-                    dasher.TakeDamage(damage);
-                else if (col.TryGetComponent(out TrailEnemy trailEnemy))
-                    trailEnemy.TakeDamage(damage);
-            }
+            if (col.TryGetComponent(out StandardSwarmer swarmer))
+                swarmer.TakeDamage(damage);
+            else if (col.TryGetComponent(out EnemyWeakPoint weakPoint))
+                weakPoint.TakeDamage(damage);
+            else if (col.TryGetComponent(out DroneWeakPoint dronePoint))
+                dronePoint.TakeDamage(damage);
+            else if (col.TryGetComponent(out DasherEnemy dasher))
+                dasher.TakeDamage(damage);
+            else if (col.TryGetComponent(out TrailEnemy trailEnemy))
+                trailEnemy.TakeDamage(damage);
         }
 
-        // Spawn wave projectile (disabled during bullet time per design)
-        if (wavesUnlocked && !IsBulletTimeActive && cameraTransform != null)
+        // Normal wave (Lv2 unlock)
+        if (wavesUnlocked && cameraTransform != null)
         {
             Vector3 wavePos = cameraTransform.position + cameraTransform.forward * 0.5f;
             ObjectPooler.Instance.SpawnFromPool(wavePoolTag, wavePos, cameraTransform.rotation);
@@ -217,7 +200,8 @@ public class KatanaWeapon : MonoBehaviour
         isBulletTimeRunning = true;
         IsBulletTimeActive = true;
         bulletTimeTimer = bulletTimeDuration;
-        swarmerHitCounts.Clear();
+        pendingBulletTimeDeaths.Clear();
+        OnBulletTimeStart?.Invoke();
 
         if (bulletTimeBarObj != null) bulletTimeBarObj.SetActive(true);
     }
@@ -227,18 +211,23 @@ public class KatanaWeapon : MonoBehaviour
         isBulletTimeRunning = false;
         IsBulletTimeActive = false;
         bulletTimeCooldownTimer = bulletTimeCooldown;
+        OnBulletTimeEnd?.Invoke();
 
-        // Deal accumulated damage to all marked enemies at once
-        foreach (var kvp in swarmerHitCounts)
+        // Kill all enemies that reached 0 HP during bullet time
+        foreach (GameObject go in pendingBulletTimeDeaths)
         {
-            StandardSwarmer swarmer = kvp.Key;
-            if (swarmer != null && swarmer.gameObject.activeInHierarchy)
-            {
-                swarmer.Unmark();
-                swarmer.TakeDamage(markedDamagePerHit * kvp.Value);
-            }
+            if (go == null || !go.activeSelf) continue;
+            if (go.TryGetComponent(out StandardSwarmer s)) s.ForceDie();
+            else if (go.TryGetComponent(out DasherEnemy d)) d.ForceDie();
+            else if (go.TryGetComponent(out TrailEnemy t)) t.ForceDie();
         }
-        swarmerHitCounts.Clear();
+        pendingBulletTimeDeaths.Clear();
+    }
+
+    public static void RegisterBulletTimeDeath(GameObject enemy)
+    {
+        if (!pendingBulletTimeDeaths.Contains(enemy))
+            pendingBulletTimeDeaths.Add(enemy);
     }
 
     // ── Bullet Time Bar (created programmatically) ────────────────────────────

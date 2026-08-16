@@ -34,6 +34,7 @@ public class StandardSwarmer : MonoBehaviour
     private Quaternion baseRotation;
     private float moveSoundTimer;
     private AudioSource moveAudioSource;
+    private bool markedForBulletTimeDeath;
 
     // Event broadcasted whenever any standard swarmer dies
     public static event Action OnEnemyDied;
@@ -72,6 +73,7 @@ public class StandardSwarmer : MonoBehaviour
         currentSpeed = minMoveSpeed; // Start at minimum speed when spawned
         baseRotation = transform.rotation; // Reset base tracking rotation
         moveSoundTimer = UnityEngine.Random.Range(0.5f, 1.5f); // Stagger timers so they don't all play at once
+        markedForBulletTimeDeath = false;
         
         if (enemyRenderer != null && originalMaterial != null)
         {
@@ -211,11 +213,23 @@ public class StandardSwarmer : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (markedForBulletTimeDeath) return;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)
         {
-            Die();
+            if (KatanaWeapon.IsBulletTimeActive)
+            {
+                markedForBulletTimeDeath = true;
+                KatanaWeapon.RegisterBulletTimeDeath(gameObject);
+                if (enemyRenderer != null && KatanaWeapon.BulletTimeMarkMaterial != null)
+                    enemyRenderer.sharedMaterial = KatanaWeapon.BulletTimeMarkMaterial;
+            }
+            else
+            {
+                Die();
+            }
         }
         else
         {
@@ -227,6 +241,8 @@ public class StandardSwarmer : MonoBehaviour
             }
         }
     }
+
+    public void ForceDie() => Die();
 
     private IEnumerator FlashRoutine()
     {

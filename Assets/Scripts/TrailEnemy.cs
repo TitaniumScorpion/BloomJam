@@ -44,6 +44,7 @@ public class TrailEnemy : MonoBehaviour
     private float moveSoundTimer;
     private Material originalMaterial;
     private Coroutine flashCoroutine;
+    private bool markedForBulletTimeDeath;
 
     private readonly Queue<GameObject> activeSegments = new Queue<GameObject>();
     private float segmentTimer;
@@ -74,6 +75,8 @@ public class TrailEnemy : MonoBehaviour
         baseRotation = transform.rotation;
         moveSoundTimer = Random.Range(0.5f, 1.5f);
         segmentTimer = segmentSpawnInterval;
+
+        markedForBulletTimeDeath = false;
 
         if (enemyRenderer != null && originalMaterial != null)
             enemyRenderer.sharedMaterial = originalMaterial;
@@ -202,17 +205,34 @@ public class TrailEnemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (markedForBulletTimeDeath) return;
+
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            StandardSwarmer.ReportDeath();
-            gameObject.SetActive(false);
+            if (KatanaWeapon.IsBulletTimeActive)
+            {
+                markedForBulletTimeDeath = true;
+                KatanaWeapon.RegisterBulletTimeDeath(gameObject);
+                if (enemyRenderer != null && KatanaWeapon.BulletTimeMarkMaterial != null)
+                    enemyRenderer.sharedMaterial = KatanaWeapon.BulletTimeMarkMaterial;
+            }
+            else
+            {
+                ForceDie();
+            }
         }
         else if (enemyRenderer != null && flashMaterial != null && gameObject.activeInHierarchy)
         {
             if (flashCoroutine != null) StopCoroutine(flashCoroutine);
             flashCoroutine = StartCoroutine(FlashRoutine());
         }
+    }
+
+    public void ForceDie()
+    {
+        StandardSwarmer.ReportDeath();
+        gameObject.SetActive(false);
     }
 
     private IEnumerator FlashRoutine()

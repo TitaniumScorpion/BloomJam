@@ -46,6 +46,7 @@ public class DasherEnemy : MonoBehaviour
     private Material currentBaseMaterial;
     private bool isFlashing;
     private Coroutine flashCoroutine;
+    private bool markedForBulletTimeDeath;
 
     private void Awake()
     {
@@ -67,9 +68,11 @@ public class DasherEnemy : MonoBehaviour
         prepareTimer = 0f;
         dashTimer = 0f;
         wanderTarget = PickWanderTarget();
+        transform.position = new Vector3(transform.position.x, wanderTarget.y, transform.position.z);
 
         isFlashing = false;
         currentBaseMaterial = originalMaterial;
+        markedForBulletTimeDeath = false;
         if (enemyRenderer != null && originalMaterial != null)
             enemyRenderer.sharedMaterial = originalMaterial;
 
@@ -223,18 +226,34 @@ public class DasherEnemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (markedForBulletTimeDeath) return;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)
         {
-            StandardSwarmer.ReportDeath();
-            gameObject.SetActive(false);
+            if (KatanaWeapon.IsBulletTimeActive)
+            {
+                markedForBulletTimeDeath = true;
+                KatanaWeapon.RegisterBulletTimeDeath(gameObject);
+                SetBaseMaterial(KatanaWeapon.BulletTimeMarkMaterial);
+            }
+            else
+            {
+                ForceDie();
+            }
         }
         else if (enemyRenderer != null && flashMaterial != null && gameObject.activeInHierarchy)
         {
             if (flashCoroutine != null) StopCoroutine(flashCoroutine);
             flashCoroutine = StartCoroutine(FlashRoutine());
         }
+    }
+
+    public void ForceDie()
+    {
+        StandardSwarmer.ReportDeath();
+        gameObject.SetActive(false);
     }
 
     private IEnumerator FlashRoutine()

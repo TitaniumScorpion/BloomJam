@@ -96,6 +96,21 @@ public class AutomaticPistol : MonoBehaviour
     private float bobTimer;
     private Vector3 stableFirePointLocalPos;
 
+    private void OnEnable()
+    {
+        KatanaWeapon.OnBulletTimeStart += HideWeapon;
+        KatanaWeapon.OnBulletTimeEnd += ShowWeapon;
+    }
+
+    private void OnDisable()
+    {
+        KatanaWeapon.OnBulletTimeStart -= HideWeapon;
+        KatanaWeapon.OnBulletTimeEnd -= ShowWeapon;
+    }
+
+    private void HideWeapon() { if (displayWeapon != null) displayWeapon.SetActive(false); }
+    private void ShowWeapon() { if (displayWeapon != null) displayWeapon.SetActive(true); }
+
     private void Start()
     {
         playerController = GetComponentInParent<PlayerController>();

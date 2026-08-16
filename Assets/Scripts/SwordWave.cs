@@ -6,6 +6,8 @@ public class SwordWave : MonoBehaviour
     public float speed = 20f;
     public float lifetime = 1.5f;
     public int damage = 2;
+    [Tooltip("Uncheck on the BulletTimeSwordWave prefab so it keeps moving during bullet time")]
+    public bool freezeDuringBulletTime = true;
 
     private Rigidbody rb;
     private bool wasFrozen;
@@ -31,7 +33,7 @@ public class SwordWave : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (KatanaWeapon.IsBulletTimeActive)
+        if (freezeDuringBulletTime && KatanaWeapon.IsBulletTimeActive)
         {
             if (!wasFrozen)
             {
