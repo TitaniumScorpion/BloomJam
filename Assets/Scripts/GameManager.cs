@@ -34,6 +34,9 @@ public class GameManager : MonoBehaviour
     public Transform[] playerSpawnPoints; // Drag the spawn point transforms for each zone here
     public GameObject playerObject; // Drag the Player here
 
+    //YILMAZ THE KOD MAESTER WAS HERE
+    [SerializeField] private float skyboxRotationSpeed = 1f;
+
     private void Awake()
     {
         // Singleton pattern for the CURRENT scene only
@@ -85,6 +88,11 @@ public class GameManager : MonoBehaviour
         {
             currentRunTime += Time.deltaTime;
         }
+
+        //YILMAZ THE KOD MAESTER WAS HERE
+        RenderSettings.skybox.SetFloat("_Rotation", RenderSettings.skybox.GetFloat("_Rotation") + skyboxRotationSpeed * Time.deltaTime); 
+        //YILMAZ THE KOD MAESTER WAS HERE
+
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
