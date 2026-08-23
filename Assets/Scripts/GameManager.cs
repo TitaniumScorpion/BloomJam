@@ -6,13 +6,13 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [Header("UI Panels")]
-    public GameObject inGameUI; // Holds crosshair, quota text, etc.
+    public GameObject inGameUI;
     public GameObject deathScreen;
     public GameObject victoryScreen;
 
     [Header("UI Elements")]
     public TMP_Text quotaText;
-    
+
     [Header("Run Timer UI")]
     public TMP_Text deathTimeText;
     public TMP_Text victoryTimeText;
@@ -26,37 +26,35 @@ public class GameManager : MonoBehaviour
     [Header("Zone Cleared UI")]
     public GameObject levelCompletedMessage;
 
+    [Header("Single Scene Progression")]
+    public GameObject[] zones;
+    public GameObject playerObject;
+
+    [Header("Elevator Hub")]
+    [Tooltip("The ElevatorHub component in the scene")]
+    public ElevatorHub elevatorHub;
+    [Tooltip("Where the player stands inside the elevator hub")]
+    public Transform elevatorHubSpawnPoint;
+    [Tooltip("The front wall/panel that disappears when a zone starts")]
+    public GameObject hubFrontWall;
+
+    [SerializeField] private float skyboxRotationSpeed = 1f;
+
     public static GameManager Instance;
     private Coroutine transitionCoroutine;
 
-    [Header("Single Scene Progression")]
-    public GameObject[] zones; // Drag Zone 1, Zone 2, Zone 3 parent objects here
-    public Transform[] playerSpawnPoints; // Drag the spawn point transforms for each zone here
-    public GameObject playerObject; // Drag the Player here
-
-    //YILMAZ THE KOD MAESTER WAS HERE
-    [SerializeField] private float skyboxRotationSpeed = 1f;
-
     private void Awake()
     {
-        // Singleton pattern for the CURRENT scene only
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
     private void OnEnable()
     {
-        // Listen to events from our other systems
         QuotaManager.OnKillCountUpdated += UpdateQuotaText;
         QuotaManager.OnZoneCleared += ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted += ShowVictoryScreen;
         PlayerHealth.OnPlayerDied += ShowDeathScreen;
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -65,7 +63,6 @@ public class GameManager : MonoBehaviour
         QuotaManager.OnZoneCleared -= ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted -= ShowVictoryScreen;
         PlayerHealth.OnPlayerDied -= ShowDeathScreen;
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Start()
@@ -73,128 +70,121 @@ public class GameManager : MonoBehaviour
         if (deathScreen != null) deathScreen.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(false);
         if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
-        
-        // If the scene loaded before OnEnable could catch it (often happens on the very first play), manually start transition
-        if (transitionCoroutine == null && SceneManager.GetActiveScene().buildIndex != 0)
-        {
-            transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
-        }
+        if (inGameUI != null) inGameUI.SetActive(false);
+
+        // Disable all zones — player starts in the elevator hub
+        foreach (GameObject zone in zones)
+            if (zone != null) zone.SetActive(false);
+
+        // Place player in hub and activate it
+        PlacePlayerInHub();
+        if (elevatorHub != null) elevatorHub.gameObject.SetActive(true);
     }
 
     private void Update()
     {
-        // Track the run time silently in the background
         if (isTimerRunning)
-        {
             currentRunTime += Time.deltaTime;
-        }
 
-        //YILMAZ THE KOD MAESTER WAS HERE
-        RenderSettings.skybox.SetFloat("_Rotation", RenderSettings.skybox.GetFloat("_Rotation") + skyboxRotationSpeed * Time.deltaTime); 
-        //YILMAZ THE KOD MAESTER WAS HERE
-
+        if (RenderSettings.skybox != null)
+            RenderSettings.skybox.SetFloat("_Rotation",
+                RenderSettings.skybox.GetFloat("_Rotation") + skyboxRotationSpeed * Time.deltaTime);
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Hide the end screens just in case
-        if (deathScreen != null) deathScreen.SetActive(false);
-        if (victoryScreen != null) victoryScreen.SetActive(false);
-        if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
+    // ── Called by ElevatorHub.OnStartPressed() ───────────────────────────────
 
-        // Do not trigger zone transition or lock cursor if returning to the Main Menu
-        if (scene.buildIndex == 0)
+    public void StartCurrentZone()
+    {
+        if (elevatorHub != null) elevatorHub.gameObject.SetActive(false);
+
+        if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
+        transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
+    }
+
+    // ── Called by QuotaManager.RevealElevator() after upgrade is picked ──────
+
+    public void ReturnToElevatorHub()
+    {
+        isTimerRunning = false;
+
+        // Disable all zones and clean up lingering enemies/projectiles
+        foreach (GameObject zone in zones)
+            if (zone != null) zone.SetActive(false);
+
+        foreach (StandardSwarmer s in FindObjectsOfType<StandardSwarmer>()) s.gameObject.SetActive(false);
+        foreach (AdvancedEnemy b in FindObjectsOfType<AdvancedEnemy>()) b.gameObject.SetActive(false);
+        foreach (Projectile p in FindObjectsOfType<Projectile>()) p.gameObject.SetActive(false);
+        foreach (EnemyProjectile ep in FindObjectsOfType<EnemyProjectile>()) ep.gameObject.SetActive(false);
+
+        if (inGameUI != null) inGameUI.SetActive(false);
+
+        if (hubFrontWall != null) hubFrontWall.SetActive(true);
+        PlacePlayerInHub();
+        if (elevatorHub != null) elevatorHub.gameObject.SetActive(true);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void PlacePlayerInHub()
+    {
+        if (playerObject == null || elevatorHubSpawnPoint == null) return;
+
+        Rigidbody rb = playerObject.GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            if (inGameUI != null) inGameUI.SetActive(false);
-            if (zoneTransitionScreen != null) zoneTransitionScreen.SetActive(false);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            return;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.position = elevatorHubSpawnPoint.position;
+            rb.rotation = elevatorHubSpawnPoint.rotation;
         }
-
-        // Stop any existing transition and start a fresh one for the newly loaded zone
-        if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
-        transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
-    }
-
-    public void AdvanceToNextZone()
-    {
-        // Called by the Elevator when it reaches the top
-        if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
-        transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
+        playerObject.transform.position = elevatorHubSpawnPoint.position;
+        playerObject.transform.rotation = elevatorHubSpawnPoint.rotation;
     }
 
     private IEnumerator ZoneTransitionRoutine()
     {
         isTimerRunning = false;
-        Time.timeScale = 0f; // Freeze the physics and spawning entirely
-        
+        Time.timeScale = 0f;
+
         if (inGameUI != null) inGameUI.SetActive(false);
         if (zoneTransitionScreen != null)
         {
             zoneTransitionScreen.SetActive(true);
             CanvasGroup cg = zoneTransitionScreen.GetComponent<CanvasGroup>();
-            if (cg != null) cg.alpha = 1f; // Ensure it starts fully opaque
+            if (cg != null) cg.alpha = 1f;
         }
 
-        // --- SINGLE SCENE ZONE SWAPPING ---
-        // Enable the current zone and disable all others
+        // Enable current zone, disable others
         for (int i = 0; i < zones.Length; i++)
-        {
-            if (zones[i] != null)
-                zones[i].SetActive(i == QuotaManager.currentZoneIndex);
-        }
+            if (zones[i] != null) zones[i].SetActive(i == QuotaManager.currentZoneIndex);
 
-        // Teleport the player to the correct spawn point
-        if (playerObject != null && playerSpawnPoints.Length > QuotaManager.currentZoneIndex && playerSpawnPoints[QuotaManager.currentZoneIndex] != null)
-        {
-            playerObject.transform.position = playerSpawnPoints[QuotaManager.currentZoneIndex].position;
-        }
-        
+        // Open the hub front wall so the player can walk into the arena
+        if (hubFrontWall != null) hubFrontWall.SetActive(false);
+
+        // Reset kills for this zone
         QuotaManager qm = FindObjectOfType<QuotaManager>();
         if (qm != null) qm.StartNextZone();
-        // ----------------------------------
-        
-        // --- ARENA CLEANUP ---
-        // Despawn any surviving enemies or stray bullets from the previous zone
-        foreach (StandardSwarmer swarmer in FindObjectsOfType<StandardSwarmer>())
-            swarmer.gameObject.SetActive(false);
-        foreach (AdvancedEnemy boss in FindObjectsOfType<AdvancedEnemy>())
-            boss.gameObject.SetActive(false);
-        foreach (Projectile proj in FindObjectsOfType<Projectile>())
-            proj.gameObject.SetActive(false);
-        foreach (EnemyProjectile eProj in FindObjectsOfType<EnemyProjectile>())
-            eProj.gameObject.SetActive(false);
-        // ---------------------
 
-        // Lock the cursor so the player is ready to aim when it hits 0
+        // Clean up anything left from the hub or previous zone
+        foreach (Projectile p in FindObjectsOfType<Projectile>()) p.gameObject.SetActive(false);
+        foreach (EnemyProjectile ep in FindObjectsOfType<EnemyProjectile>()) ep.gameObject.SetActive(false);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // +1 because zone index is 0-based, but we want to show "Zone 1", "Zone 2", etc.
-        int displayZone = QuotaManager.currentZoneIndex + 1; 
-        
+        int displayZone = QuotaManager.currentZoneIndex + 1;
         for (int i = 3; i > 0; i--)
         {
-            if (zoneTransitionText != null)
-            {
-                zoneTransitionText.text = $"ZONE {displayZone}\nSTARTS IN {i}";
-            }
-            // We must use Realtime because Time.timeScale is currently 0!
-            yield return new WaitForSecondsRealtime(1f); 
+            if (zoneTransitionText != null) zoneTransitionText.text = $"ZONE {displayZone}\nSTARTS IN {i}";
+            yield return new WaitForSecondsRealtime(1f);
         }
 
-        if (zoneTransitionText != null)
-        {
-            zoneTransitionText.text = "GO!";
-        }
-
+        if (zoneTransitionText != null) zoneTransitionText.text = "GO!";
         if (inGameUI != null) inGameUI.SetActive(true);
 
-        Time.timeScale = 1f; // Unfreeze the game!
-        isTimerRunning = true; // Resume the background timer
+        Time.timeScale = 1f;
+        isTimerRunning = true;
 
-        // Fade out the transition screen smoothly over 0.5 seconds
         if (zoneTransitionScreen != null)
         {
             CanvasGroup canvasGroup = zoneTransitionScreen.GetComponent<CanvasGroup>();
@@ -206,25 +196,20 @@ public class GameManager : MonoBehaviour
                 canvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
                 yield return null;
             }
-            canvasGroup.alpha = 1f; // Reset the alpha so it's opaque for the next zone's transition
+            canvasGroup.alpha = 1f;
             zoneTransitionScreen.SetActive(false);
         }
     }
 
     private void UpdateQuotaText(int currentKills, int targetQuota)
     {
-        if (quotaText != null)
-        {
-            quotaText.text = $"KILLS: {currentKills} / {targetQuota}";
-        }
+        if (quotaText != null) quotaText.text = $"KILLS: {currentKills} / {targetQuota}";
     }
 
     private void ShowLevelCompletedMessage()
     {
         if (levelCompletedMessage != null)
-        {
             StartCoroutine(LevelCompletedRoutine());
-        }
     }
 
     private IEnumerator LevelCompletedRoutine()
@@ -232,6 +217,32 @@ public class GameManager : MonoBehaviour
         levelCompletedMessage.SetActive(true);
         yield return new WaitForSeconds(2f);
         if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
+    }
+
+    private void ShowDeathScreen()
+    {
+        isTimerRunning = false;
+        Time.timeScale = 0f;
+        if (inGameUI != null) inGameUI.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(true);
+        if (deathTimeText != null) deathTimeText.text = $"TIME ALIVE: {FormatTime(currentRunTime)}";
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverSound != null)
+            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.gameOverSound,
+                Camera.main != null ? Camera.main.transform.position : Vector3.zero,
+                AudioManager.Instance.gameOverVolume, 1f);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void ShowVictoryScreen()
+    {
+        isTimerRunning = false;
+        Time.timeScale = 0f;
+        if (inGameUI != null) inGameUI.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(true);
+        if (victoryTimeText != null) victoryTimeText.text = $"FINAL TIME: {FormatTime(currentRunTime)}";
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private string FormatTime(float timeInSeconds)
@@ -242,56 +253,18 @@ public class GameManager : MonoBehaviour
         return $"{minutes:00}:{seconds:00}.{milliseconds:00}";
     }
 
-    private void ShowDeathScreen()
-    {
-        isTimerRunning = false;
-        Time.timeScale = 0f; // Freeze the game action
-        
-        if (inGameUI != null) inGameUI.SetActive(false);
-        if (deathScreen != null) deathScreen.SetActive(true);
-        
-        if (AudioManager.Instance != null && AudioManager.Instance.gameOverSound != null)
-        {
-            AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.gameOverSound, Camera.main != null ? Camera.main.transform.position : Vector3.zero, AudioManager.Instance.gameOverVolume, 1f);
-        }
+    // ── Button methods ────────────────────────────────────────────────────────
 
-        if (deathTimeText != null) deathTimeText.text = $"TIME ALIVE: {FormatTime(currentRunTime)}";
-        
-        // Unlock the cursor so the player can click the Restart button
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
-    private void ShowVictoryScreen()
-    {
-        isTimerRunning = false;
-        Time.timeScale = 0f; // Freeze the game action
-        
-        if (inGameUI != null) inGameUI.SetActive(false);
-        if (victoryScreen != null) victoryScreen.SetActive(true);
-
-        if (victoryTimeText != null) victoryTimeText.text = $"FINAL TIME: {FormatTime(currentRunTime)}";
-        
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
-    // --- Button Methods ---
-    
     public void RestartGame()
     {
-        // Reset our runtime, time scale, and progress for the new run
         currentRunTime = 0f;
         Time.timeScale = 1f;
-        QuotaManager.ResetProgression(); 
-        
-        // Send the player back to the interactive Main Menu Elevator hub
-        SceneManager.LoadScene(0); 
+        QuotaManager.ResetProgression();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Quitting Game...");
         Application.Quit();
     }
 }

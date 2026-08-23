@@ -15,10 +15,6 @@ public class QuotaManager : MonoBehaviour
     public static int currentZoneIndex = 0;
     private bool zoneCleared = false;
 
-    [Header("Level Transition")]
-    [Tooltip("The elevator object that appears when the zone is cleared.")]
-    public GameObject[] levelElevators; // Assign one elevator per zone here
-
     // Events to broadcast progression state to the UI, Spawner, or Game Manager
     public static event Action<int, int> OnKillCountUpdated; // Sends (currentKills, targetQuota)
     public static event Action OnZoneCleared;                // Broadcasted when a zone is finished to stop spawners
@@ -46,11 +42,6 @@ public class QuotaManager : MonoBehaviour
         int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
         OnKillCountUpdated?.Invoke(currentKills, currentQuota);
             
-        // Hide all elevators at start
-        foreach (GameObject elevator in levelElevators)
-        {
-            if (elevator != null) elevator.SetActive(false);
-        }
     }
 
     // Called by GameManager when actually starting the next zone after the elevator ride
@@ -72,10 +63,8 @@ public class QuotaManager : MonoBehaviour
     // Called by UpgradeManager after the player picks their upgrade
     public void RevealElevator()
     {
-        if (currentZoneIndex < levelElevators.Length && levelElevators[currentZoneIndex] != null)
-            levelElevators[currentZoneIndex].SetActive(true);
-
         currentZoneIndex++;
+        GameManager.Instance?.ReturnToElevatorHub();
     }
 
     private void HandleEnemyDied()

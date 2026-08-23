@@ -69,10 +69,6 @@ public class PlayerController : MonoBehaviour
 
         yRotation = transform.eulerAngles.y;
 
-        // Lock the cursor to the center of the screen
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         if (playerCamera == null && cameraTransform != null)
             playerCamera = cameraTransform.GetComponent<Camera>();
             
@@ -83,10 +79,21 @@ public class PlayerController : MonoBehaviour
             defaultCameraY = cameraTransform.localPosition.y;
     }
 
+    // Called by ElevatorHub to drive the camera during hub mode
+    public void SetYRotation(float y)
+    {
+        yRotation = y;
+        if (cameraTransform != null)
+            cameraTransform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
+    }
+
     private void Update()
     {
         // Completely freeze the player's inputs and camera movement during the countdown
         if (Time.timeScale == 0f) return;
+
+        // Hub controls camera and movement during elevator mode
+        if (ElevatorHub.IsActive) return;
 
         // Ground check using a simple Raycast downward
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
@@ -128,6 +135,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (ElevatorHub.IsActive)
+        {
+            rb.linearVelocity = Vector3.zero;
+            return;
+        }
+
         // We only move normally if we aren't currently locked into a dash animation/movement
         if (!isDashing)
         {
