@@ -174126,7 +174126,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1908027263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196771,7 +196771,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[0].size
-      value: 100
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[10].tag
@@ -197327,7 +197327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2239107502438115786, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: maxHeat
-      value: 100
+      value: 500000
       objectReference: {fileID: 0}
     - target: {fileID: 2239107502438115786, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: bobSpeed

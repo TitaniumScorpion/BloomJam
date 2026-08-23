@@ -69,6 +69,12 @@ public class Projectile : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (inGracePeriod) return;
+        gameObject.SetActive(false);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (inGracePeriod) return;

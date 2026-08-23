@@ -207,8 +207,9 @@ public class AutomaticPistol : MonoBehaviour
 
         if (firePoint != null && playerCamera != null)
         {
-            GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
-            if (flash != null) flash.transform.SetParent(firePoint);
+            // TEMP: muzzle flash spawning disabled for testing
+            // GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
+            // if (flash != null) flash.transform.SetParent(firePoint);
 
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit) ? hit.point : ray.GetPoint(1000f);
@@ -217,7 +218,7 @@ public class AutomaticPistol : MonoBehaviour
             Vector3 direction = targetPoint - stableFirePointPos;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-            ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, firePoint.position, targetRotation);
+            ObjectPooler.Instance.SpawnFromPool(projectilePoolTag, stableFirePointPos, targetRotation);
         }
 
         playerController?.AddCameraShake(camShakeMagnitude, camShakeDuration);
