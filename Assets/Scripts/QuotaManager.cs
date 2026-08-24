@@ -13,7 +13,7 @@ public class QuotaManager : MonoBehaviour
     // Made static so progression persists across scene loads
     public static int currentKills = 0;
     public static int currentZoneIndex = 0;
-    private bool zoneCleared = false;
+    public static bool IsZoneCleared { get; private set; }
 
     // Events to broadcast progression state to the UI, Spawner, or Game Manager
     public static event Action<int, int> OnKillCountUpdated; // Sends (currentKills, targetQuota)
@@ -36,7 +36,7 @@ public class QuotaManager : MonoBehaviour
     {
         // Reset kills at the start of every zone so the quota starts at 0
         currentKills = 0;
-        zoneCleared = false;
+        IsZoneCleared = false;
 
         // Initialize the UI with starting values for this specific zone
         int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
@@ -48,7 +48,7 @@ public class QuotaManager : MonoBehaviour
     public void StartNextZone()
     {
         currentKills = 0;
-        zoneCleared = false;
+        IsZoneCleared = false;
         int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
         OnKillCountUpdated?.Invoke(currentKills, currentQuota);
     }
@@ -58,13 +58,15 @@ public class QuotaManager : MonoBehaviour
     {
         currentKills = 0;
         currentZoneIndex = 0;
+        IsZoneCleared = false;
     }
 
-    // Called by UpgradeManager after the player picks their upgrade
+    // Called by UpgradeManager after the player picks their upgrade.
+    // Just advances the zone index — the player now has to walk back into the
+    // elevator themselves; ElevatorEntryTrigger calls GameManager.ReturnToElevatorHub() then.
     public void RevealElevator()
     {
         currentZoneIndex++;
-        GameManager.Instance?.ReturnToElevatorHub();
     }
 
     private void HandleEnemyDied()
@@ -73,12 +75,12 @@ public class QuotaManager : MonoBehaviour
         int currentQuota = (currentZoneIndex < targetQuotas.Length) ? targetQuotas[currentZoneIndex] : 50;
         OnKillCountUpdated?.Invoke(currentKills, currentQuota);
         
-        if (zoneCleared) return;
+        if (IsZoneCleared) return;
 
         // Check if we reached the milestone for the current zone
         if (currentKills >= currentQuota)
         {
-            zoneCleared = true;
+            IsZoneCleared = true;
             AdvanceZone();
         }
     }

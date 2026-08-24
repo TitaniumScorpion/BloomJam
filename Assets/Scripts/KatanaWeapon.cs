@@ -76,6 +76,25 @@ public class KatanaWeapon : MonoBehaviour
     private RectTransform bulletTimeBarFill;
     private Image bulletTimeBarFillImage;
 
+    private void OnEnable()
+    {
+        PanelInteractable.OnInteractStart += HideWeapon;
+        PanelInteractable.OnInteractEnd += ShowWeapon;
+        ElevatorHub.OnHubModeEnter += HideWeapon;
+        ElevatorHub.OnHubModeExit += ShowWeapon;
+    }
+
+    private void OnDisable()
+    {
+        PanelInteractable.OnInteractStart -= HideWeapon;
+        PanelInteractable.OnInteractEnd -= ShowWeapon;
+        ElevatorHub.OnHubModeEnter -= HideWeapon;
+        ElevatorHub.OnHubModeExit -= ShowWeapon;
+    }
+
+    private void HideWeapon() { if (displayWeapon != null) displayWeapon.SetActive(false); }
+    private void ShowWeapon() { if (displayWeapon != null) displayWeapon.SetActive(true); }
+
     private void Start()
     {
         if (cameraTransform == null && Camera.main != null)
@@ -95,6 +114,8 @@ public class KatanaWeapon : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0f) return;
+        if (PanelInteractable.IsInteracting) return;
+        if (ElevatorHub.IsActive) return;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
 

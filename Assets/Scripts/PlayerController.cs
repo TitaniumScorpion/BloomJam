@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2f;
     private float xRotation = 0f;
     private float yRotation = 0f;
+    private bool lookLocked; // Freezes mouse-look only (movement stays active) — used while interacting with UI panels
 
     private float horizontalInput;
     private float verticalInput;
@@ -85,6 +86,13 @@ public class PlayerController : MonoBehaviour
         yRotation = y;
         if (cameraTransform != null)
             cameraTransform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
+    }
+
+    // Called by PanelInteractable while the player is clicking UI with an unlocked cursor —
+    // movement stays active, only mouse-look pauses so the camera doesn't spin while aiming for a button.
+    public void SetLookLocked(bool locked)
+    {
+        lookLocked = locked;
     }
 
     private void Update()
@@ -196,9 +204,9 @@ public class PlayerController : MonoBehaviour
         float mouseX = 0f;
         float mouseY = 0f;
 
-        if (Mouse.current != null)
+        if (!lookLocked && Mouse.current != null)
         {
-            // The new Input System returns raw pixel delta for the mouse. 
+            // The new Input System returns raw pixel delta for the mouse.
             // We scale it down slightly so your current mouseSensitivity value still feels normal.
             Vector2 mouseDelta = Mouse.current.delta.ReadValue();
             mouseX = mouseDelta.x * mouseSensitivity * 0.05f;

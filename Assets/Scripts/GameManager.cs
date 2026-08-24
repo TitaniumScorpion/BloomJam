@@ -35,8 +35,10 @@ public class GameManager : MonoBehaviour
     public ElevatorHub elevatorHub;
     [Tooltip("Where the player stands inside the elevator hub")]
     public Transform elevatorHubSpawnPoint;
-    [Tooltip("The front wall/panel that disappears when a zone starts")]
+    [Tooltip("The front wall that disappears when a zone starts")]
     public GameObject hubFrontWall;
+    [Tooltip("The Start/Advance panel that disappears alongside the front wall when a zone starts")]
+    public GameObject hubFrontPanel;
 
     [SerializeField] private float skyboxRotationSpeed = 1f;
 
@@ -78,7 +80,7 @@ public class GameManager : MonoBehaviour
 
         // Place player in hub and activate it
         PlacePlayerInHub();
-        if (elevatorHub != null) elevatorHub.gameObject.SetActive(true);
+        if (elevatorHub != null) elevatorHub.EnterHubMode();
     }
 
     private void Update()
@@ -95,16 +97,27 @@ public class GameManager : MonoBehaviour
 
     public void StartCurrentZone()
     {
-        if (elevatorHub != null) elevatorHub.gameObject.SetActive(false);
+        if (elevatorHub != null) elevatorHub.ExitHubMode();
+
+        // Clear any leftover panel-interact look-lock from a between-zones return
+        if (playerObject != null)
+        {
+            PlayerController pc = playerObject.GetComponent<PlayerController>();
+            if (pc != null) pc.SetLookLocked(false);
+        }
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
         transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
     }
 
-    // ── Called by QuotaManager.RevealElevator() after upgrade is picked ──────
+    // ── Called by ElevatorEntryTrigger when the player walks back into the elevator ──────
+    // Unlike the very first hub visit, this does NOT engage full hub mode — the player keeps
+    // free movement/look and interacts with the panel via PanelInteractable (walk close, press E).
 
     public void ReturnToElevatorHub()
     {
+        if (ElevatorHub.IsActive) return; // Still in the initial hub mode, nothing to do
+
         isTimerRunning = false;
 
         // Disable all zones and clean up lingering enemies/projectiles
@@ -119,8 +132,8 @@ public class GameManager : MonoBehaviour
         if (inGameUI != null) inGameUI.SetActive(false);
 
         if (hubFrontWall != null) hubFrontWall.SetActive(true);
-        PlacePlayerInHub();
-        if (elevatorHub != null) elevatorHub.gameObject.SetActive(true);
+        if (hubFrontPanel != null) hubFrontPanel.SetActive(true);
+        if (elevatorHub != null) elevatorHub.RefreshButtonLabel();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -160,6 +173,7 @@ public class GameManager : MonoBehaviour
 
         // Open the hub front wall so the player can walk into the arena
         if (hubFrontWall != null) hubFrontWall.SetActive(false);
+        if (hubFrontPanel != null) hubFrontPanel.SetActive(false);
 
         // Reset kills for this zone
         QuotaManager qm = FindObjectOfType<QuotaManager>();
