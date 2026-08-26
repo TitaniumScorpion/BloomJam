@@ -131,7 +131,9 @@ public class DasherEnemy : MonoBehaviour
                 prepareTimer += Time.deltaTime;
                 if (prepareTimer >= prepareDuration)
                 {
-                    dashDirection = (playerTransform.position - transform.position).normalized;
+                    // Reuse the already-flattened facing vector so the dash stays level
+                    // instead of climbing/diving toward the player's exact head height
+                    dashDirection = toPlayer.normalized;
                     dashTimer = 0f;
                     state = DasherState.Dashing;
                     // stays on triggeredMaterial
