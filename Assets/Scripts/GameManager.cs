@@ -23,6 +23,13 @@ public class GameManager : MonoBehaviour
     public GameObject zoneTransitionScreen;
     public TMP_Text zoneTransitionText;
 
+    [Header("Start Fade")]
+    [Tooltip("Full-screen black overlay shown at boot, then faded out")]
+    public GameObject startFadeScreen;
+    [Tooltip("Seconds to hold pitch black before the fade-out begins")]
+    public float startFadeDelay = 1f;
+    public float startFadeDuration = 3f;
+
     [Header("Zone Cleared UI")]
     public GameObject levelCompletedMessage;
 
@@ -92,6 +99,27 @@ public class GameManager : MonoBehaviour
         // Place player in the hub; hub browsing auto-engages after a short delay
         PlacePlayerInHub();
         StartCoroutine(AutoEnterHubModeAfterDelay());
+        StartCoroutine(FadeInFromBlack());
+    }
+
+    private IEnumerator FadeInFromBlack()
+    {
+        if (startFadeScreen == null) yield break;
+
+        startFadeScreen.SetActive(true);
+        CanvasGroup canvasGroup = startFadeScreen.GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = startFadeScreen.AddComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
+
+        yield return new WaitForSeconds(startFadeDelay);
+
+        for (float t = 0; t < startFadeDuration; t += Time.deltaTime)
+        {
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, t / startFadeDuration);
+            yield return null;
+        }
+        canvasGroup.alpha = 0f;
+        startFadeScreen.SetActive(false);
     }
 
     private IEnumerator AutoEnterHubModeAfterDelay()
