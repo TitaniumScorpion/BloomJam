@@ -47,6 +47,10 @@ public class ElevatorHub : MonoBehaviour
     private Vector3 restLocalPosition;
     private Quaternion restLocalRotation;
     private Coroutine exitRoutine;
+    // Guards against the same F-press that triggered EnterHubMode() (from PanelInteractable)
+    // also being read as an exit signal later in the same frame — Unity doesn't guarantee
+    // Update() order between different components.
+    private int enterFrame = -1;
 
     // Call when the player should enter hub browsing — initial game start (after its delay),
     // or walking up to any panel and pressing F after a zone clear.
@@ -61,6 +65,7 @@ public class ElevatorHub : MonoBehaviour
         }
 
         IsActive = true;
+        enterFrame = Time.frameCount;
         currentPanelIndex = Mathf.Clamp(startPanelIndex, 0, panels.Length - 1);
 
         Cursor.lockState = CursorLockMode.None;
@@ -152,7 +157,7 @@ public class ElevatorHub : MonoBehaviour
         HandlePanelCycling();
         UpdateCameraTransition();
 
-        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame && Time.frameCount != enterFrame)
             ExitHubMode();
     }
 
@@ -165,9 +170,9 @@ public class ElevatorHub : MonoBehaviour
         if (Keyboard.current != null)
         {
             if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
-                newIndex = (currentPanelIndex - 1 + panels.Length) % panels.Length;
-            if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
                 newIndex = (currentPanelIndex + 1) % panels.Length;
+            if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
+                newIndex = (currentPanelIndex - 1 + panels.Length) % panels.Length;
         }
 
         if (newIndex == currentPanelIndex && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
@@ -178,8 +183,8 @@ public class ElevatorHub : MonoBehaviour
             {
                 float x = Mouse.current.position.ReadValue().x;
                 newIndex = x < Screen.width * 0.5f
-                    ? (currentPanelIndex - 1 + panels.Length) % panels.Length
-                    : (currentPanelIndex + 1) % panels.Length;
+                    ? (currentPanelIndex + 1) % panels.Length
+                    : (currentPanelIndex - 1 + panels.Length) % panels.Length;
             }
         }
 
