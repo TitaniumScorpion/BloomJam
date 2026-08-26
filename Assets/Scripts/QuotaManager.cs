@@ -61,14 +61,6 @@ public class QuotaManager : MonoBehaviour
         IsZoneCleared = false;
     }
 
-    // Called by UpgradeManager after the player picks their upgrade.
-    // Just advances the zone index — the player now has to walk back into the
-    // elevator themselves; ElevatorEntryTrigger calls GameManager.ReturnToElevatorHub() then.
-    public void RevealElevator()
-    {
-        currentZoneIndex++;
-    }
-
     private void HandleEnemyDied()
     {
         currentKills++;
@@ -99,13 +91,17 @@ public class QuotaManager : MonoBehaviour
         }
         else
         {
+            // Advance immediately — the upgrade choice is now decoupled from progression timing;
+            // the player picks it whenever they focus the left panel back in the elevator.
+            currentZoneIndex++;
+
             Debug.Log($"Zone Cleared! Head to the elevator to advance to Zone {currentZoneIndex + 1}!");
             if (AudioManager.Instance != null && AudioManager.Instance.levelCompleteSound != null)
             {
                 // Play as a global 2D sound (spatialBlend = 0f) with highest priority (0)
                 AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.levelCompleteSound, Vector3.zero, AudioManager.Instance.levelCompleteVolume, 1f, 0, 0f);
             }
-            OnZoneCleared?.Invoke(); // Tell spawners to stop. UpgradeManager reveals elevator after upgrade choice.
+            OnZoneCleared?.Invoke(); // Tell spawners to stop; UpgradeManager flags an upgrade as pending.
         }
     }
 }

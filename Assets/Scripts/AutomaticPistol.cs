@@ -100,8 +100,6 @@ public class AutomaticPistol : MonoBehaviour
     {
         KatanaWeapon.OnBulletTimeStart += HideWeapon;
         KatanaWeapon.OnBulletTimeEnd += ShowWeapon;
-        PanelInteractable.OnInteractStart += HideWeapon;
-        PanelInteractable.OnInteractEnd += ShowWeapon;
         ElevatorHub.OnHubModeEnter += HideWeapon;
         ElevatorHub.OnHubModeExit += ShowWeapon;
     }
@@ -110,8 +108,6 @@ public class AutomaticPistol : MonoBehaviour
     {
         KatanaWeapon.OnBulletTimeStart -= HideWeapon;
         KatanaWeapon.OnBulletTimeEnd -= ShowWeapon;
-        PanelInteractable.OnInteractStart -= HideWeapon;
-        PanelInteractable.OnInteractEnd -= ShowWeapon;
         ElevatorHub.OnHubModeEnter -= HideWeapon;
         ElevatorHub.OnHubModeExit -= ShowWeapon;
     }
@@ -147,7 +143,6 @@ public class AutomaticPistol : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
         if (KatanaWeapon.IsBulletTimeActive) return;
-        if (PanelInteractable.IsInteracting) return;
         if (ElevatorHub.IsActive) return;
 
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);

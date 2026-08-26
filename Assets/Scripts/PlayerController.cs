@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2f;
     private float xRotation = 0f;
     private float yRotation = 0f;
-    private bool lookLocked; // Freezes mouse-look only (movement stays active) — used while interacting with UI panels
 
     private float horizontalInput;
     private float verticalInput;
@@ -80,19 +79,12 @@ public class PlayerController : MonoBehaviour
             defaultCameraY = cameraTransform.localPosition.y;
     }
 
-    // Called by ElevatorHub to drive the camera during hub mode
-    public void SetYRotation(float y)
+    // Called by ElevatorHub after it hands the camera back, so normal look resumes exactly
+    // where the hub's camera transition left off instead of snapping to the old pre-hub angle.
+    public void SyncRotation(float pitch, float yaw)
     {
-        yRotation = y;
-        if (cameraTransform != null)
-            cameraTransform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
-    }
-
-    // Called by PanelInteractable while the player is clicking UI with an unlocked cursor —
-    // movement stays active, only mouse-look pauses so the camera doesn't spin while aiming for a button.
-    public void SetLookLocked(bool locked)
-    {
-        lookLocked = locked;
+        xRotation = pitch;
+        yRotation = yaw;
     }
 
     private void Update()
@@ -204,7 +196,7 @@ public class PlayerController : MonoBehaviour
         float mouseX = 0f;
         float mouseY = 0f;
 
-        if (!lookLocked && Mouse.current != null)
+        if (Mouse.current != null)
         {
             // The new Input System returns raw pixel delta for the mouse.
             // We scale it down slightly so your current mouseSensitivity value still feels normal.

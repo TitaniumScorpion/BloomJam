@@ -78,16 +78,12 @@ public class KatanaWeapon : MonoBehaviour
 
     private void OnEnable()
     {
-        PanelInteractable.OnInteractStart += HideWeapon;
-        PanelInteractable.OnInteractEnd += ShowWeapon;
         ElevatorHub.OnHubModeEnter += HideWeapon;
         ElevatorHub.OnHubModeExit += ShowWeapon;
     }
 
     private void OnDisable()
     {
-        PanelInteractable.OnInteractStart -= HideWeapon;
-        PanelInteractable.OnInteractEnd -= ShowWeapon;
         ElevatorHub.OnHubModeEnter -= HideWeapon;
         ElevatorHub.OnHubModeExit -= ShowWeapon;
     }
@@ -114,7 +110,6 @@ public class KatanaWeapon : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0f) return;
-        if (PanelInteractable.IsInteracting) return;
         if (ElevatorHub.IsActive) return;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;

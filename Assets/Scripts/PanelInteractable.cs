@@ -1,25 +1,19 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
-using System;
 
-// Place this on a trigger collider positioned right around the elevator's front panel.
-// Used for the BETWEEN-ZONES return only — the very first hub visit still uses ElevatorHub's
-// full auto hub mode. Here the player keeps free movement, walks up, and presses F to unlock
-// the cursor so they can click the panel's Start/Advance button; movement stays active the
-// whole time, only mouse-look pauses while interacting.
+// Place one of these on a trigger collider positioned right around each of the elevator's
+// 4 panels. Walking into range and pressing F tells ElevatorHub to enter hub browsing mode
+// focused on this specific panel (index must match its slot in ElevatorHub.panels).
 [RequireComponent(typeof(Collider))]
 public class PanelInteractable : MonoBehaviour
 {
-    [Tooltip("The PlayerController on the player GameObject, used to pause mouse-look while interacting")]
-    public PlayerController playerController;
+    [Tooltip("The ElevatorHub in the scene")]
+    public ElevatorHub elevatorHub;
+    [Tooltip("This panel's index in ElevatorHub.panels")]
+    public int panelIndex;
     [Tooltip("UI prompt shown while the player is in range. Leave unassigned to auto-create a 'PRESS F' label at runtime.")]
     public GameObject interactPrompt;
-
-    // Static so weapons (AutomaticPistol, KatanaWeapon) can react without needing a reference
-    public static bool IsInteracting { get; private set; }
-    public static event Action OnInteractStart;
-    public static event Action OnInteractEnd;
 
     private bool playerInRange;
 
@@ -65,7 +59,6 @@ public class PanelInteractable : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         playerInRange = false;
         if (interactPrompt != null) interactPrompt.SetActive(false);
-        if (IsInteracting) StopInteracting();
     }
 
     // Only interactable once the panel has actually reappeared (player walked back into the
@@ -80,17 +73,16 @@ public class PanelInteractable : MonoBehaviour
 
     private void Update()
     {
-        // The very first hub visit is handled entirely by ElevatorHub's own auto hub mode
+        // Already browsing (manually entered, or the game-start auto-intro) — this trigger has nothing to do
         if (ElevatorHub.IsActive) return;
 
         if (!IsPanelAvailable())
         {
-            if (IsInteracting) StopInteracting();
             if (interactPrompt != null) interactPrompt.SetActive(false);
             return;
         }
 
-        if (playerInRange && !IsInteracting && interactPrompt != null && !interactPrompt.activeSelf)
+        if (playerInRange && interactPrompt != null && !interactPrompt.activeSelf)
             interactPrompt.SetActive(true);
 
         if (!playerInRange) return;
@@ -98,28 +90,8 @@ public class PanelInteractable : MonoBehaviour
 
         if (Keyboard.current.fKey.wasPressedThisFrame)
         {
-            if (IsInteracting) StopInteracting();
-            else StartInteracting();
+            if (interactPrompt != null) interactPrompt.SetActive(false);
+            elevatorHub?.EnterHubMode(panelIndex);
         }
-    }
-
-    private void StartInteracting()
-    {
-        IsInteracting = true;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        playerController?.SetLookLocked(true);
-        if (interactPrompt != null) interactPrompt.SetActive(false);
-        OnInteractStart?.Invoke();
-    }
-
-    public void StopInteracting()
-    {
-        IsInteracting = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        playerController?.SetLookLocked(false);
-        if (playerInRange && interactPrompt != null) interactPrompt.SetActive(true);
-        OnInteractEnd?.Invoke();
     }
 }

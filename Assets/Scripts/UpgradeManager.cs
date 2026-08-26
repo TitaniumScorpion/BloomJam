@@ -10,10 +10,16 @@ public class UpgradeManager : MonoBehaviour
     public TMP_Text swordUpgradeDescription;
     public Button pistolUpgradeButton;
     public Button swordUpgradeButton;
+    [Tooltip("Shown instead of the upgrade cards when the left panel is focused but nothing is available yet")]
+    public GameObject noUpgradeAvailableMessage;
 
     [Header("Weapon References")]
     public AutomaticPistol pistol;
     public KatanaWeapon katana;
+
+    [Header("Panel Index")]
+    [Tooltip("This panel's index in ElevatorHub.panels — the upgrade UI only shows while this one is focused")]
+    public int leftPanelIndex = 1;
 
     // ── Zone 1 ────────────────────────────────────────────────────────────────
     [Header("Zone 1 - Pistol")]
@@ -47,35 +53,49 @@ public class UpgradeManager : MonoBehaviour
 
     private int pistolUpgradeLevel = 0;
     private int katanaUpgradeLevel = 0;
-    private QuotaManager quotaManager;
+
+    // True once a zone's been cleared and the player hasn't spent that zone's upgrade choice yet.
+    // Starts false — no upgrades are available at the very start of the game.
+    private bool hasPendingUpgrade;
 
     private void Start()
     {
-        quotaManager = FindObjectOfType<QuotaManager>();
         if (upgradePanel != null) upgradePanel.SetActive(false);
+        if (noUpgradeAvailableMessage != null) noUpgradeAvailableMessage.SetActive(false);
     }
 
     private void OnEnable()
     {
         QuotaManager.OnZoneCleared += OnZoneCleared;
+        ElevatorHub.OnPanelFocusChanged += OnPanelFocusChanged;
+        ElevatorHub.OnHubModeExit += HidePanel;
     }
 
     private void OnDisable()
     {
         QuotaManager.OnZoneCleared -= OnZoneCleared;
-        CancelInvoke();
+        ElevatorHub.OnPanelFocusChanged -= OnPanelFocusChanged;
+        ElevatorHub.OnHubModeExit -= HidePanel;
     }
 
     private void OnZoneCleared()
     {
-        // Skip panel if both weapons are fully upgraded
-        if (pistolUpgradeLevel >= PistolDescriptions.Length && katanaUpgradeLevel >= SwordDescriptions.Length)
+        // Nothing to flag if both weapons are already fully upgraded
+        hasPendingUpgrade = pistolUpgradeLevel < PistolDescriptions.Length || katanaUpgradeLevel < SwordDescriptions.Length;
+    }
+
+    private void OnPanelFocusChanged(int index)
+    {
+        if (index != leftPanelIndex)
         {
-            quotaManager?.RevealElevator();
+            HidePanel();
             return;
         }
 
-        Invoke(nameof(ShowPanel), 2.5f);
+        if (hasPendingUpgrade)
+            ShowPanel();
+        else
+            ShowNoUpgradeMessage();
     }
 
     private void ShowPanel()
@@ -95,10 +115,19 @@ public class UpgradeManager : MonoBehaviour
             swordUpgradeButton.interactable = swordAvailable;
 
         if (upgradePanel != null) upgradePanel.SetActive(true);
+        if (noUpgradeAvailableMessage != null) noUpgradeAvailableMessage.SetActive(false);
+    }
 
-        Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+    private void ShowNoUpgradeMessage()
+    {
+        if (upgradePanel != null) upgradePanel.SetActive(false);
+        if (noUpgradeAvailableMessage != null) noUpgradeAvailableMessage.SetActive(true);
+    }
+
+    private void HidePanel()
+    {
+        if (upgradePanel != null) upgradePanel.SetActive(false);
+        if (noUpgradeAvailableMessage != null) noUpgradeAvailableMessage.SetActive(false);
     }
 
     public void ChoosePistolUpgrade()
@@ -125,7 +154,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         pistolUpgradeLevel++;
-        ClosePanel();
+        OnUpgradeChosen();
     }
 
     public void ChooseSwordUpgrade()
@@ -151,17 +180,12 @@ public class UpgradeManager : MonoBehaviour
 
         katanaUpgradeLevel++;
         katana?.SetSwordVisual(katanaUpgradeLevel);
-        ClosePanel();
+        OnUpgradeChosen();
     }
 
-    private void ClosePanel()
+    private void OnUpgradeChosen()
     {
-        if (upgradePanel != null) upgradePanel.SetActive(false);
-
-        Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        quotaManager?.RevealElevator();
+        hasPendingUpgrade = false;
+        ShowNoUpgradeMessage();
     }
 }

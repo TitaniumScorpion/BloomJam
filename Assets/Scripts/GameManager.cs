@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
     public GameObject hubFrontWall;
     [Tooltip("The Start/Advance panel that disappears alongside the front wall when a zone starts")]
     public GameObject hubFrontPanel;
+    [Tooltip("Seconds the player stands free in the elevator before hub browsing auto-engages on the front panel")]
+    [SerializeField] private float firstVisitAutoEnterDelay = 5f;
 
     [SerializeField] private float skyboxRotationSpeed = 1f;
 
@@ -78,9 +80,15 @@ public class GameManager : MonoBehaviour
         foreach (GameObject zone in zones)
             if (zone != null) zone.SetActive(false);
 
-        // Place player in hub and activate it
+        // Place player in the hub; hub browsing auto-engages after a short delay
         PlacePlayerInHub();
-        if (elevatorHub != null) elevatorHub.EnterHubMode();
+        StartCoroutine(AutoEnterHubModeAfterDelay());
+    }
+
+    private IEnumerator AutoEnterHubModeAfterDelay()
+    {
+        yield return new WaitForSeconds(firstVisitAutoEnterDelay);
+        if (elevatorHub != null) elevatorHub.EnterHubMode(0);
     }
 
     private void Update()
@@ -97,22 +105,15 @@ public class GameManager : MonoBehaviour
 
     public void StartCurrentZone()
     {
-        if (elevatorHub != null) elevatorHub.ExitHubMode();
-
-        // Clear any leftover panel-interact look-lock from a between-zones return
-        if (playerObject != null)
-        {
-            PlayerController pc = playerObject.GetComponent<PlayerController>();
-            if (pc != null) pc.SetLookLocked(false);
-        }
+        if (elevatorHub != null) elevatorHub.ForceExitHubMode();
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
         transitionCoroutine = StartCoroutine(ZoneTransitionRoutine());
     }
 
     // ── Called by ElevatorEntryTrigger when the player walks back into the elevator ──────
-    // Unlike the very first hub visit, this does NOT engage full hub mode — the player keeps
-    // free movement/look and interacts with the panel via PanelInteractable (walk close, press E).
+    // Closes the wall/panel and cleans up the finished zone. Doesn't engage hub browsing itself —
+    // the player still walks up to a panel and presses F (via PanelInteractable) to do that.
 
     public void ReturnToElevatorHub()
     {
