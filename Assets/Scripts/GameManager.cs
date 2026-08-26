@@ -110,6 +110,10 @@ public class GameManager : MonoBehaviour
         CanvasGroup canvasGroup = startFadeScreen.GetComponent<CanvasGroup>();
         if (canvasGroup == null) canvasGroup = startFadeScreen.AddComponent<CanvasGroup>();
         canvasGroup.alpha = 1f;
+        // Purely visual — never intercept clicks meant for the panel underneath it,
+        // even while it's still visibly fading
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
 
         yield return new WaitForSeconds(startFadeDelay);
 
@@ -315,6 +319,7 @@ public class GameManager : MonoBehaviour
         currentRunTime = 0f;
         Time.timeScale = 1f;
         QuotaManager.ResetProgression();
+        UpgradeManager.ResetPendingUpgrade();
         HasGameStarted = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

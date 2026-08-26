@@ -55,8 +55,9 @@ public class UpgradeManager : MonoBehaviour
     private int katanaUpgradeLevel = 0;
 
     // True once a zone's been cleared and the player hasn't spent that zone's upgrade choice yet.
-    // Starts false — no upgrades are available at the very start of the game.
-    private bool hasPendingUpgrade;
+    // Starts false — no upgrades are available at the very start of the game. Static so
+    // ElevatorHub can gate the Advance button on it without needing an instance reference.
+    public static bool HasPendingUpgrade { get; private set; }
 
     private void Start()
     {
@@ -81,7 +82,7 @@ public class UpgradeManager : MonoBehaviour
     private void OnZoneCleared()
     {
         // Nothing to flag if both weapons are already fully upgraded
-        hasPendingUpgrade = pistolUpgradeLevel < PistolDescriptions.Length || katanaUpgradeLevel < SwordDescriptions.Length;
+        HasPendingUpgrade = pistolUpgradeLevel < PistolDescriptions.Length || katanaUpgradeLevel < SwordDescriptions.Length;
     }
 
     private void OnPanelFocusChanged(int index)
@@ -92,7 +93,7 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        if (hasPendingUpgrade)
+        if (HasPendingUpgrade)
             ShowPanel();
         else
             ShowNoUpgradeMessage();
@@ -133,7 +134,7 @@ public class UpgradeManager : MonoBehaviour
     public void ChoosePistolUpgrade()
     {
         // Guards against clicking before the panel's actually focused/populated
-        if (!ElevatorHub.IsActive || !hasPendingUpgrade) return;
+        if (!ElevatorHub.IsActive || !HasPendingUpgrade) return;
 
         if (pistol != null)
         {
@@ -163,7 +164,7 @@ public class UpgradeManager : MonoBehaviour
     public void ChooseSwordUpgrade()
     {
         // Guards against clicking before the panel's actually focused/populated
-        if (!ElevatorHub.IsActive || !hasPendingUpgrade) return;
+        if (!ElevatorHub.IsActive || !HasPendingUpgrade) return;
 
         if (katana != null)
         {
@@ -191,7 +192,13 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnUpgradeChosen()
     {
-        hasPendingUpgrade = false;
+        HasPendingUpgrade = false;
         ShowNoUpgradeMessage();
+    }
+
+    // Call this from GameManager.RestartGame() so a stale value doesn't carry over the scene reload
+    public static void ResetPendingUpgrade()
+    {
+        HasPendingUpgrade = false;
     }
 }

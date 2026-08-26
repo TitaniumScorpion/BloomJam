@@ -218,6 +218,9 @@ public class ElevatorHub : MonoBehaviour
         // the initial 5-second wait, if the panel happens to be visible/reachable on screen already)
         if (!IsActive) return;
 
+        // Can't advance with an upgrade choice still sitting unspent on the left panel
+        if (UpgradeManager.HasPendingUpgrade) return;
+
         if (GameManager.Instance != null)
             GameManager.Instance.StartCurrentZone();
     }
