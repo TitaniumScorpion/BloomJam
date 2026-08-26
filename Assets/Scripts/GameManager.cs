@@ -45,6 +45,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float skyboxRotationSpeed = 1f;
 
     public static GameManager Instance;
+    // False from boot until the player presses Start for the very first time — used to keep
+    // the player frozen, weapons hidden/unusable, and F unable to back out of hub browsing
+    // during the initial elevator sequence.
+    public static bool HasGameStarted { get; private set; }
     private Coroutine transitionCoroutine;
 
     private void Awake()
@@ -80,6 +84,11 @@ public class GameManager : MonoBehaviour
         foreach (GameObject zone in zones)
             if (zone != null) zone.SetActive(false);
 
+        // Hide the front panel entirely for the initial wait — deactivating it (rather than just
+        // gating its button) means nothing on it can receive hover/click events at all, whatever
+        // components it has. Reactivated the moment hub browsing actually focuses it below.
+        if (hubFrontPanel != null) hubFrontPanel.SetActive(false);
+
         // Place player in the hub; hub browsing auto-engages after a short delay
         PlacePlayerInHub();
         StartCoroutine(AutoEnterHubModeAfterDelay());
@@ -88,6 +97,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator AutoEnterHubModeAfterDelay()
     {
         yield return new WaitForSeconds(firstVisitAutoEnterDelay);
+        if (hubFrontPanel != null) hubFrontPanel.SetActive(true);
         if (elevatorHub != null) elevatorHub.EnterHubMode(0);
     }
 
@@ -105,6 +115,8 @@ public class GameManager : MonoBehaviour
 
     public void StartCurrentZone()
     {
+        HasGameStarted = true;
+
         if (elevatorHub != null) elevatorHub.ForceExitHubMode();
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
@@ -275,6 +287,7 @@ public class GameManager : MonoBehaviour
         currentRunTime = 0f;
         Time.timeScale = 1f;
         QuotaManager.ResetProgression();
+        HasGameStarted = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

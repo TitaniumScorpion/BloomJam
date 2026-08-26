@@ -92,6 +92,9 @@ public class PlayerController : MonoBehaviour
         // Completely freeze the player's inputs and camera movement during the countdown
         if (Time.timeScale == 0f) return;
 
+        // Frozen until the player has actually pressed Start for the first time
+        if (!GameManager.HasGameStarted) return;
+
         // Hub controls camera and movement during elevator mode
         if (ElevatorHub.IsActive) return;
 
@@ -135,7 +138,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (ElevatorHub.IsActive)
+        if (!GameManager.HasGameStarted || ElevatorHub.IsActive)
         {
             rb.linearVelocity = Vector3.zero;
             return;

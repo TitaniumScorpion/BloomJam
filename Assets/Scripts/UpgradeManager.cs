@@ -132,6 +132,9 @@ public class UpgradeManager : MonoBehaviour
 
     public void ChoosePistolUpgrade()
     {
+        // Guards against clicking before the panel's actually focused/populated
+        if (!ElevatorHub.IsActive || !hasPendingUpgrade) return;
+
         if (pistol != null)
         {
             switch (pistolUpgradeLevel)
@@ -159,6 +162,9 @@ public class UpgradeManager : MonoBehaviour
 
     public void ChooseSwordUpgrade()
     {
+        // Guards against clicking before the panel's actually focused/populated
+        if (!ElevatorHub.IsActive || !hasPendingUpgrade) return;
+
         if (katana != null)
         {
             switch (katanaUpgradeLevel)

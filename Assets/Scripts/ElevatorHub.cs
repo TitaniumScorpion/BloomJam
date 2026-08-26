@@ -157,7 +157,10 @@ public class ElevatorHub : MonoBehaviour
         HandlePanelCycling();
         UpdateCameraTransition();
 
-        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame && Time.frameCount != enterFrame)
+        // Before the game has ever started, F can't back the player out of hub browsing —
+        // there's nothing to back out to yet (weapons hidden, movement frozen either way)
+        if (GameManager.HasGameStarted && Keyboard.current != null &&
+            Keyboard.current.fKey.wasPressedThisFrame && Time.frameCount != enterFrame)
             ExitHubMode();
     }
 
@@ -211,6 +214,10 @@ public class ElevatorHub : MonoBehaviour
     // Wire this to the Start/Advance button's OnClick event in the Inspector
     public void OnStartPressed()
     {
+        // Guards against clicking the button before hub mode has actually engaged (e.g. during
+        // the initial 5-second wait, if the panel happens to be visible/reachable on screen already)
+        if (!IsActive) return;
+
         if (GameManager.Instance != null)
             GameManager.Instance.StartCurrentZone();
     }

@@ -105,11 +105,16 @@ public class KatanaWeapon : MonoBehaviour
 
         SetSwordVisual(0);
         BulletTimeMarkMaterial = markedMaterial;
+
+        // Stay hidden until the player actually presses Start — ElevatorHub.OnHubModeExit
+        // (fired from GameManager.StartCurrentZone) shows it again from there on
+        if (!GameManager.HasGameStarted) HideWeapon();
     }
 
     private void Update()
     {
         if (Time.timeScale == 0f) return;
+        if (!GameManager.HasGameStarted) return;
         if (ElevatorHub.IsActive) return;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;

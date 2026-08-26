@@ -137,11 +137,16 @@ public class AutomaticPistol : MonoBehaviour
             weaponMaterial.EnableKeyword("_EMISSION");
             emissionColorID = Shader.PropertyToID(emissionPropertyName);
         }
+
+        // Stay hidden until the player actually presses Start — ElevatorHub.OnHubModeExit
+        // (fired from GameManager.StartCurrentZone) shows it again from there on
+        if (!GameManager.HasGameStarted) HideWeapon();
     }
 
     private void Update()
     {
         if (Time.timeScale == 0f) return;
+        if (!GameManager.HasGameStarted) return;
         if (KatanaWeapon.IsBulletTimeActive) return;
         if (ElevatorHub.IsActive) return;
 
