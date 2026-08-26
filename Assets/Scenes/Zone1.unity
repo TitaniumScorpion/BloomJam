@@ -22674,7 +22674,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b18ac0b3d987ed94da06eb8072cb5967, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanelInteractable
-  playerController: {fileID: 7735761706090348629}
+  elevatorHub: {fileID: 0}
+  panelIndex: 0
   interactPrompt: {fileID: 0}
 --- !u!65 &206431199
 BoxCollider:
@@ -26140,7 +26141,7 @@ GameObject:
   - component: {fileID: 237742337}
   - component: {fileID: 237742336}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -72737,8 +72738,10 @@ MonoBehaviour:
   swordUpgradeDescription: {fileID: 551408682}
   pistolUpgradeButton: {fileID: 1875894014}
   swordUpgradeButton: {fileID: 1220225561}
+  noUpgradeAvailableMessage: {fileID: 0}
   pistol: {fileID: 7735761706090348628}
   katana: {fileID: 7735761706090348627}
+  leftPanelIndex: 1
   z1_PistolFireRate: 0.07
   z1_SwordRadiusIncrease: 1.2
   z3_MaxHeatMultiplier: 2
@@ -92245,8 +92248,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElevatorHub
   playerController: {fileID: 7735761706090348629}
   startButtonLabel: {fileID: 1100159009}
-  frontPanelAngle: 0
-  rotationSpeed: 10
+  panels:
+  - label: 
+    focusPoint: {fileID: 0}
+  - label: 
+    focusPoint: {fileID: 0}
+  - label: 
+    focusPoint: {fileID: 0}
+  - label: 
+    focusPoint: {fileID: 0}
+  transitionSpeed: 4
 --- !u!4 &889656867
 Transform:
   m_ObjectHideFlags: 0
@@ -162673,7 +162684,7 @@ GameObject:
   - component: {fileID: 1577179701}
   - component: {fileID: 1577179700}
   m_Layer: 5
-  m_Name: Canvas (2)
+  m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162687,7 +162698,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1577179698}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: -4.7828703}
+  m_LocalPosition: {x: 0, y: 0, z: -5.356}
   m_LocalScale: {x: 0.0022, y: 0.0022, z: 0.0022}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -175992,7 +176003,7 @@ GameObject:
   - component: {fileID: 1700527495}
   - component: {fileID: 1700527494}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -176006,7 +176017,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700527492}
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -2.90587}
+  m_LocalPosition: {x: 0, y: 0, z: -2.608}
   m_LocalScale: {x: 0.0022, y: 0.0022, z: 0.0022}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -176014,7 +176025,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -3.07869, y: -3.7214003}
+  m_AnchoredPosition: {x: -4.467, y: -3.7214003}
   m_SizeDelta: {x: 569, y: 560}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1700527494
@@ -183494,7 +183505,7 @@ GameObject:
   - component: {fileID: 1759529130}
   - component: {fileID: 1759529129}
   m_Layer: 5
-  m_Name: Canvas (1)
+  m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -183516,7 +183527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.8113098, y: -3.7214003}
+  m_AnchoredPosition: {x: 1.195, y: -3.7214003}
   m_SizeDelta: {x: 569, y: 560}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1759529129
