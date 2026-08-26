@@ -227473,7 +227473,19 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 56b79ab4576852b45855aa62e728db2b, type: 2}
     - target: {fileID: 1646861531944640186, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_ClearFlags
-      value: 1
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1646861531944640186, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1646861531944640186, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1646861531944640186, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1763567798717389132, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -227838,6 +227850,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
+      propertyPath: startFadeDelay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: startFadeScreen
       value: 
       objectReference: {fileID: 94687949}
@@ -227847,7 +227863,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: startFadeDuration
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: skyboxRotationSpeed
@@ -227879,7 +227895,7 @@ PrefabInstance:
       objectReference: {fileID: 1134317698}
     - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: firstVisitAutoEnterDelay
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3266017976902140182, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: playerSpawnPoints.Array.size
