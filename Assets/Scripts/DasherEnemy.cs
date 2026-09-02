@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
-public class DasherEnemy : MonoBehaviour
+public class DasherEnemy : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     public int maxHealth = 3;

@@ -163,7 +163,7 @@ public class EnemySpawner : MonoBehaviour
         if (advancedSpawnPoints != null && advancedSpawnPoints.Length > 0)
         {
             List<Transform> available = new List<Transform>();
-            AdvancedEnemy[] active = FindObjectsOfType<AdvancedEnemy>();
+            AdvancedEnemy[] active = FindObjectsByType<AdvancedEnemy>(FindObjectsSortMode.None);
 
             foreach (Transform pt in advancedSpawnPoints)
             {

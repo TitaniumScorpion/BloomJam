@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AdvancedEnemy : MonoBehaviour
+public class AdvancedEnemy : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     public int maxHealth = 20;

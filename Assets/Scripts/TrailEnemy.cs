@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
-public class TrailEnemy : MonoBehaviour
+public class TrailEnemy : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     public int maxHealth = 1;

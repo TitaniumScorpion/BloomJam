@@ -79,35 +79,9 @@ public class Projectile : MonoBehaviour
     {
         if (inGracePeriod) return;
         if (other.CompareTag("Player")) return;
-        bool hitEnemy = false;
-
-        // Check if the object we hit has the StandardSwarmer script
-        if (other.TryGetComponent(out StandardSwarmer enemy))
-        {
-            enemy.TakeDamage(damage);
-            hitEnemy = true;
-        }
-        // Check if we hit an Elite boss's weak point
-        else if (other.TryGetComponent(out EnemyWeakPoint weakPoint))
-        {
-            weakPoint.TakeDamage(damage);
-            hitEnemy = true;
-        }
-        else if (other.TryGetComponent(out DroneWeakPoint dronePoint))
-        {
-            dronePoint.TakeDamage(damage);
-            hitEnemy = true;
-        }
-        else if (other.TryGetComponent(out DasherEnemy dasher))
-        {
-            dasher.TakeDamage(damage);
-            hitEnemy = true;
-        }
-        else if (other.TryGetComponent(out TrailEnemy trailEnemy))
-        {
-            trailEnemy.TakeDamage(damage);
-            hitEnemy = true;
-        }
+        // Any enemy or weak point implements IDamageable, so one lookup covers them all
+        bool hitEnemy = other.TryGetComponent(out IDamageable damageable);
+        if (hitEnemy) damageable.TakeDamage(damage);
 
         if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
         {

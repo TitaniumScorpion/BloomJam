@@ -153,18 +153,8 @@ public class KatanaWeapon : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapCapsule(startPoint, endPoint, attackRadius);
 
         foreach (Collider col in hitColliders)
-        {
-            if (col.TryGetComponent(out StandardSwarmer swarmer))
-                swarmer.TakeDamage(damage);
-            else if (col.TryGetComponent(out EnemyWeakPoint weakPoint))
-                weakPoint.TakeDamage(damage);
-            else if (col.TryGetComponent(out DroneWeakPoint dronePoint))
-                dronePoint.TakeDamage(damage);
-            else if (col.TryGetComponent(out DasherEnemy dasher))
-                dasher.TakeDamage(damage);
-            else if (col.TryGetComponent(out TrailEnemy trailEnemy))
-                trailEnemy.TakeDamage(damage);
-        }
+            if (col.TryGetComponent(out IDamageable damageable))
+                damageable.TakeDamage(damage);
 
         // Normal wave (Lv2 unlock)
         if (wavesUnlocked && cameraTransform != null)
@@ -255,7 +245,7 @@ public class KatanaWeapon : MonoBehaviour
 
     public void CreateBulletTimeBar()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
 
         bulletTimeBarObj = new GameObject("BulletTimeBar");

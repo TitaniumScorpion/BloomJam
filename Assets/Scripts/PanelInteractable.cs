@@ -25,7 +25,7 @@ public class PanelInteractable : MonoBehaviour
 
     private void CreatePrompt()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
 
         GameObject promptObj = new GameObject("PressFPrompt");

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DroneWeakPoint : MonoBehaviour
+public class DroneWeakPoint : MonoBehaviour, IDamageable
 {
     [Tooltip("Drag the SpawnerDrone root object here")]
     public SpawnerDrone parentDrone;

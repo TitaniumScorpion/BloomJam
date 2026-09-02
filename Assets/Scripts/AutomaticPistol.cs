@@ -33,6 +33,8 @@ public class AutomaticPistol : MonoBehaviour
     [Header("References")]
     public string projectilePoolTag = "PlayerProjectile";
     public string muzzleFlashPoolTag = "MuzzleFlash";
+    [Tooltip("Muzzle flash was disabled during testing. Tick to re-enable — needs a 'MuzzleFlash' pool on the ObjectPooler.")]
+    public bool muzzleFlashEnabled = false;
     public Transform firePoint;
     public Camera playerCamera;
 
@@ -74,7 +76,6 @@ public class AutomaticPistol : MonoBehaviour
     public float beamMaxWidth = 0.15f;
     public Material beamMaterial;
     private LineRenderer beamRenderer;
-    private bool isCharging = false;
     private float chargeTime = 0f;
     private float chargeWindowTimer = 0f;
 
@@ -217,9 +218,11 @@ public class AutomaticPistol : MonoBehaviour
 
         if (firePoint != null && playerCamera != null)
         {
-            // TEMP: muzzle flash spawning disabled for testing
-            // GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
-            // if (flash != null) flash.transform.SetParent(firePoint);
+            if (muzzleFlashEnabled)
+            {
+                GameObject flash = ObjectPooler.Instance.SpawnFromPool(muzzleFlashPoolTag, firePoint.position, firePoint.rotation);
+                if (flash != null) flash.transform.SetParent(firePoint);
+            }
 
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit) ? hit.point : ray.GetPoint(1000f);
@@ -284,7 +287,6 @@ public class AutomaticPistol : MonoBehaviour
                 {
                     fireState = FireState.Charging;
                     chargeTime = 0f;
-                    isCharging = true;
                     if (beamRenderer != null) beamRenderer.enabled = true;
                 }
                 break;
@@ -348,16 +350,8 @@ public class AutomaticPistol : MonoBehaviour
 
             foreach (RaycastHit hit in hits)
             {
-                if (hit.collider.TryGetComponent(out StandardSwarmer swarmer))
-                    swarmer.TakeDamage(damage);
-                else if (hit.collider.TryGetComponent(out EnemyWeakPoint weakPoint))
-                    weakPoint.TakeDamage(damage);
-                else if (hit.collider.TryGetComponent(out DroneWeakPoint dronePoint))
-                    dronePoint.TakeDamage(damage);
-                else if (hit.collider.TryGetComponent(out DasherEnemy dasher))
-                    dasher.TakeDamage(damage);
-                else if (hit.collider.TryGetComponent(out TrailEnemy trailEnemy))
-                    trailEnemy.TakeDamage(damage);
+                if (hit.collider.TryGetComponent(out IDamageable damageable))
+                    damageable.TakeDamage(damage);
                 else if (!hit.collider.isTrigger && hit.rigidbody == null)
                     break; // Stop piercing at solid environment
             }
@@ -375,7 +369,6 @@ public class AutomaticPistol : MonoBehaviour
 
     private void CancelCharge()
     {
-        isCharging = false;
         chargeTime = 0f;
         fireState = FireState.Idle;
         if (beamRenderer != null) beamRenderer.enabled = false;

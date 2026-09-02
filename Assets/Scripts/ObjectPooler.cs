@@ -65,6 +65,25 @@ public class ObjectPooler : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deactivates every live instance in every pool. Called at zone transitions to clear
+    /// leftover enemies, projectiles and effects in a single pass.
+    ///
+    /// Replaces the previous approach of running one FindObjectsByType scan per type, which
+    /// scanned the whole scene repeatedly and only covered a hardcoded list — dashers, trail
+    /// enemies, trail segments and sword waves were being missed. Pools added later are
+    /// covered automatically.
+    /// </summary>
+    public void DeactivateAll()
+    {
+        if (poolDictionary == null) return;
+
+        foreach (Queue<GameObject> pool in poolDictionary.Values)
+            foreach (GameObject obj in pool)
+                if (obj != null && obj.activeSelf)
+                    obj.SetActive(false);
+    }
+
     public GameObject SpawnFromPool(string tag, Vector3 position, Quaternion rotation)
     {
         if (!poolDictionary.ContainsKey(tag))

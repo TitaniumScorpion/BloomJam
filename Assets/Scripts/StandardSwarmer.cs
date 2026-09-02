@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 
 [RequireComponent(typeof(Rigidbody))]
-public class StandardSwarmer : MonoBehaviour
+public class StandardSwarmer : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     public int maxHealth = 1;
@@ -96,16 +96,12 @@ public class StandardSwarmer : MonoBehaviour
         gameObject.SetActive(false); // Return to pool without triggering death events
     }
 
+    // Swaps to the bullet-time "marked for death" material. OnEnable restores the
+    // original material on respawn, so there's no matching Unmark().
     public void Mark(Material markedMaterial)
     {
         if (enemyRenderer != null && markedMaterial != null)
             enemyRenderer.sharedMaterial = markedMaterial;
-    }
-
-    public void Unmark()
-    {
-        if (enemyRenderer != null && originalMaterial != null)
-            enemyRenderer.sharedMaterial = originalMaterial;
     }
 
     private void FixedUpdate()
@@ -223,8 +219,7 @@ public class StandardSwarmer : MonoBehaviour
             {
                 markedForBulletTimeDeath = true;
                 KatanaWeapon.RegisterBulletTimeDeath(gameObject);
-                if (enemyRenderer != null && KatanaWeapon.BulletTimeMarkMaterial != null)
-                    enemyRenderer.sharedMaterial = KatanaWeapon.BulletTimeMarkMaterial;
+                Mark(KatanaWeapon.BulletTimeMarkMaterial);
             }
             else
             {

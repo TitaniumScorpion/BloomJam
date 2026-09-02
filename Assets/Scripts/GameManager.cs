@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
     // during the initial elevator sequence.
     public static bool HasGameStarted { get; private set; }
     private Coroutine transitionCoroutine;
+    private QuotaManager quotaManager;
 
     private void Awake()
     {
@@ -169,10 +170,8 @@ public class GameManager : MonoBehaviour
         foreach (GameObject zone in zones)
             if (zone != null) zone.SetActive(false);
 
-        foreach (StandardSwarmer s in FindObjectsOfType<StandardSwarmer>()) s.gameObject.SetActive(false);
-        foreach (AdvancedEnemy b in FindObjectsOfType<AdvancedEnemy>()) b.gameObject.SetActive(false);
-        foreach (Projectile p in FindObjectsOfType<Projectile>()) p.gameObject.SetActive(false);
-        foreach (EnemyProjectile ep in FindObjectsOfType<EnemyProjectile>()) ep.gameObject.SetActive(false);
+        // Clears every pooled enemy, projectile and effect in one pass
+        if (ObjectPooler.Instance != null) ObjectPooler.Instance.DeactivateAll();
 
         if (inGameUI != null) inGameUI.SetActive(false);
 
@@ -220,13 +219,12 @@ public class GameManager : MonoBehaviour
         if (hubFrontWall != null) hubFrontWall.SetActive(false);
         if (hubFrontPanel != null) hubFrontPanel.SetActive(false);
 
-        // Reset kills for this zone
-        QuotaManager qm = FindObjectOfType<QuotaManager>();
-        if (qm != null) qm.StartNextZone();
+        // Reset kills for this zone. Cached after the first lookup — this runs every transition.
+        if (quotaManager == null) quotaManager = FindFirstObjectByType<QuotaManager>();
+        if (quotaManager != null) quotaManager.StartNextZone();
 
         // Clean up anything left from the hub or previous zone
-        foreach (Projectile p in FindObjectsOfType<Projectile>()) p.gameObject.SetActive(false);
-        foreach (EnemyProjectile ep in FindObjectsOfType<EnemyProjectile>()) ep.gameObject.SetActive(false);
+        if (ObjectPooler.Instance != null) ObjectPooler.Instance.DeactivateAll();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

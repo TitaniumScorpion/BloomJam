@@ -55,37 +55,17 @@ public class SwordWave : MonoBehaviour
     {
         if (other.CompareTag("Player")) return;
 
-        if (other.TryGetComponent(out StandardSwarmer swarmer))
+        if (other.TryGetComponent(out IDamageable damageable))
         {
-            swarmer.TakeDamage(damage);
+            damageable.TakeDamage(damage);
             return; // Pierce through enemies
         }
-        if (other.TryGetComponent(out EnemyWeakPoint weakPoint))
-        {
-            weakPoint.TakeDamage(damage);
-            return;
-        }
-        if (other.TryGetComponent(out DroneWeakPoint dronePoint))
-        {
-            dronePoint.TakeDamage(damage);
-            return;
-        }
-        if (other.TryGetComponent(out DasherEnemy dasher))
-        {
-            dasher.TakeDamage(damage);
-            return;
-        }
-        if (other.TryGetComponent(out TrailEnemy trailEnemy))
-        {
-            trailEnemy.TakeDamage(damage);
-            return;
-        }
 
-        // Stop on solid environment
-        if (!other.isTrigger && other.GetComponentInParent<AdvancedEnemy>() == null
-            && other.GetComponentInParent<SpawnerDrone>() == null
-            && other.GetComponentInParent<DasherEnemy>() == null
-            && other.GetComponentInParent<TrailEnemy>() == null)
+        // Stop on solid environment. Non-damageable colliders that belong to an enemy
+        // (body parts, hitbox shells) are passed through rather than stopping the wave —
+        // SpawnerDrone needs naming explicitly because only its weak points are damageable.
+        if (!other.isTrigger && other.GetComponentInParent<IDamageable>() == null
+            && other.GetComponentInParent<SpawnerDrone>() == null)
             gameObject.SetActive(false);
     }
 }
