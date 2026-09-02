@@ -40,8 +40,7 @@ public class DasherEnemy : MonoBehaviour, IDamageable
     private float prepareTimer;
     private Vector3 dashDirection;
     private float dashTimer;
-    private bool wasFrozen;
-    private Vector3 frozenVelocity;
+    private BulletTimeFreeze bulletTimeFreeze;
     private Material originalMaterial;
     private Material currentBaseMaterial;
     private bool isFlashing;
@@ -64,7 +63,7 @@ public class DasherEnemy : MonoBehaviour, IDamageable
     {
         currentHealth = maxHealth;
         state = DasherState.Wandering;
-        wasFrozen = false;
+        bulletTimeFreeze.Reset();
         prepareTimer = 0f;
         dashTimer = 0f;
         wanderTarget = PickWanderTarget();
@@ -166,22 +165,7 @@ public class DasherEnemy : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
-        if (KatanaWeapon.IsBulletTimeActive)
-        {
-            if (!wasFrozen)
-            {
-                frozenVelocity = rb.linearVelocity;
-                rb.linearVelocity = Vector3.zero;
-                wasFrozen = true;
-            }
-            return;
-        }
-
-        if (wasFrozen)
-        {
-            rb.linearVelocity = frozenVelocity;
-            wasFrozen = false;
-        }
+        if (bulletTimeFreeze.Tick(rb)) return;
 
         switch (state)
         {

@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class KatanaWeapon : MonoBehaviour
+public class KatanaWeapon : HandheldWeapon
 {
     [Header("Weapon Settings")]
     public float attackRange = 3.5f;
@@ -15,27 +15,14 @@ public class KatanaWeapon : MonoBehaviour
     private float cooldownTimer;
 
     [Header("References")]
-    public GameObject displayWeapon;
     public Transform cameraTransform;
 
-    [Header("Tilt Settings")]
-    public float tiltAmount = 5f;
-
-    [Header("Sway Settings")]
-    public float swayAmount = 0.05f;
-    public float swaySpeed = 8f;
-    private Vector3 initialDisplayPosition;
-
-    [Header("Bob Settings")]
-    public float bobSpeed = 14f;
-    public float bobAmount = 0.05f;
-    private float bobTimer;
-
     [Header("Swing Animation")]
+    [Tooltip("How fast the view-model chases its rotation target.")]
     public float swingSpeed = 15f;
     public float swingDuration = 0.35f;
     public Vector3 swingRotationOffset = new Vector3(10f, 100f, -40f);
-    private Quaternion initialDisplayRotation;
+    // Rest rotation the sway swings around — offset mid-swing, back to initial otherwise
     private Quaternion targetSwingRotation;
 
     // ── Sword Visuals (per upgrade level) ────────────────────────────────────
@@ -76,46 +63,22 @@ public class KatanaWeapon : MonoBehaviour
     private RectTransform bulletTimeBarFill;
     private Image bulletTimeBarFillImage;
 
-    private void OnEnable()
-    {
-        ElevatorHub.OnHubModeEnter += HideWeapon;
-        ElevatorHub.OnHubModeExit += ShowWeapon;
-    }
-
-    private void OnDisable()
-    {
-        ElevatorHub.OnHubModeEnter -= HideWeapon;
-        ElevatorHub.OnHubModeExit -= ShowWeapon;
-    }
-
-    private void HideWeapon() { if (displayWeapon != null) displayWeapon.SetActive(false); }
-    private void ShowWeapon() { if (displayWeapon != null) displayWeapon.SetActive(true); }
-
-    private void Start()
+    protected override void Start()
     {
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
 
-        if (displayWeapon != null)
-        {
-            initialDisplayRotation = displayWeapon.transform.localRotation;
-            initialDisplayPosition = displayWeapon.transform.localPosition;
-            targetSwingRotation = initialDisplayRotation;
-        }
+        targetSwingRotation = initialDisplayRotation; // cached by the base in Awake
 
         SetSwordVisual(0);
         BulletTimeMarkMaterial = markedMaterial;
 
-        // Stay hidden until the player actually presses Start — ElevatorHub.OnHubModeExit
-        // (fired from GameManager.StartCurrentZone) shows it again from there on
-        if (!GameManager.HasGameStarted) HideWeapon();
+        base.Start(); // applies the pre-game hide — must run last
     }
 
     private void Update()
     {
-        if (Time.timeScale == 0f) return;
-        if (!GameManager.HasGameStarted) return;
-        if (ElevatorHub.IsActive) return;
+        if (!CanAct()) return;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
 
@@ -333,37 +296,7 @@ public class KatanaWeapon : MonoBehaviour
 
     // ── Weapon Sway ───────────────────────────────────────────────────────────
 
-    private void HandleWeaponSwayAndSwing()
-    {
-        if (displayWeapon == null || !displayWeapon.activeSelf) return;
-
-        float moveX = 0f;
-        float moveY = 0f;
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.dKey.isPressed) moveX += 1f;
-            if (Keyboard.current.aKey.isPressed) moveX -= 1f;
-            if (Keyboard.current.wKey.isPressed) moveY += 1f;
-            if (Keyboard.current.sKey.isPressed) moveY -= 1f;
-        }
-
-        float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
-        if (speedMagnitude > 0.1f) bobTimer += Time.deltaTime * bobSpeed;
-
-        Vector3 bobOffset = new Vector3(
-            Mathf.Cos(bobTimer * 0.5f) * (bobAmount * 0.5f),
-            Mathf.Sin(bobTimer) * bobAmount, 0f) * speedMagnitude;
-
-        Vector3 targetPosition = initialDisplayPosition
-            + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f)
-            + bobOffset;
-        displayWeapon.transform.localPosition =
-            Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed);
-
-        Quaternion tiltRotation = Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
-        displayWeapon.transform.localRotation =
-            Quaternion.Lerp(displayWeapon.transform.localRotation,
-                targetSwingRotation * tiltRotation, Time.deltaTime * swingSpeed);
-    }
+    // The swing is expressed purely as a moving rest rotation, so the shared sway
+    // naturally blends into and out of it instead of fighting it.
+    private void HandleWeaponSwayAndSwing() => ApplySway(targetSwingRotation, swingSpeed);
 }

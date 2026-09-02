@@ -10,8 +10,7 @@ public class SwordWave : MonoBehaviour
     public bool freezeDuringBulletTime = true;
 
     private Rigidbody rb;
-    private bool wasFrozen;
-    private Vector3 frozenVelocity;
+    private BulletTimeFreeze bulletTimeFreeze;
 
     private void Awake()
     {
@@ -22,7 +21,7 @@ public class SwordWave : MonoBehaviour
 
     private void OnEnable()
     {
-        wasFrozen = false;
+        bulletTimeFreeze.Reset();
         rb.linearVelocity = transform.forward * speed;
         Invoke(nameof(Deactivate), lifetime);
     }
@@ -33,22 +32,9 @@ public class SwordWave : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (freezeDuringBulletTime && KatanaWeapon.IsBulletTimeActive)
-        {
-            if (!wasFrozen)
-            {
-                frozenVelocity = rb.linearVelocity;
-                rb.linearVelocity = Vector3.zero;
-                wasFrozen = true;
-            }
-            return;
-        }
-
-        if (wasFrozen)
-        {
-            rb.linearVelocity = frozenVelocity;
-            wasFrozen = false;
-        }
+        // Holds the wave still during bullet time. The bullet-time variant unticks
+        // freezeDuringBulletTime so it keeps travelling while everything else stops.
+        bulletTimeFreeze.Tick(rb, freezeDuringBulletTime && KatanaWeapon.IsBulletTimeActive);
     }
 
     private void OnTriggerEnter(Collider other)

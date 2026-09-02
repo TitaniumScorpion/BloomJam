@@ -35,7 +35,8 @@ public class UpgradeManager : MonoBehaviour
     [Header("Zone 3 - Sword")]
     public float z3_CooldownMultiplier = 0.55f;
 
-    private static readonly string[] PistolDescriptions =
+    /// <summary>Upgrade cards in order. Public so DebugUpgradeKeys labels itself from the same source.</summary>
+    public static readonly string[] PistolDescriptions =
     {
         "FIRE RATE UP\nOverheat takes slightly longer.",
         "CHARGE SHOT\nTap to fire. Hold Q to charge a piercing laser beam.",
@@ -43,7 +44,7 @@ public class UpgradeManager : MonoBehaviour
         "AUTO SHOTGUN\nFiring for 3s triggers a wide burst. Interval drops to 2s with sustained fire.",
     };
 
-    private static readonly string[] SwordDescriptions =
+    public static readonly string[] SwordDescriptions =
     {
         "WIDE SLASH\nIncreased attack radius for a broader sweep.",
         "ENERGY WAVES\nEach swing sends a piercing energy wave forward.",
@@ -136,29 +137,38 @@ public class UpgradeManager : MonoBehaviour
         // Guards against clicking before the panel's actually focused/populated
         if (!ElevatorHub.IsActive || !HasPendingUpgrade) return;
 
-        if (pistol != null)
-        {
-            switch (pistolUpgradeLevel)
-            {
-                case 0:
-                    float oldRate = pistol.fireRate;
-                    pistol.fireRate = z1_PistolFireRate;
-                    pistol.heatPerShot *= (z1_PistolFireRate / oldRate) * 0.75f;
-                    break;
-                case 1:
-                    pistol.UnlockChargeAttack();
-                    break;
-                case 2:
-                    pistol.maxHeat *= z3_MaxHeatMultiplier;
-                    break;
-                case 3:
-                    pistol.UnlockShotgun();
-                    break;
-            }
-        }
-
+        ApplyPistolUpgrade(pistolUpgradeLevel);
         pistolUpgradeLevel++;
         OnUpgradeChosen();
+    }
+
+    /// <summary>
+    /// Applies one pistol upgrade's effect, with no progression bookkeeping. Split out so the
+    /// debug toggles run the real upgrade rather than a hardcoded copy of it that can drift.
+    /// </summary>
+    public void ApplyPistolUpgrade(int level)
+    {
+        if (pistol == null) return;
+
+        switch (level)
+        {
+            case 0:
+                // Heat per shot scales with the new rate so a faster gun does not simply
+                // overheat proportionally sooner — the 0.75 is the net endurance gain
+                float oldRate = pistol.fireRate;
+                pistol.fireRate = z1_PistolFireRate;
+                pistol.heatPerShot *= (z1_PistolFireRate / oldRate) * 0.75f;
+                break;
+            case 1:
+                pistol.UnlockChargeAttack();
+                break;
+            case 2:
+                pistol.maxHeat *= z3_MaxHeatMultiplier;
+                break;
+            case 3:
+                pistol.UnlockShotgun();
+                break;
+        }
     }
 
     public void ChooseSwordUpgrade()
@@ -166,28 +176,35 @@ public class UpgradeManager : MonoBehaviour
         // Guards against clicking before the panel's actually focused/populated
         if (!ElevatorHub.IsActive || !HasPendingUpgrade) return;
 
-        if (katana != null)
-        {
-            switch (katanaUpgradeLevel)
-            {
-                case 0:
-                    katana.attackRadius += z1_SwordRadiusIncrease;
-                    break;
-                case 1:
-                    katana.UnlockWaves();
-                    break;
-                case 2:
-                    katana.cooldownTime *= z3_CooldownMultiplier;
-                    break;
-                case 3:
-                    katana.UnlockBulletTime();
-                    break;
-            }
-        }
-
+        ApplySwordUpgrade(katanaUpgradeLevel);
         katanaUpgradeLevel++;
         katana?.SetSwordVisual(katanaUpgradeLevel);
         OnUpgradeChosen();
+    }
+
+    /// <summary>
+    /// Applies one sword upgrade's effect. The blade visual is deliberately left to the
+    /// caller — progression drives it off the level, the debug toggles off a live count.
+    /// </summary>
+    public void ApplySwordUpgrade(int level)
+    {
+        if (katana == null) return;
+
+        switch (level)
+        {
+            case 0:
+                katana.attackRadius += z1_SwordRadiusIncrease;
+                break;
+            case 1:
+                katana.UnlockWaves();
+                break;
+            case 2:
+                katana.cooldownTime *= z3_CooldownMultiplier;
+                break;
+            case 3:
+                katana.UnlockBulletTime();
+                break;
+        }
     }
 
     private void OnUpgradeChosen()

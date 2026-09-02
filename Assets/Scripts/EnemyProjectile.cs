@@ -6,8 +6,7 @@ public class EnemyProjectile : MonoBehaviour
     public int damage = 1;
     public float lifetime = 5f;
     private Rigidbody rb;
-    private bool wasFrozen;
-    private Vector3 frozenVelocity;
+    private BulletTimeFreeze bulletTimeFreeze;
 
     private void Awake()
     {
@@ -18,7 +17,7 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnEnable()
     {
-        wasFrozen = false;
+        bulletTimeFreeze.Reset();
         Invoke(nameof(Deactivate), lifetime);
     }
 
@@ -29,24 +28,9 @@ public class EnemyProjectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (KatanaWeapon.IsBulletTimeActive)
-        {
-            if (!wasFrozen)
-            {
-                frozenVelocity = rb.linearVelocity;
-                rb.linearVelocity = Vector3.zero;
-                rb.useGravity = false;
-                wasFrozen = true;
-            }
-            return;
-        }
-
-        if (wasFrozen)
-        {
-            rb.linearVelocity = frozenVelocity;
-            rb.useGravity = true;
-            wasFrozen = false;
-        }
+        // Gravity is stored and restored by the helper, so the arc resumes mid-flight
+        // exactly where it left off rather than dropping straight down.
+        bulletTimeFreeze.Tick(rb);
     }
 
     private void Deactivate()

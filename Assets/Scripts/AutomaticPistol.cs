@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
-public class AutomaticPistol : MonoBehaviour
+public class AutomaticPistol : HandheldWeapon
 {
     [Header("Weapon Settings")]
     public float fireRate = 0.1f;
@@ -39,13 +39,8 @@ public class AutomaticPistol : MonoBehaviour
     public Camera playerCamera;
 
     [Header("Visual Weapon Sway")]
-    public GameObject displayWeapon;
-    public float tiltAmount = 5f;
+    [Tooltip("How fast the view-model chases its rotation target.")]
     public float tiltSpeed = 8f;
-    public float swayAmount = 0.05f;
-    public float swaySpeed = 8f;
-    public float bobSpeed = 14f;
-    public float bobAmount = 0.05f;
 
     [Header("Recoil Settings")]
     public float recoilKickback = 0.3f;
@@ -92,43 +87,33 @@ public class AutomaticPistol : MonoBehaviour
     private float currentShotgunThreshold = 3f;
     private const float shotgunThresholdMin = 2f;
 
-    private Quaternion initialDisplayRotation;
-    private Vector3 initialDisplayPosition;
-    private float bobTimer;
     private Vector3 stableFirePointLocalPos;
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable(); // elevator-hub show/hide
         KatanaWeapon.OnBulletTimeStart += HideWeapon;
         KatanaWeapon.OnBulletTimeEnd += ShowWeapon;
-        ElevatorHub.OnHubModeEnter += HideWeapon;
-        ElevatorHub.OnHubModeExit += ShowWeapon;
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         KatanaWeapon.OnBulletTimeStart -= HideWeapon;
         KatanaWeapon.OnBulletTimeEnd -= ShowWeapon;
-        ElevatorHub.OnHubModeEnter -= HideWeapon;
-        ElevatorHub.OnHubModeExit -= ShowWeapon;
     }
 
-    private void HideWeapon() { if (displayWeapon != null) displayWeapon.SetActive(false); }
-    private void ShowWeapon() { if (displayWeapon != null) displayWeapon.SetActive(true); }
+    // The pistol is additionally unusable during bullet time — that is the katana's window
+    protected override bool CanAct() => base.CanAct() && !KatanaWeapon.IsBulletTimeActive;
 
-    private void Start()
+    protected override void Start()
     {
         playerController = GetComponentInParent<PlayerController>();
 
         if (playerCamera == null)
             playerCamera = Camera.main;
 
-        if (displayWeapon != null)
-        {
-            initialDisplayRotation = displayWeapon.transform.localRotation;
-            initialDisplayPosition = displayWeapon.transform.localPosition;
-        }
-
+        // Captured in camera space so weapon sway never skews where shots originate
         if (firePoint != null && playerCamera != null)
             stableFirePointLocalPos = playerCamera.transform.InverseTransformPoint(firePoint.position);
 
@@ -139,17 +124,12 @@ public class AutomaticPistol : MonoBehaviour
             emissionColorID = Shader.PropertyToID(emissionPropertyName);
         }
 
-        // Stay hidden until the player actually presses Start — ElevatorHub.OnHubModeExit
-        // (fired from GameManager.StartCurrentZone) shows it again from there on
-        if (!GameManager.HasGameStarted) HideWeapon();
+        base.Start(); // applies the pre-game hide — must run last
     }
 
     private void Update()
     {
-        if (Time.timeScale == 0f) return;
-        if (!GameManager.HasGameStarted) return;
-        if (KatanaWeapon.IsBulletTimeActive) return;
-        if (ElevatorHub.IsActive) return;
+        if (!CanAct()) return;
 
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
         currentRecoilEuler = Vector3.Lerp(currentRecoilEuler, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
@@ -465,56 +445,31 @@ public class AutomaticPistol : MonoBehaviour
 
     private void HandleWeaponSway()
     {
-        if (displayWeapon == null || !displayWeapon.activeSelf) return;
-
-        float moveX = 0f;
-        float moveY = 0f;
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.dKey.isPressed) moveX += 1f;
-            if (Keyboard.current.aKey.isPressed) moveX -= 1f;
-            if (Keyboard.current.wKey.isPressed) moveY += 1f;
-            if (Keyboard.current.sKey.isPressed) moveY -= 1f;
-        }
-
-        Vector3 randomShake = Vector3.zero;
-        Quaternion randomRotShake = Quaternion.identity;
+        Vector3 positionShake = Vector3.zero;
+        Quaternion rotationShake = Quaternion.identity;
 
         if (weaponShakeTimer > 0f)
         {
-            randomShake = new Vector3(
+            positionShake = new Vector3(
                 Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
                 Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude),
                 Random.Range(-weaponShakeMagnitude, weaponShakeMagnitude));
 
             float rotMag = weaponShakeMagnitude * 200f;
-            randomRotShake = Quaternion.Euler(
+            rotationShake = Quaternion.Euler(
                 Random.Range(-rotMag, rotMag),
                 Random.Range(-rotMag, rotMag),
                 Random.Range(-rotMag, rotMag));
         }
 
-        Quaternion swayRotation = initialDisplayRotation * Quaternion.Euler(moveY * tiltAmount, 0f, -moveX * tiltAmount);
-        Quaternion recoilRot = Quaternion.Euler(currentRecoilEuler);
-        displayWeapon.transform.localRotation = Quaternion.Lerp(displayWeapon.transform.localRotation,
-            swayRotation * recoilRot, Time.deltaTime * tiltSpeed) * randomRotShake;
-
-        float speedMagnitude = Mathf.Clamp01(Mathf.Abs(moveX) + Mathf.Abs(moveY));
-        if (speedMagnitude > 0.1f) bobTimer += Time.deltaTime * bobSpeed;
-
-        Vector3 bobOffset = new Vector3(
-            Mathf.Cos(bobTimer * 0.5f) * (bobAmount * 0.5f),
-            Mathf.Sin(bobTimer) * bobAmount,
-            0f) * speedMagnitude;
-
-        Vector3 targetPosition = initialDisplayPosition
-            + new Vector3(-moveX * swayAmount, -moveY * swayAmount, 0f)
-            + bobOffset
-            + currentRecoilPosition;
-
-        displayWeapon.transform.localPosition =
-            Vector3.Lerp(displayWeapon.transform.localPosition, targetPosition, Time.deltaTime * swaySpeed)
-            + randomShake;
+        // Recoil rides on top of the shared sway: rotation after the tilt, position added
+        // to the rest target, and the per-shot shake applied outside the lerp as jitter.
+        ApplySway(
+            baseRotation: initialDisplayRotation,
+            rotationLerpSpeed: tiltSpeed,
+            postRotation: Quaternion.Euler(currentRecoilEuler),
+            positionOffset: currentRecoilPosition,
+            positionShake: positionShake,
+            rotationShake: rotationShake);
     }
 }
