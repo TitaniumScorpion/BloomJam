@@ -224,13 +224,13 @@ public class KatanaWeapon : MonoBehaviour
         bulletTimeCooldownTimer = bulletTimeCooldown;
         OnBulletTimeEnd?.Invoke();
 
-        // Kill all enemies that reached 0 HP during bullet time
+        // Kill all enemies that reached 0 HP during bullet time. FlyingChaserEnemy covers
+        // both the standard swarmer and the trail enemy.
         foreach (GameObject go in pendingBulletTimeDeaths)
         {
             if (go == null || !go.activeSelf) continue;
-            if (go.TryGetComponent(out StandardSwarmer s)) s.ForceDie();
-            else if (go.TryGetComponent(out DasherEnemy d)) d.ForceDie();
-            else if (go.TryGetComponent(out TrailEnemy t)) t.ForceDie();
+            if (go.TryGetComponent(out FlyingChaserEnemy chaser)) chaser.ForceDie();
+            else if (go.TryGetComponent(out DasherEnemy dasher)) dasher.ForceDie();
         }
         pendingBulletTimeDeaths.Clear();
     }

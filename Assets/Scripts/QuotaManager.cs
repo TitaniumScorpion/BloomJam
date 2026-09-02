@@ -23,13 +23,13 @@ public class QuotaManager : MonoBehaviour
     private void OnEnable()
     {
         // Subscribe to the enemy death event when this manager becomes active
-        StandardSwarmer.OnEnemyDied += HandleEnemyDied;
+        EnemyEvents.OnEnemyDied += HandleEnemyDied;
     }
 
     private void OnDisable()
     {
         // ALWAYS unsubscribe from static events when disabled to prevent memory leaks
-        StandardSwarmer.OnEnemyDied -= HandleEnemyDied;
+        EnemyEvents.OnEnemyDied -= HandleEnemyDied;
     }
 
     private void Start()

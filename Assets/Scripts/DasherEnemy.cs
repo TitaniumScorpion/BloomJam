@@ -254,7 +254,7 @@ public class DasherEnemy : MonoBehaviour, IDamageable
 
     public void ForceDie()
     {
-        StandardSwarmer.ReportDeath();
+        EnemyEvents.ReportDeath();
         gameObject.SetActive(false);
     }
 

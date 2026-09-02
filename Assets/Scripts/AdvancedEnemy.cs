@@ -199,7 +199,7 @@ public class AdvancedEnemy : MonoBehaviour, IDamageable
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            StandardSwarmer.ReportDeath(); // Tells the Quota Manager we died
+            EnemyEvents.ReportDeath(); // Tells the Quota Manager we died
             gameObject.SetActive(false);
         }
     }

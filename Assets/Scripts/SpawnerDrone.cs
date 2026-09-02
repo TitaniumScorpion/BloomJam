@@ -128,7 +128,7 @@ public class SpawnerDrone : MonoBehaviour
         destroyedWeakPoints++;
         if (weakPoints.Length > 0 && destroyedWeakPoints >= weakPoints.Length)
         {
-            StandardSwarmer.ReportDeath();
+            EnemyEvents.ReportDeath();
             gameObject.SetActive(false);
         }
     }
