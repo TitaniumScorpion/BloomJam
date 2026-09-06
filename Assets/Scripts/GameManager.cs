@@ -11,11 +11,16 @@ public class GameManager : MonoBehaviour
     public GameObject victoryScreen;
 
     [Header("UI Elements")]
+    [Tooltip("Hidden for the whole run by design — progress is revealed only by the completion % on the death screen")]
     public TMP_Text quotaText;
 
     [Header("Run Timer UI")]
     public TMP_Text deathTimeText;
     public TMP_Text victoryTimeText;
+
+    [Header("Run Completion UI")]
+    [Tooltip("Shows how far through the run the player got, on the death screen")]
+    public TMP_Text deathCompletionText;
     private float currentRunTime = 0f;
     private bool isTimerRunning = false;
 
@@ -67,7 +72,6 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        QuotaManager.OnKillCountUpdated += UpdateQuotaText;
         QuotaManager.OnZoneCleared += ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted += ShowVictoryScreen;
         PlayerHealth.OnPlayerDied += ShowDeathScreen;
@@ -75,7 +79,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDisable()
     {
-        QuotaManager.OnKillCountUpdated -= UpdateQuotaText;
         QuotaManager.OnZoneCleared -= ShowLevelCompletedMessage;
         QuotaManager.OnGameCompleted -= ShowVictoryScreen;
         PlayerHealth.OnPlayerDied -= ShowDeathScreen;
@@ -87,6 +90,9 @@ public class GameManager : MonoBehaviour
         if (victoryScreen != null) victoryScreen.SetActive(false);
         if (levelCompletedMessage != null) levelCompletedMessage.SetActive(false);
         if (inGameUI != null) inGameUI.SetActive(false);
+        // Stays off for the whole run — deactivated here rather than never assigned so the
+        // scene wiring survives if the counter is ever brought back.
+        if (quotaText != null) quotaText.gameObject.SetActive(false);
 
         // Disable all zones — player starts in the elevator hub
         foreach (GameObject zone in zones)
@@ -258,11 +264,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void UpdateQuotaText(int currentKills, int targetQuota)
-    {
-        if (quotaText != null) quotaText.text = $"KILLS: {currentKills} / {targetQuota}";
-    }
-
     private void ShowLevelCompletedMessage()
     {
         if (levelCompletedMessage != null)
@@ -283,6 +284,8 @@ public class GameManager : MonoBehaviour
         if (inGameUI != null) inGameUI.SetActive(false);
         if (deathScreen != null) deathScreen.SetActive(true);
         if (deathTimeText != null) deathTimeText.text = $"TIME ALIVE: {FormatTime(currentRunTime)}";
+        if (deathCompletionText != null)
+            deathCompletionText.text = $"COMPLETED: {QuotaManager.GetCompletionPercent():0.0}%";
         if (AudioManager.Instance != null && AudioManager.Instance.gameOverSound != null)
             AudioManager.Instance.PlaySoundAtLocation(AudioManager.Instance.gameOverSound,
                 Camera.main != null ? Camera.main.transform.position : Vector3.zero,

@@ -15,10 +15,26 @@ public class QuotaManager : MonoBehaviour
     public static int currentZoneIndex = 0;
     public static bool IsZoneCleared { get; private set; }
 
+    // Zones fully cleared this run. Tracked separately from currentZoneIndex because the final
+    // zone clears without advancing the index — the index alone can't tell "cleared zone 5" from
+    // "standing in zone 5". Used by the completion percentage on the death screen.
+    public static int zonesCompleted = 0;
+
+    // Static mirrors of the two inspector fields below, so the completion percentage can be read
+    // after death without hunting for the (by then possibly disabled) QuotaManager in the scene.
+    private static int[] quotaTable;
+    private static int lastZoneIndex;
+
     // Events to broadcast progression state to the UI, Spawner, or Game Manager
     public static event Action<int, int> OnKillCountUpdated; // Sends (currentKills, targetQuota)
     public static event Action OnZoneCleared;                // Broadcasted when a zone is finished to stop spawners
     public static event Action OnGameCompleted;              // Broadcasted when all 3 zones are beaten
+
+    private void Awake()
+    {
+        quotaTable = targetQuotas;
+        lastZoneIndex = finalZoneIndex;
+    }
 
     private void OnEnable()
     {
@@ -58,7 +74,35 @@ public class QuotaManager : MonoBehaviour
     {
         currentKills = 0;
         currentZoneIndex = 0;
+        zonesCompleted = 0;
         IsZoneCleared = false;
+    }
+
+    /// <summary>
+    /// How far through the whole run the player got, 0-100. Counts every zone's quota:
+    /// fully cleared zones contribute their entire quota, the zone in progress contributes
+    /// its kills so far.
+    /// </summary>
+    public static float GetCompletionPercent()
+    {
+        if (quotaTable == null || quotaTable.Length == 0) return 0f;
+
+        // finalZoneIndex may stop short of the array's end — only count zones that are actually played
+        int zoneCount = Mathf.Min(quotaTable.Length, lastZoneIndex + 1);
+
+        int totalQuota = 0;
+        for (int i = 0; i < zoneCount; i++) totalQuota += quotaTable[i];
+        if (totalQuota <= 0) return 0f;
+
+        int killsBanked = 0;
+        for (int i = 0; i < zonesCompleted && i < zoneCount; i++) killsBanked += quotaTable[i];
+
+        // While a zone is cleared but not yet restarted, currentKills still holds that zone's
+        // final tally — already banked above, so adding it again would double-count.
+        if (!IsZoneCleared && currentZoneIndex < zoneCount)
+            killsBanked += Mathf.Min(currentKills, quotaTable[currentZoneIndex]);
+
+        return Mathf.Clamp01((float)killsBanked / totalQuota) * 100f;
     }
 
     private void HandleEnemyDied()
@@ -79,6 +123,8 @@ public class QuotaManager : MonoBehaviour
 
     private void AdvanceZone()
     {
+        zonesCompleted++;
+
         if (currentZoneIndex >= finalZoneIndex)
         {
             Debug.Log("All zones cleared! Game Completed!");
