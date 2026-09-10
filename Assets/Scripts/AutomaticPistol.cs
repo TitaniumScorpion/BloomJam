@@ -38,6 +38,16 @@ public class AutomaticPistol : HandheldWeapon
     public Transform firePoint;
     public Camera playerCamera;
 
+    // Layers the crosshair ray is allowed to hit. Projectiles must be excluded: a bullet's
+    // trigger sphere is wide enough to straddle the camera's centre line for its whole flight,
+    // and Physics queries hit triggers, so an unmasked ray locks onto an in-flight bullet a few
+    // metres out instead of the world behind it. The muzzle sits ~0.5m right of the camera, so
+    // aiming at a near point on that centre line swings the shot left — and the mis-aimed bullet
+    // then crosses the centre line itself, feeding the next shot. That loop is what made
+    // sustained fire drift steadily to the left after a couple of seconds.
+    private static readonly string[] aimIgnoredLayers = { "PlayerBullet", "EnemyProjectile" };
+    private int aimLayerMask = ~0;
+
     [Header("Visual Weapon Sway")]
     [Tooltip("How fast the view-model chases its rotation target.")]
     public float tiltSpeed = 8f;
@@ -112,6 +122,12 @@ public class AutomaticPistol : HandheldWeapon
 
         if (playerCamera == null)
             playerCamera = Camera.main;
+
+        foreach (string layerName in aimIgnoredLayers)
+        {
+            int layer = LayerMask.NameToLayer(layerName);
+            if (layer >= 0) aimLayerMask &= ~(1 << layer);
+        }
 
         // Captured in camera space so weapon sway never skews where shots originate
         if (firePoint != null && playerCamera != null)
@@ -205,7 +221,9 @@ public class AutomaticPistol : HandheldWeapon
             }
 
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit) ? hit.point : ray.GetPoint(1000f);
+            Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimLayerMask)
+                ? hit.point
+                : ray.GetPoint(1000f);
 
             Vector3 stableFirePointPos = playerCamera.transform.TransformPoint(stableFirePointLocalPos);
             Vector3 direction = targetPoint - stableFirePointPos;
@@ -301,7 +319,7 @@ public class AutomaticPistol : HandheldWeapon
         beamRenderer.SetPosition(0, firePoint.position);
 
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        Vector3 endPoint = Physics.Raycast(ray, out RaycastHit hit, 500f) ? hit.point : ray.GetPoint(500f);
+        Vector3 endPoint = Physics.Raycast(ray, out RaycastHit hit, 500f, aimLayerMask) ? hit.point : ray.GetPoint(500f);
         beamRenderer.SetPosition(1, endPoint);
     }
 
@@ -325,7 +343,7 @@ public class AutomaticPistol : HandheldWeapon
         if (playerCamera != null)
         {
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            RaycastHit[] hits = Physics.RaycastAll(ray, 500f);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 500f, aimLayerMask);
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
             foreach (RaycastHit hit in hits)
