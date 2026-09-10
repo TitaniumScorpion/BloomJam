@@ -1,6 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Keep a pool's instances from colliding with each other via the layer collision matrix
+/// (Project Settings > Physics), not via Physics.IgnoreCollision. Unity only applies an ignore
+/// pair to colliders on *active* GameObjects and drops it again when they deactivate, which is
+/// something pooled objects do constantly - an ignoreSelfCollisions flag lived here for a while
+/// and silently did nothing. Player bullets use the "PlayerBullet" layer, enemy shots use
+/// "EnemyProjectile"; both are unticked against themselves in the matrix.
+/// </summary>
 public class ObjectPooler : MonoBehaviour
 {
     [System.Serializable]
@@ -9,8 +17,6 @@ public class ObjectPooler : MonoBehaviour
         public string tag;
         public GameObject prefab;
         public int size;
-        [Tooltip("If checked, instances from this pool will never physically collide with each other (e.g. rapid-fire bullets bumping into and deflecting one another).")]
-        public bool ignoreSelfCollisions;
     }
 
     public static ObjectPooler Instance;
@@ -40,7 +46,6 @@ public class ObjectPooler : MonoBehaviour
             }
 
             Queue<GameObject> objectPool = new Queue<GameObject>();
-            List<Collider> poolColliders = pool.ignoreSelfCollisions ? new List<Collider>() : null;
 
             for (int i = 0; i < pool.size; i++)
             {
@@ -48,17 +53,6 @@ public class ObjectPooler : MonoBehaviour
                 GameObject obj = Instantiate(pool.prefab, transform);
                 obj.SetActive(false);
                 objectPool.Enqueue(obj);
-
-                if (pool.ignoreSelfCollisions)
-                    poolColliders.AddRange(obj.GetComponentsInChildren<Collider>(true));
-            }
-
-            if (pool.ignoreSelfCollisions)
-            {
-                // Since pooled instances are reused (never destroyed), ignoring each pair once here holds for the pool's whole lifetime
-                for (int i = 0; i < poolColliders.Count; i++)
-                    for (int j = i + 1; j < poolColliders.Count; j++)
-                        Physics.IgnoreCollision(poolColliders[i], poolColliders[j], true);
             }
 
             poolDictionary.Add(pool.tag, objectPool);

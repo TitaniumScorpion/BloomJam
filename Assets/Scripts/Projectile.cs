@@ -10,7 +10,6 @@ public class Projectile : MonoBehaviour
 
     private Rigidbody rb;
     private Vector3 originalScale;
-    private bool inGracePeriod;
 
     //YILMAZ KOD MAESTER WAS HERE
     [SerializeField] private GameObject bulletGFX;
@@ -51,18 +50,13 @@ public class Projectile : MonoBehaviour
     {
         transform.localScale = originalScale;
         rb.linearVelocity = transform.forward * speed;
-        inGracePeriod = true;
-        Invoke(nameof(EndGracePeriod), 0.05f);
         Invoke(nameof(Deactivate), lifetime);
     }
 
     private void OnDisable()
     {
         CancelInvoke();
-        inGracePeriod = false;
     }
-
-    private void EndGracePeriod() => inGracePeriod = false;
 
     private void Deactivate()
     {
@@ -71,13 +65,16 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (inGracePeriod) return;
         gameObject.SetActive(false);
     }
 
+    // There is deliberately no spawn grace period here. One used to ignore every trigger for the
+    // first 0.05s, which at 80 m/s blanked out the first 4m of flight - the muzzle already sits
+    // ~2.4m ahead of the camera, so shots passed straight through anything within ~6m of the
+    // player. It existed to stop bullets killing each other at the muzzle; the "PlayerBullet"
+    // layer handles that now, and the Player tag check below covers the player's own capsule.
     private void OnTriggerEnter(Collider other)
     {
-        if (inGracePeriod) return;
         if (other.CompareTag("Player")) return;
         // Any enemy or weak point implements IDamageable, so one lookup covers them all
         bool hitEnemy = other.TryGetComponent(out IDamageable damageable);

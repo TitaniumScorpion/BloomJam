@@ -78,6 +78,18 @@ state is `static` so it survives scene reloads — reset it via `ResetProgressio
 
 ## API traps hit in this project
 
+- **Physics queries hit trigger colliders** (`m_QueriesHitTriggers: 1`), so an aim raycast will
+  happily target your own bullets. This was a long-standing pistol bug: a projectile's
+  0.5-radius trigger sphere straddles the camera's centre line for its whole flight, and the
+  muzzle sits ~0.5 m to the *right* of the camera — so aiming at a bullet a few metres out
+  kicked the shot left, and that shot then crossed the centre line itself and fed the next one.
+  A feedback loop that ramped in over ~2 s of held fire and then held a steady leftward bias.
+  **Any raycast that decides where a shot goes must mask out `PlayerBullet` and
+  `EnemyProjectile`** (`AutomaticPistol.aimLayerMask` builds this in `Start`).
+- **Pool instances must not collide with each other via `Physics.IgnoreCollision`.** Unity only
+  applies an ignore pair to colliders on *active* GameObjects and drops it when they deactivate,
+  which pooled objects do constantly. Untick the layer against itself in the collision matrix
+  instead — `PlayerBullet` and `EnemyProjectile` are already set up that way.
 - **`Quaternion == default` is always `false`.** Unity overloads `operator==` to compare by
   dot product, and `Dot(zero, zero) == 0` fails the `> 0.999999f` test. Never use `== default`
   on a Quaternion — use `Quaternion?` and `?? Quaternion.identity`. This shipped a real bug

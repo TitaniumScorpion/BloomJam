@@ -48,6 +48,13 @@ public class AutomaticPistol : HandheldWeapon
     private static readonly string[] aimIgnoredLayers = { "PlayerBullet", "EnemyProjectile" };
     private int aimLayerMask = ~0;
 
+    [Tooltip("Shots converge on whatever the crosshair is over. The muzzle sits ~2.4 m AHEAD of " +
+             "the camera, so an aim point nearer than that inverts the muzzle-to-target vector and " +
+             "fires the shot sideways or backwards - which is what made steep downward shots look " +
+             "like they ricocheted off the floor. Aim points closer than this are pushed out to " +
+             "this distance instead. Must stay comfortably larger than the muzzle's forward offset.")]
+    public float minAimDistance = 10f;
+
     [Header("Visual Weapon Sway")]
     [Tooltip("How fast the view-model chases its rotation target.")]
     public float tiltSpeed = 8f;
@@ -221,9 +228,15 @@ public class AutomaticPistol : HandheldWeapon
             }
 
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimLayerMask)
-                ? hit.point
-                : ray.GetPoint(1000f);
+            float aimDistance = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimLayerMask)
+                ? hit.distance
+                : 1000f;
+
+            // Both hit.distance and GetPoint are measured from the ray origin, which sits on the
+            // near plane rather than at the camera itself - subtract it so minAimDistance reads as
+            // a plain "metres in front of the camera".
+            float minRayDistance = Mathf.Max(minAimDistance - playerCamera.nearClipPlane, 0f);
+            Vector3 targetPoint = ray.GetPoint(Mathf.Max(aimDistance, minRayDistance));
 
             Vector3 stableFirePointPos = playerCamera.transform.TransformPoint(stableFirePointLocalPos);
             Vector3 direction = targetPoint - stableFirePointPos;
