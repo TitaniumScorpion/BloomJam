@@ -250234,6 +250234,18 @@ PrefabInstance:
       propertyPath: attackRadius
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: comboSwings.Array.data[0].cooldownOverride
+      value: 0.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: comboSwings.Array.data[1].cooldownOverride
+      value: 0.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: comboSwings.Array.data[2].cooldownOverride
+      value: 0.45
+      objectReference: {fileID: 0}
     - target: {fileID: 8677833960182127638, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_LocalPosition.x
       value: -24.15
@@ -250341,7 +250353,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 871871080597411597, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3144219802533734415, guid: 2a67be363df1bcf4a934733e3d07d624, type: 3}
       propertyPath: m_Name

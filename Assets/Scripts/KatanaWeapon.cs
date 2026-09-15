@@ -17,13 +17,73 @@ public class KatanaWeapon : HandheldWeapon
     [Header("References")]
     public Transform cameraTransform;
 
-    [Header("Swing Animation")]
+    [Header("Swing Animation (procedural fallback)")]
     [Tooltip("How fast the view-model chases its rotation target.")]
     public float swingSpeed = 15f;
     public float swingDuration = 0.35f;
+    [Tooltip("Used only by combo steps that leave their own procedural offset at zero.")]
     public Vector3 swingRotationOffset = new Vector3(10f, 100f, -40f);
     // Rest rotation the sway swings around — offset mid-swing, back to initial otherwise
     private Quaternion targetSwingRotation;
+
+    // ── Attack Combo ─────────────────────────────────────────────────
+    /// <summary>
+    /// One step of the melee combo. The array of these IS the combo: add or remove
+    /// entries and the cycle length follows.
+    /// </summary>
+    [Serializable]
+    public class SwordSwing
+    {
+        [Tooltip("Label only — makes the array readable in the Inspector.")]
+        public string name = "Swing";
+
+        [Tooltip("Animator state to play for this step. Must match a state name in the sword's Animator Controller.")]
+        public string animationStateName = "";
+
+        [Tooltip("Seconds between the button press and the damage landing, so the hit matches the contact frame of the clip. 0 = instant (current behaviour). Ignored when Use Animation Event For Hit is on.")]
+        public float hitDelay = 0f;
+
+        [Tooltip("Attack cooldown for this step. 0 or less = use the weapon's Cooldown Time. Never applies during bullet time.")]
+        public float cooldownOverride = 0f;
+
+        [Tooltip("Scales this weapon's Damage for this step — give the finisher a bonus here.")]
+        public float damageMultiplier = 1f;
+
+        [Tooltip("Procedural fallback pose, used only while Sword Animator is empty. Zero = fall back to the weapon's Swing Rotation Offset.")]
+        public Vector3 proceduralRotationOffset = Vector3.zero;
+    }
+
+    [Header("Attack Combo")]
+    [Tooltip("Optional. Leave empty and the old procedural swing plays instead. Put this on a CHILD of the view-model — the sway drives the parent, the clips drive the child.")]
+    public Animator swordAnimator;
+
+    [Tooltip("State cross-faded back to when a swing reports it is finished. Leave empty if your controller uses Exit Time transitions instead.")]
+    public string idleStateName = "Idle";
+
+    [Tooltip("Cross-fade length into a swing state, in seconds.")]
+    public float animationBlendTime = 0.05f;
+
+    [Tooltip("Seconds of no attack after which the combo drops back to step 1.")]
+    public float comboResetTime = 1f;
+
+    [Tooltip("Let an Animation Event on the clip pick the hit frame instead of Hit Delay. Needs a SwordAnimationEvents component on the animated object, calling SwordHit().")]
+    public bool useAnimationEventForHit = false;
+
+    public SwordSwing[] comboSwings =
+    {
+        new SwordSwing { name = "1 — Left Swing",  animationStateName = "Swing_Left",  proceduralRotationOffset = new Vector3(85f,  20f, -20f) },
+        new SwordSwing { name = "2 — Right Swing", animationStateName = "Swing_Right", proceduralRotationOffset = new Vector3(85f, -35f,  25f) },
+        new SwordSwing { name = "3 — Cross Swing", animationStateName = "Swing_Cross", proceduralRotationOffset = new Vector3(110f,  0f,   0f) },
+    };
+
+    /// <summary>Which combo step the last attack played — for VFX/audio that want to know.</summary>
+    public int ComboIndex => comboIndex;
+
+    private int comboIndex = -1;
+    private float lastAttackTime = float.NegativeInfinity;
+    private SwordSwing pendingSwing;
+    private bool swingHitResolved = true;
+    private Coroutine pendingHitRoutine;
 
     // ── Sword Visuals (per upgrade level) ────────────────────────────────────
     [Header("Sword Visuals")]
@@ -95,18 +155,104 @@ public class KatanaWeapon : HandheldWeapon
 
     private void Attack()
     {
-        cooldownTimer = IsBulletTimeActive ? bulletTimeAttackCooldown : cooldownTime;
+        SwordSwing swing = AdvanceCombo();
 
-        if (displayWeapon != null)
-            StartCoroutine(SwingRoutine());
+        cooldownTimer = IsBulletTimeActive
+            ? bulletTimeAttackCooldown
+            : (swing != null && swing.cooldownOverride > 0f ? swing.cooldownOverride : cooldownTime);
 
+        PlaySwingAnimation(swing);
+
+        if (cameraTransform == null) return;
+
+        // Arm the hit. A new swing always cancels the previous one's pending hit, so a
+        // short cooldown can never let one press land two hits.
+        if (pendingHitRoutine != null) StopCoroutine(pendingHitRoutine);
+        pendingHitRoutine = null;
+        pendingSwing = swing;
+        swingHitResolved = false;
+
+        // Animation-event mode hands the timing to the clip — OnSwingHit() resolves it.
+        if (useAnimationEventForHit && swordAnimator != null) return;
+
+        float delay = swing != null ? swing.hitDelay : 0f;
+        if (delay <= 0f) ResolveSwingHit();
+        else pendingHitRoutine = StartCoroutine(DelayedHitRoutine(delay));
+    }
+
+    /// <summary>
+    /// Steps the combo forward, or restarts it if the player let the window lapse.
+    /// Returns null when no combo is configured, which keeps the old single-swing path alive.
+    /// </summary>
+    private SwordSwing AdvanceCombo()
+    {
+        if (comboSwings == null || comboSwings.Length == 0)
+        {
+            lastAttackTime = Time.time;
+            return null;
+        }
+
+        // Measured from the last press, per design: quiet for comboResetTime, back to step 1.
+        // Time.time is safe here — bullet time never touches timeScale.
+        if (Time.time - lastAttackTime > comboResetTime) comboIndex = 0;
+        else comboIndex = (comboIndex + 1) % comboSwings.Length;
+
+        lastAttackTime = Time.time;
+        return comboSwings[comboIndex];
+    }
+
+    private void PlaySwingAnimation(SwordSwing swing)
+    {
+        if (swordAnimator != null && swordAnimator.isActiveAndEnabled
+            && swing != null && !string.IsNullOrEmpty(swing.animationStateName))
+        {
+            // Fixed-time cross-fade restarted from 0, so re-triggering the same state
+            // replays it instead of being swallowed as "already playing".
+            swordAnimator.CrossFadeInFixedTime(swing.animationStateName, animationBlendTime, 0, 0f);
+            return;
+        }
+
+        // No animator (or no clip named for this step) — the original procedural swing.
+        if (displayWeapon != null) StartCoroutine(SwingRoutine(swing));
+    }
+
+    private IEnumerator DelayedHitRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        pendingHitRoutine = null;
+        ResolveSwingHit();
+    }
+
+    /// <summary>Called from an Animation Event via <see cref="SwordAnimationEvents"/>.</summary>
+    public void OnSwingHit() => ResolveSwingHit();
+
+    /// <summary>
+    /// Called from an Animation Event via <see cref="SwordAnimationEvents"/>. Optional —
+    /// only needed if the controller has no Exit Time transition back to idle.
+    /// </summary>
+    public void OnSwingEnd()
+    {
+        if (swordAnimator == null || !swordAnimator.isActiveAndEnabled) return;
+        if (string.IsNullOrEmpty(idleStateName)) return;
+        swordAnimator.CrossFadeInFixedTime(idleStateName, animationBlendTime, 0, 0f);
+    }
+
+    /// <summary>The damage/wave application, run once per swing whatever triggered it.</summary>
+    private void ResolveSwingHit()
+    {
+        if (swingHitResolved) return;
+        swingHitResolved = true;
+
+        // A delayed hit can outlive the player's control — e.g. the zone ends and the hub
+        // opens between the press and the contact frame. Drop it rather than land it.
+        if (!CanAct()) return;
         if (cameraTransform == null) return;
 
         if (IsBulletTimeActive)
         {
             // Fire a fast, large bullet-time wave forward
-            Vector3 wavePos = cameraTransform.position + cameraTransform.forward * 0.5f;
-            ObjectPooler.Instance.SpawnFromPool(bulletTimeWavePoolTag, wavePos, cameraTransform.rotation);
+            Vector3 btWavePos = cameraTransform.position + cameraTransform.forward * 0.5f;
+            ObjectPooler.Instance.SpawnFromPool(bulletTimeWavePoolTag, btWavePos, cameraTransform.rotation);
             return;
         }
 
@@ -115,21 +261,28 @@ public class KatanaWeapon : HandheldWeapon
         Vector3 endPoint = cameraTransform.position + cameraTransform.forward * attackRange;
         Collider[] hitColliders = Physics.OverlapCapsule(startPoint, endPoint, attackRadius);
 
+        float multiplier = pendingSwing != null ? pendingSwing.damageMultiplier : 1f;
+        int swingDamage = Mathf.Max(1, Mathf.RoundToInt(damage * multiplier));
+
         foreach (Collider col in hitColliders)
             if (col.TryGetComponent(out IDamageable damageable))
-                damageable.TakeDamage(damage);
+                damageable.TakeDamage(swingDamage);
 
         // Normal wave (Lv2 unlock)
-        if (wavesUnlocked && cameraTransform != null)
+        if (wavesUnlocked)
         {
             Vector3 wavePos = cameraTransform.position + cameraTransform.forward * 0.5f;
             ObjectPooler.Instance.SpawnFromPool(wavePoolTag, wavePos, cameraTransform.rotation);
         }
     }
 
-    private IEnumerator SwingRoutine()
+    private IEnumerator SwingRoutine(SwordSwing swing)
     {
-        targetSwingRotation = initialDisplayRotation * Quaternion.Euler(swingRotationOffset);
+        Vector3 offset = swingRotationOffset;
+        if (swing != null && swing.proceduralRotationOffset != Vector3.zero)
+            offset = swing.proceduralRotationOffset;
+
+        targetSwingRotation = initialDisplayRotation * Quaternion.Euler(offset);
         yield return new WaitForSeconds(swingDuration);
         targetSwingRotation = initialDisplayRotation;
     }
