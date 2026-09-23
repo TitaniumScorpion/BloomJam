@@ -182520,7 +182520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
-  targetQuotas: 0300000004000000050000000600000007000000
+  targetQuotas: 3200000004000000050000000600000007000000
   finalZoneIndex: 4
 --- !u!4 &1600402342
 Transform:
@@ -249758,94 +249758,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ObjectPooler
       objectReference: {fileID: 0}
-    - target: {fileID: 4548802212284547648, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.size
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[6].tag
-      value: SwordWave
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[7].tag
-      value: DasherEnemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[8].tag
-      value: TrailEnemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[9].tag
-      value: TrailSegment
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[0].size
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[10].tag
-      value: BulletTimeSwordWave
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[11].tag
-      value: BulletTimeSwordWave
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[6].size
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[7].size
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[8].size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[9].size
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[10].size
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[11].size
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 9194846395807770034, guid: 515771079cd51924bb1f0aaaf9deba71, type: 3}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[6].prefab
-      value: 
-      objectReference: {fileID: 1679428047145151834, guid: 56347050062e76c48b01abeff1969fc9, type: 3}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[7].prefab
-      value: 
-      objectReference: {fileID: 8687382240258577881, guid: faeb40a2fc50d5742a4ca59c29f726d3, type: 3}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[8].prefab
-      value: 
-      objectReference: {fileID: 7520299409785806000, guid: 922ed9c4a23b52b4d902f43abda15d83, type: 3}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[9].prefab
-      value: 
-      objectReference: {fileID: 3667184909392613680, guid: e02cd48ac065ab24b985dee7b9c84733, type: 3}
-    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[10].prefab
-      value: 
-      objectReference: {fileID: 1679428047145151834, guid: 3e3147fa3ceb3f04fb8aa7be98e536e7, type: 3}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[11].prefab
       value: 
-      objectReference: {fileID: 1679428047145151834, guid: 3e3147fa3ceb3f04fb8aa7be98e536e7, type: 3}
+      objectReference: {fileID: 100002, guid: 4577daf8de78fc54fb9a511466d3019f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -250225,6 +250141,10 @@ PrefabInstance:
     - target: {fileID: 2456856366881023602, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7323496235121137549, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
+      propertyPath: maxHealth
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7429899312607839502, guid: 5cd61a7690a04e14da43b9f134e77386, type: 3}
       propertyPath: attackRange

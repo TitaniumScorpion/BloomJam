@@ -78,7 +78,16 @@ public class Projectile : MonoBehaviour
         if (other.CompareTag("Player")) return;
         // Any enemy or weak point implements IDamageable, so one lookup covers them all
         bool hitEnemy = other.TryGetComponent(out IDamageable damageable);
-        if (hitEnemy) damageable.TakeDamage(damage);
+        if (hitEnemy)
+        {
+            // Sparks MUST be spawned before the damage lands. Swarmers have 1 HP, so TakeDamage
+            // deactivates the enemy and takes its collider out of the physics scene - querying
+            // that collider afterwards cannot resolve, and the burst ends up at world origin.
+            // -transform.forward reverses the direction of travel, so the burst sprays back
+            // toward the player instead of through the enemy.
+            HitSparks.SpawnOnCollider(other, transform.position, -transform.forward);
+            damageable.TakeDamage(damage);
+        }
 
         if (hitEnemy && AudioManager.Instance != null && AudioManager.Instance.hitSound != null)
         {

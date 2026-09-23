@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectPooler
   pools:
   - tag: PlayerProjectile
-    prefab: {fileID: 9194846395807770034, guid: c52197874ba48214ba8ceb9e7474a55f, type: 3}
+    prefab: {fileID: 9194846395807770034, guid: 515771079cd51924bb1f0aaaf9deba71, type: 3}
     size: 100
   - tag: CLassicSwarmEnemy
     prefab: {fileID: 1586300689540924413, guid: fc3be5e240170ab47ac883b30f49d70d, type: 3}
@@ -63,6 +63,21 @@ MonoBehaviour:
   - tag: SpawnTelegraph
     prefab: {fileID: 4230533699123781479, guid: 86e6c7d81766295418601bcd9d9ae6b9, type: 3}
     size: 5
-  - tag: MuzzleFlash
-    prefab: {fileID: 100000, guid: 8eaaa4f553116f44b8459bc24201c514, type: 3}
-    size: 100
+  - tag: SwordWave
+    prefab: {fileID: 1679428047145151834, guid: 56347050062e76c48b01abeff1969fc9, type: 3}
+    size: 10
+  - tag: DasherEnemy
+    prefab: {fileID: 8687382240258577881, guid: faeb40a2fc50d5742a4ca59c29f726d3, type: 3}
+    size: 10
+  - tag: TrailEnemy
+    prefab: {fileID: 7520299409785806000, guid: 922ed9c4a23b52b4d902f43abda15d83, type: 3}
+    size: 6
+  - tag: TrailSegment
+    prefab: {fileID: 3667184909392613680, guid: e02cd48ac065ab24b985dee7b9c84733, type: 3}
+    size: 64
+  - tag: BulletTimeSwordWave
+    prefab: {fileID: 1679428047145151834, guid: 3e3147fa3ceb3f04fb8aa7be98e536e7, type: 3}
+    size: 40
+  - tag: HitSpark
+    prefab: {fileID: 100002, guid: 4577daf8de78fc54fb9a511466d3019f, type: 3}
+    size: 40
