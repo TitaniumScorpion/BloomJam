@@ -128,6 +128,7 @@ public class SpawnerDrone : MonoBehaviour
         destroyedWeakPoints++;
         if (weakPoints.Length > 0 && destroyedWeakPoints >= weakPoints.Length)
         {
+            DeathBlood.Spawn(transform.position);
             EnemyEvents.ReportDeath();
             gameObject.SetActive(false);
         }

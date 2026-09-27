@@ -238,6 +238,7 @@ public class DasherEnemy : MonoBehaviour, IDamageable
 
     public void ForceDie()
     {
+        DeathBlood.Spawn(transform.position);
         EnemyEvents.ReportDeath();
         gameObject.SetActive(false);
     }

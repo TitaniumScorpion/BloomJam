@@ -63,6 +63,7 @@ This also constrains any future hit-stop feature — a `timeScale` dip would col
 ### Adding an enemy type
 1. Implement `IDamageable`, or inherit `FlyingChaserEnemy` (which already does).
 2. Call `EnemyEvents.ReportDeath()` on death — otherwise the zone quota never counts it.
+   Call `DeathBlood.Spawn(transform.position)` next to it for the death spray.
 3. Handle bullet time (above).
 4. Add a pool entry on `ObjectPooler`; `DeactivateAll()` then covers it at zone transitions.
 

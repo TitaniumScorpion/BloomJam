@@ -199,6 +199,7 @@ public class AdvancedEnemy : MonoBehaviour, IDamageable
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
+            DeathBlood.Spawn(transform.position);
             EnemyEvents.ReportDeath(); // Tells the Quota Manager we died
             gameObject.SetActive(false);
         }

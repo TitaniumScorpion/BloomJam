@@ -240,6 +240,7 @@ public abstract class FlyingChaserEnemy : MonoBehaviour, IDamageable
     /// <summary>Kills the enemy immediately, counting toward the zone quota.</summary>
     public virtual void ForceDie()
     {
+        DeathBlood.Spawn(transform.position);
         EnemyEvents.ReportDeath();
         gameObject.SetActive(false);
     }

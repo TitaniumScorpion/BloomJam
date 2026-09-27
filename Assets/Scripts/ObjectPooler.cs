@@ -88,6 +88,11 @@ public class ObjectPooler : MonoBehaviour
 
         GameObject objectToSpawn = poolDictionary[tag].Dequeue();
 
+        // The oldest instance may still be live when the pool wraps. SetActive(true) on an active
+        // object is a no-op that skips OnEnable, so without this the instance would teleport
+        // mid-state instead of restarting - a recycled particle effect would never replay
+        if (objectToSpawn.activeSelf) objectToSpawn.SetActive(false);
+
         objectToSpawn.transform.position = position;
         objectToSpawn.transform.rotation = rotation;
 
