@@ -165,6 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StandardSwarmer
   maxHealth: 2
+  collisionDamage: 1
   moveSpeed: 16.5
   minMoveSpeed: 4
   acceleration: 6
@@ -172,7 +173,6 @@ MonoBehaviour:
   tiltAmount: 30
   pitchWobbleSpeed: 8
   pitchWobbleAmount: 15
-  collisionDamage: 1
   hoverHeight: 1.5
   enemyRenderer: {fileID: 5624140600336542875}
   flashMaterial: {fileID: 2100000, guid: 001da46b96c6a9a4288358ec418ba1d8, type: 2}
