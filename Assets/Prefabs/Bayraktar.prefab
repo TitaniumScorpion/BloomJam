@@ -175,7 +175,7 @@ MonoBehaviour:
   pitchWobbleAmount: 15
   hoverHeight: 1.5
   enemyRenderer: {fileID: 5624140600336542875}
-  flashMaterial: {fileID: 2100000, guid: 001da46b96c6a9a4288358ec418ba1d8, type: 2}
+  flashMaterial: {fileID: 2100000, guid: 1d38fae8f1c6c734f8d9556a37c199fc, type: 2}
   flashDuration: 0.1
 --- !u!136 &6986421432055780164
 CapsuleCollider:
