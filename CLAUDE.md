@@ -28,6 +28,46 @@ real signal rather than noise.
 
 ---
 
+## Play-testing through the Unity MCP
+
+Unity is usually unfocused while Claude works (focus is on the terminal), which shapes all of this.
+
+- **Play mode keeps running unfocused because of `Assets/Editor/PlayModeRunInBackground.cs`.**
+  Player Settings > Run In Background stays **off** for the build; the helper switches it on only
+  for Play mode and restores it afterwards. Don't set `Application.runInBackground` by hand — in the
+  editor it writes straight through to the Player Setting and leaks into the build. The first few
+  seconds after entering Play are slow; after that it runs at full speed.
+- **Stuck at frame 1–2? Check `EditorApplication.isPaused` and the console errors first.** Error
+  Pause is on, so an error logged every frame pauses the game every frame.
+- **Injected input does not reach the game while unfocused.** `InputSystem.QueueStateEvent` on
+  `Mouse.current` / `Keyboard.current` is silently dropped, even with `IgnoreFocus` and
+  `AllDeviceInputAlwaysGoesToGameView`. Drive state instead: set private fields (`fireState`,
+  timers) and invoke private methods (`StartBulletTime`) via reflection, then assert. That tests
+  logic, not feel — hand the input checks to the user.
+- **Never assign a plain `CreateInstance<InputSettings>()` to `InputSystem.settings`.** The project
+  has no settings asset, and the package's default is `HideAndDontSave`. Without that flag the next
+  domain reload destroys it, `InputManager.settings` asserts every frame, and Error Pause freezes
+  Play mode. Recovery: assign a new instance with `hideFlags = HideFlags.HideAndDontSave`, or restart Unity.
+- **Multi-frame scenarios:** schedule steps on `EditorApplication.update` against
+  `EditorApplication.timeSinceStartup` from one `execute_code` call. It survives scene reloads, so
+  `RestartGame()` can be tested inside it — but only statics are safe afterwards; captured component
+  references die with the old scene.
+- **Read results from `SessionState`, not the console.** Plain `Debug.Log` does not come back through
+  `read_console` (errors and warnings do). Append lines to a `SessionState` string, read it later.
+- **Physics without frames:** `Physics.Simulate` under `SimulationMode.Script` steps physics by hand
+  (restore the mode after). That is how the TargetZone bullet bug was proven.
+- **Long test runs die to idle enemies.** Set `PlayerHealth.currentHealth` via reflection first.
+- **`execute_code` compiles as C# 6 (CodeDom).** `Object` is ambiguous — write `UnityEngine.Object`;
+  editor namespaces need full names (`UnityEditor.SceneManagement.EditorSceneManager`).
+- **Check `scene.isDirty` before saving the scene from the MCP.** The user edits alongside; saving
+  would commit their unsaved work too. Leaving Play mode also marks the scene dirty with no real changes.
+- **Play mode dirties assets it shouldn't** — discard these before committing:
+  `Assets/testHDRI.mat` (`GameManager.Update` rotates the shared skybox material and writes
+  `_Rotation` into it), `Assets/Font/PermanentMarker-Regular SDF.asset` (dynamic TMP atlas gains
+  glyphs as text renders), and occasionally `ProjectSettings.asset` (Unity adding new default fields).
+
+---
+
 ## Unity serialization — read before restructuring any script
 
 Unity stores component values by **public field name**, walking the whole inheritance chain.
@@ -87,6 +127,15 @@ state is `static` so it survives scene reloads — reset it via `ResetProgressio
   A feedback loop that ramped in over ~2 s of held fire and then held a steady leftward bias.
   **Any raycast that decides where a shot goes must mask out `PlayerBullet` and
   `EnemyProjectile`** (`AutomaticPistol.aimLayerMask` builds this in `Start`).
+- **Trigger volumes are invisible walls to anything that reacts to "any trigger".** Zones 2–5
+  once had an artillery `TargetZone` — a trigger slab over the whole floor, up to 0.5 m above
+  it — and player bullets deactivated on touching any trigger. The camera sits at the player's
+  centre (~1 m up) and the muzzle 0.27 m below that, so a fresh bullet's 0.5-radius sphere
+  already overlapped the slab and **every level shot died on its first physics step**: the
+  pistol was dead in four zones and compiled cleanly. `Projectile` now skips triggers that
+  aren't `IDamageable`. Any new projectile or trigger-reacting script needs the same filter,
+  and remember casts see these volumes too (`FlyingChaserEnemy`'s floor SphereCast would hover
+  over one).
 - **Pool instances must not collide with each other via `Physics.IgnoreCollision`.** Unity only
   applies an ignore pair to colliders on *active* GameObjects and drops it when they deactivate,
   which pooled objects do constantly. Untick the layer against itself in the collision matrix

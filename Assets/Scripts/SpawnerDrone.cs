@@ -4,6 +4,7 @@ using System.Collections;
 public class SpawnerDrone : MonoBehaviour
 {
     [Header("Orbit")]
+    [Tooltip("Leave empty on the pooled prefab — it then orbits the active zone's EnemySpawner arena centre.")]
     public Transform arenaCenter;
     public float orbitRadius = 18f;
     public float orbitHeight = 5f;
@@ -33,6 +34,10 @@ public class SpawnerDrone : MonoBehaviour
     private float spawnTimer;
     private bool isOrbiting;
 
+    // Pooled drones are activated before anything could assign arenaCenter, so they fall back
+    // to the centre the active zone's EnemySpawner publishes - the same source DasherEnemy uses
+    private Vector3 CenterPosition => arenaCenter != null ? arenaCenter.position : EnemySpawner.CurrentArenaCenter;
+
     private void Awake()
     {
         weakPoints = GetComponentsInChildren<DroneWeakPoint>(true);
@@ -44,7 +49,7 @@ public class SpawnerDrone : MonoBehaviour
         isOrbiting = false;
         spawnTimer = spawnInterval;
 
-        Vector3 center = arenaCenter != null ? arenaCenter.position : Vector3.zero;
+        Vector3 center = CenterPosition;
 
         entryTargetAngle = Random.Range(0f, Mathf.PI * 2f);
         orbitAngle = entryTargetAngle;
@@ -72,7 +77,7 @@ public class SpawnerDrone : MonoBehaviour
     {
         if (KatanaWeapon.IsBulletTimeActive) return;
 
-        Vector3 center = arenaCenter != null ? arenaCenter.position : Vector3.zero;
+        Vector3 center = CenterPosition;
 
         if (!isOrbiting)
         {

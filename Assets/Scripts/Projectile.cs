@@ -78,6 +78,13 @@ public class Projectile : MonoBehaviour
         if (other.CompareTag("Player")) return;
         // Any enemy or weak point implements IDamageable, so one lookup covers them all
         bool hitEnemy = other.TryGetComponent(out IDamageable damageable);
+
+        // A trigger that cannot take damage is a volume, not a surface - fly straight through it.
+        // Zones 2-5 used to carry an artillery TargetZone trigger slab over the whole floor, and a
+        // bullet spawned from a standing player's muzzle already overlaps it, so every level shot
+        // died on its first physics step. Damageable triggers (drone weak points) still count.
+        if (!hitEnemy && other.isTrigger) return;
+
         if (hitEnemy)
         {
             // Sparks MUST be spawned before the damage lands. Swarmers have 1 HP, so TakeDamage

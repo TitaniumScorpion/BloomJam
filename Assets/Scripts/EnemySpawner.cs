@@ -8,7 +8,8 @@ public class EnemySpawner : MonoBehaviour
     public static float CurrentSpawnRadius;
 
     [Header("Spawner Drone")]
-    public SpawnerDrone dronePrefab;
+    [Tooltip("ObjectPooler tag for this zone's drone. Empty = no drones in this zone.")]
+    public string dronePoolTag = "SpawnerDrone";
     [Tooltip("Empty Transform at the arena center — drone orbits this point")]
     public Transform arenaCenter;
     [Tooltip("Seconds between each new drone entering the arena")]
@@ -37,6 +38,12 @@ public class EnemySpawner : MonoBehaviour
 
     private void OnEnable()
     {
+        // Zones are switched on by GameManager's zone transition, after the run has started.
+        // Any earlier enable must not spawn: Zone1 is saved active, so it fires once at scene
+        // load - before GameManager.Start switches every zone off, and before the ObjectPooler
+        // has necessarily built its pools.
+        if (!GameManager.HasGameStarted) return;
+
         isSpawningActive = true;
         droneSpawnTimer = 0f; // first drone appears immediately
         dasherSpawnTimer = dasherSpawnInterval;
@@ -116,12 +123,14 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnDrone()
     {
-        if (!isSpawningActive || dronePrefab == null) return;
+        if (!isSpawningActive || string.IsNullOrEmpty(dronePoolTag)) return;
 
-        SpawnerDrone drone = Instantiate(dronePrefab);
-        drone.arenaCenter = arenaCenter != null ? arenaCenter : transform;
-        spawnedDrones.Add(drone);
-        drone.gameObject.SetActive(true);
+        // The drone places itself on its entry path around CurrentArenaCenter in OnEnable, so
+        // the position passed here is only a placeholder. A wrapped pool hands back a drone this
+        // spawner already tracks - hence the Contains check, which keeps the maxDrones count honest.
+        GameObject obj = ObjectPooler.Instance.SpawnFromPool(dronePoolTag, CurrentArenaCenter, Quaternion.identity);
+        if (obj != null && obj.TryGetComponent(out SpawnerDrone drone) && !spawnedDrones.Contains(drone))
+            spawnedDrones.Add(drone);
     }
 
     private void StopSpawning()

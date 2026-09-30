@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59dd7b307c5ee46a2291819f84ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  dronePrefab: {fileID: 7310990627363050863, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+  dronePoolTag: SpawnerDrone
   arenaCenter: {fileID: 253881225}
   droneSpawnInterval: 10
   maxDrones: 0
@@ -171,7 +171,7 @@ MonoBehaviour:
   dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
-  maxAdvancedEnemiesToSpawn: 6
+  maxAdvancedEnemiesToSpawn: 0
   advancedSpawnPoints:
   - {fileID: 1302133588}
   - {fileID: 144724885}
@@ -14841,7 +14841,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59dd7b307c5ee46a2291819f84ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  dronePrefab: {fileID: 7310990627363050863, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+  dronePoolTag: SpawnerDrone
   arenaCenter: {fileID: 915526828}
   droneSpawnInterval: 10
   maxDrones: 0
@@ -14849,7 +14849,7 @@ MonoBehaviour:
   dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
-  maxAdvancedEnemiesToSpawn: 6
+  maxAdvancedEnemiesToSpawn: 0
   advancedSpawnPoints:
   - {fileID: 842779865}
   - {fileID: 1932308624}
@@ -15713,7 +15713,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &128236082
 Transform:
   m_ObjectHideFlags: 0
@@ -32809,6 +32809,145 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266844533}
+  m_CullTransparentMesh: 1
+--- !u!1 &266996630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 266996631}
+  - component: {fileID: 266996633}
+  - component: {fileID: 266996632}
+  m_Layer: 5
+  m_Name: NoUpgradeMessage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &266996631
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266996630}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1700527493}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 500, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &266996632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266996630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 'NO UPGRADE AVAILABLE
+
+    <size=24>Clear a zone to earn your next upgrade.</size>'
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: 0
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &266996633
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266996630}
   m_CullTransparentMesh: 1
 --- !u!1001 &267133079
 PrefabInstance:
@@ -81041,7 +81180,7 @@ MonoBehaviour:
   swordUpgradeDescription: {fileID: 551408682}
   pistolUpgradeButton: {fileID: 1875894014}
   swordUpgradeButton: {fileID: 1220225561}
-  noUpgradeAvailableMessage: {fileID: 0}
+  noUpgradeAvailableMessage: {fileID: 266996630}
   pistol: {fileID: 7735761706090348628}
   katana: {fileID: 7735761706090348627}
   leftPanelIndex: 1
@@ -112996,7 +113135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &998154680
 Transform:
   m_ObjectHideFlags: 0
@@ -120118,7 +120257,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1056107571
 Transform:
   m_ObjectHideFlags: 0
@@ -148568,7 +148707,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1297894066
 Transform:
   m_ObjectHideFlags: 0
@@ -162201,7 +162340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59dd7b307c5ee46a2291819f84ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  dronePrefab: {fileID: 7310990627363050863, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+  dronePoolTag: SpawnerDrone
   arenaCenter: {fileID: 741174423}
   droneSpawnInterval: 10
   maxDrones: 0
@@ -162209,7 +162348,7 @@ MonoBehaviour:
   dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
-  maxAdvancedEnemiesToSpawn: 4
+  maxAdvancedEnemiesToSpawn: 0
   advancedSpawnPoints:
   - {fileID: 1269443917}
   - {fileID: 537519771}
@@ -175026,7 +175165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59dd7b307c5ee46a2291819f84ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  dronePrefab: {fileID: 7310990627363050863, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+  dronePoolTag: SpawnerDrone
   arenaCenter: {fileID: 1929630348}
   droneSpawnInterval: 10
   maxDrones: 0
@@ -175034,7 +175173,7 @@ MonoBehaviour:
   dasherSpawnInterval: 8
   advancedEnemyPoolTag: AdvancedEnemy
   advancedSpawnInterval: 20
-  maxAdvancedEnemiesToSpawn: 6
+  maxAdvancedEnemiesToSpawn: 0
   advancedSpawnPoints:
   - {fileID: 78886565}
   - {fileID: 970178478}
@@ -182719,7 +182858,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0be66bec1b9f1554eb18be30c772c839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuotaManager
-  targetQuotas: 3200000004000000050000000600000007000000
+  targetQuotas: 0200000004000000050000000600000007000000
   finalZoneIndex: 4
 --- !u!4 &1600402342
 Transform:
@@ -194863,6 +195002,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1644893416}
+  - {fileID: 266996631}
   m_Father: {fileID: 889656867}
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -221000,7 +221140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59dd7b307c5ee46a2291819f84ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  dronePrefab: {fileID: 7310990627363050863, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+  dronePoolTag: SpawnerDrone
   arenaCenter: {fileID: 346145077}
   droneSpawnInterval: 18
   maxDrones: 0
@@ -249682,20 +249822,140 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.size
-      value: 13
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[1].tag
+      value: StandardSwarmer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[2].tag
+      value: EnemyProjectile
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[3].tag
+      value: SwordWave
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[4].tag
+      value: DasherEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[5].tag
+      value: TrailEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[6].tag
+      value: TrailSegment
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[7].tag
+      value: BulletTimeSwordWave
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[8].tag
+      value: HitSpark
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[9].tag
+      value: DeathBlood
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[10].tag
+      value: SpawnerDrone
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].tag
+      value: DeathBlood
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[12].tag
       value: DeathBlood
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[2].size
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[3].size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[4].size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[5].size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[6].size
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[7].size
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[8].size
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[9].size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[10].size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[12].size
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
-      propertyPath: pools.Array.data[11].prefab
+      propertyPath: pools.Array.data[2].prefab
+      value: 
+      objectReference: {fileID: 7979081138352257746, guid: fe9ae774800fb274a81c3648df6c58f9, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[3].prefab
+      value: 
+      objectReference: {fileID: 1679428047145151834, guid: 56347050062e76c48b01abeff1969fc9, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[4].prefab
+      value: 
+      objectReference: {fileID: 8687382240258577881, guid: faeb40a2fc50d5742a4ca59c29f726d3, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[5].prefab
+      value: 
+      objectReference: {fileID: 7520299409785806000, guid: 922ed9c4a23b52b4d902f43abda15d83, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[6].prefab
+      value: 
+      objectReference: {fileID: 3667184909392613680, guid: e02cd48ac065ab24b985dee7b9c84733, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[7].prefab
+      value: 
+      objectReference: {fileID: 1679428047145151834, guid: 3e3147fa3ceb3f04fb8aa7be98e536e7, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[8].prefab
       value: 
       objectReference: {fileID: 5865697011022027503, guid: c826188f081bb8d4a8a37835495d5f44, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[9].prefab
+      value: 
+      objectReference: {fileID: 9067125747552507852, guid: 1255e6b0c16153147be3836922ddf1b3, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[10].prefab
+      value: 
+      objectReference: {fileID: 618732689242264005, guid: c77913d01b9993c4bb55d392688ca89f, type: 3}
+    - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
+      propertyPath: pools.Array.data[11].prefab
+      value: 
+      objectReference: {fileID: 9067125747552507852, guid: 1255e6b0c16153147be3836922ddf1b3, type: 3}
     - target: {fileID: 8715854762395241382, guid: ed267c3100861204e9c75a6aac828b9a, type: 3}
       propertyPath: pools.Array.data[12].prefab
       value: 

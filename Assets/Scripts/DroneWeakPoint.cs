@@ -42,8 +42,27 @@ public class DroneWeakPoint : MonoBehaviour, IDamageable
             originalEmissionColor2 = instanceMaterial2.GetColor(emissionColorID);
             instanceMaterial2.EnableKeyword("_EMISSION");
         }
+    }
 
+    // Drones are pooled, so a weak point destroyed in one life would come back dark, at 0 HP
+    // and with its colliders off - an unkillable drone. Undo everything Deactivate() changed.
+    private void OnEnable()
+    {
         currentHealth = maxHealth;
+
+        foreach (Collider col in GetComponents<Collider>())
+            col.enabled = true;
+
+        if (instanceMaterial != null)
+        {
+            instanceMaterial.EnableKeyword("_EMISSION");
+            instanceMaterial.SetColor(emissionColorID, originalEmissionColor);
+        }
+        if (instanceMaterial2 != null)
+        {
+            instanceMaterial2.EnableKeyword("_EMISSION");
+            instanceMaterial2.SetColor(emissionColorID, originalEmissionColor2);
+        }
     }
 
     private void OnDestroy()

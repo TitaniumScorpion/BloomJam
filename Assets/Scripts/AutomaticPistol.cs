@@ -152,7 +152,15 @@ public class AutomaticPistol : HandheldWeapon
 
     private void Update()
     {
-        if (!CanAct()) return;
+        if (!CanAct())
+        {
+            // Input goes unread while control is gone (bullet time, hub, countdown), so a button
+            // release in that window is never seen - the state machine would resume NormalFire and
+            // keep shooting with the button up, and a charge would leave its beam hanging on screen.
+            // Drop whatever was in progress; a fresh click starts firing again.
+            if (fireState != FireState.Idle) CancelCharge();
+            return;
+        }
 
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
         currentRecoilEuler = Vector3.Lerp(currentRecoilEuler, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);

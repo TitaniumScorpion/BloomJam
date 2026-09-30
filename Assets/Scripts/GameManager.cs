@@ -217,6 +217,11 @@ public class GameManager : MonoBehaviour
             if (cg != null) cg.alpha = 1f;
         }
 
+        // Clean up anything left from the hub or previous zone. Must run BEFORE the zone is
+        // enabled: its EnemySpawner spawns the first pooled drone in OnEnable, and clearing the
+        // pools afterwards would switch that drone straight back off.
+        if (ObjectPooler.Instance != null) ObjectPooler.Instance.DeactivateAll();
+
         // Enable current zone, disable others
         for (int i = 0; i < zones.Length; i++)
             if (zones[i] != null) zones[i].SetActive(i == QuotaManager.currentZoneIndex);
@@ -228,9 +233,6 @@ public class GameManager : MonoBehaviour
         // Reset kills for this zone. Cached after the first lookup — this runs every transition.
         if (quotaManager == null) quotaManager = FindFirstObjectByType<QuotaManager>();
         if (quotaManager != null) quotaManager.StartNextZone();
-
-        // Clean up anything left from the hub or previous zone
-        if (ObjectPooler.Instance != null) ObjectPooler.Instance.DeactivateAll();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

@@ -123,6 +123,18 @@ public class KatanaWeapon : HandheldWeapon
     private RectTransform bulletTimeBarFill;
     private Image bulletTimeBarFillImage;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // Bullet-time state is static, so it outlives the scene. Dying mid-bullet-time never
+        // reaches EndBulletTime (Update stops once the death screen sets timeScale to 0), and
+        // RestartGame's reload would then start the next run with every enemy frozen and the
+        // pistol locked out - with no way to end it, since the fresh katana hasn't unlocked it.
+        IsBulletTimeActive = false;
+        pendingBulletTimeDeaths.Clear();
+    }
+
     protected override void Start()
     {
         if (cameraTransform == null && Camera.main != null)
