@@ -47,6 +47,10 @@ public class DasherEnemy : MonoBehaviour, IDamageable
     private Coroutine flashCoroutine;
     private bool markedForBulletTimeDeath;
 
+    //YILMAZ THE KOD MAESTER WAS HERE
+    public Transform wheel;
+    public float wheelRotationSpeed;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -93,10 +97,14 @@ public class DasherEnemy : MonoBehaviour, IDamageable
 
     private void Update()
     {
+
         if (KatanaWeapon.IsBulletTimeActive) return;
         if (playerTransform == null) return;
 
         float distToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        //YILMAZ THE KOD MAESTER WAS HERE
+        wheel.rotation *= Quaternion.Euler(rb.linearVelocity.magnitude * Time.deltaTime * -wheelRotationSpeed, 0, 0);
 
         switch (state)
         {
